@@ -1,0 +1,6 @@
+PIXI.Sprite:
+    * position.set(x, y)
+    * scale.set(x, y) 
+    * width|height = INT
+    * rotation = FLOAT
+    * anchor.set(x, y)

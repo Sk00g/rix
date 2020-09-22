@@ -1,0 +1,25 @@
+{
+    "name": "rix",
+    "version": "1.0.0",
+    "description": "",
+    "private": true,
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "pixi.js": "^5.3.3",
+        "pixi.js-keyboard": "^1.0.9",
+        "pixi.js-mouse": "^1.0.4",
+        "webpack": "^4.44.2",
+        "webpack-cli": "^3.3.12"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.4"
+    },
+    "scripts": {
+        "start": "npx webpack && nodemon index.js",
+        "watch": "webpack --watch",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Scott Kemperman",
+    "license": "ISC"
+}
