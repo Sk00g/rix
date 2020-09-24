@@ -2,11 +2,12 @@ import * as PIXI from "pixi.js";
 import SUIE from "./sengine/suie/suie.js";
 import utils from "./sengine/utils.js";
 import UnitAvatar from "./sengine/unitAvatar.js";
-const Keyboard = require("pixi.js-keyboard");
+import Keyboard from "pixi.js-keyboard";
+import Mouse from "pixi.js-mouse";
 
 const loader = PIXI.Loader.shared;
 
-let unit, enemy, panel, panel2;
+let unit, enemy, panel;
 
 PIXI.utils.sayHello("WebGL");
 PIXI.settings.RESOLUTION = 1.5;
@@ -38,12 +39,12 @@ loader.add(imagePaths).load(() => {
         SUIE.PanelColor.ORANGE
     );
     panel.addMember(new SUIE.Label("Hello scott", [15, 10]));
-    panel2 = new SUIE.Panel(
-        new PIXI.Rectangle(300, 50, 100, 100),
-        SUIE.PanelSize.LARGE,
-        SUIE.PanelColor.BLUE
-    );
-    // panel.addMember(new SUIE.TextButton("login", [20, 20], [60, 20]));
+    panel.addMember(new SUIE.TextButton("log", [20, 20], () => console.warn("booyah!")));
+    panel.addMember(new SUIE.TextButton("logi", [20, 40]));
+    panel.addMember(new SUIE.TextButton("login", [20, 60]));
+    panel.addMember(new SUIE.TextButton("logine", [20, 80]));
+    panel.addMember(new SUIE.TextButton("loginr", [20, 100]));
+    panel.addMember(new SUIE.TextButton("loginrest", [20, 120]));
 
     /* 
     app.stage.addChild(new SUIE.Panel(
@@ -82,7 +83,6 @@ loader.add(imagePaths).load(() => {
     app.stage.addChild(unit.sprite);
     app.stage.addChild(enemy.sprite);
     app.stage.addChild(panel);
-    app.stage.addChild(panel2);
 
     app.ticker.add(gameLoop);
 });
@@ -93,4 +93,5 @@ function gameLoop(delta) {
     // panel.update(delta);
 
     Keyboard.update();
+    Mouse.update();
 }

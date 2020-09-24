@@ -1,0 +1,15 @@
+{
+    "maxPlayers": 4,
+    "tileSize": [20, 20],
+    "regions": [
+        {
+            "continent": "Southeast Japan",
+            "hasCastle": false,
+            "hasVillage": false,
+            "polygon": [
+                [25, 432],
+                [26, 462]
+            ]
+        }
+    ]
+}

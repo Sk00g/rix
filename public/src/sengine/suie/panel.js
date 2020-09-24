@@ -1,10 +1,9 @@
 import * as PIXI from "pixi.js";
-import enums from "./enums";
+import core from "./core";
 
-const SOURCE_PATH = "graphics/ui/source/source.png";
 const BORDER_FRAMES = {
-    [enums.PanelSize.LARGE]: {
-        [enums.PanelColor.BLUE]: {
+    [core.PanelSize.LARGE]: {
+        [core.PanelColor.BLUE]: {
             tl: [384, 96, 16, 16],
             t: [407, 96, 16, 16],
             tr: [432, 96, 16, 16],
@@ -14,7 +13,7 @@ const BORDER_FRAMES = {
             bl: [384, 160, 16, 16],
             l: [384, 121, 16, 16],
         },
-        [enums.PanelColor.ORANGE]: {
+        [core.PanelColor.ORANGE]: {
             tl: [320, 96, 16, 16],
             t: [339, 96, 16, 16],
             tr: [368, 96, 16, 16],
@@ -25,13 +24,13 @@ const BORDER_FRAMES = {
             l: [320, 127, 16, 16],
         },
     },
-    [enums.PanelSize.SMALL]: {
-        [enums.PanelColor.BLUE]: {
+    [core.PanelSize.SMALL]: {
+        [core.PanelColor.BLUE]: {
             l: [368, 32, 8, 16],
             m: [381, 32, 8, 16],
             r: [392, 32, 8, 16],
         },
-        [enums.PanelColor.ORANGE]: {
+        [core.PanelColor.ORANGE]: {
             l: [240, 32, 8, 16],
             m: [252, 32, 8, 16],
             r: [264, 32, 8, 16],
@@ -39,24 +38,21 @@ const BORDER_FRAMES = {
     },
 };
 const BACKGROUND_COLOR = {
-    [enums.PanelColor.BLUE]: 0x417291,
-    [enums.PanelColor.ORANGE]: 0xd36b41,
+    [core.PanelColor.BLUE]: 0x417291,
+    [core.PanelColor.ORANGE]: 0xd36b41,
 };
 const RAW_BORDER_WIDTH = {
-    [enums.PanelSize.LARGE]: 16,
-    [enums.PanelSize.SMALL]: 8,
+    [core.PanelSize.LARGE]: 16,
+    [core.PanelSize.SMALL]: 8,
 };
 const RAW_BORDER_HEIGHT = {
-    [enums.PanelSize.LARGE]: 16,
-    [enums.PanelSize.SMALL]: 8,
+    [core.PanelSize.LARGE]: 16,
+    [core.PanelSize.SMALL]: 8,
 };
 
 class Panel extends PIXI.Container {
-    constructor(rect, panelSize = enums.PanelSize.LARGE, panelColor = enums.PanelColor.BLUE) {
+    constructor(rect, panelSize = core.PanelSize.LARGE, panelColor = core.PanelColor.BLUE) {
         super();
-
-        console.log(panelSize);
-        console.log(panelColor);
 
         this.position.set(rect.x, rect.y);
         this._size = [rect.width, rect.height];
@@ -75,7 +71,7 @@ class Panel extends PIXI.Container {
 
     _getBorderSprite(border) {
         let texture = new PIXI.Texture(
-            PIXI.BaseTexture.from(SOURCE_PATH),
+            PIXI.BaseTexture.from(core.SOURCE_PATH),
             new PIXI.Rectangle(...BORDER_FRAMES[this._panelSize][this._color][border])
         );
         let sprite = new PIXI.Sprite(texture);
