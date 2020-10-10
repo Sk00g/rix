@@ -43713,6 +43713,9 @@ loader.add(imagePaths).load(() => {
             case "KeyA":
                 testMap.updateTileIndex(4, 4, 3, 3);
                 break;
+            case "KeyB":
+                testMap.updateTileIndex(3, 3, 4, 4);
+                break;
         }
     });
 
