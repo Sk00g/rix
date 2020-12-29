@@ -1,15 +1,44 @@
 {
     "maxPlayers": 4,
-    "tileSize": [20, 20],
+    "tilesetPath": "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
+    "tileMapSize": [40, 20],
+    "tileSize": [16, 16],
     "regions": [
         {
             "continent": "Southeast Japan",
+            "name": "SJ-1",
             "hasCastle": false,
             "hasVillage": false,
-            "polygon": [
-                [25, 432],
-                [26, 462]
-            ]
+            "position": [50, 50],
+            "path": [0, 0, 100, 0, 100, 100, 0, 100],
+            "centerPoint": [50, 50]
+        },
+        {
+            "continent": "Southeast Japan",
+            "name": "SJ-2",
+            "hasCastle": false,
+            "hasVillage": false,
+            "position": [160, 50],
+            "path": [0, 0, 100, 0, 100, 100, 0, 100],
+            "centerPoint": [50, 50]
+        },
+        {
+            "continent": "Southeast Japan",
+            "name": "SJ-3",
+            "hasCastle": false,
+            "hasVillage": false,
+            "position": [160, 160],
+            "path": [0, 0, 100, 0, 100, 100, 0, 100],
+            "centerPoint": [50, 50]
+        },
+        {
+            "continent": "Southeast Japan",
+            "name": "SJ-4",
+            "hasCastle": false,
+            "hasVillage": false,
+            "position": [50, 160],
+            "path": [0, 0, 100, 0, 100, 100, 0, 100],
+            "centerPoint": [50, 50]
         }
     ]
 }

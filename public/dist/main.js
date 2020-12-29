@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -819,7 +819,7 @@ var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
 var earcut = __webpack_require__(8);
 var earcut_default = /*#__PURE__*/__webpack_require__.n(earcut);
 
-// EXTERNAL MODULE: ./node_modules/url/url.js
+// EXTERNAL MODULE: D:/Dev/games/Rix/node_modules/url/url.js
 var url_url = __webpack_require__(4);
 var url_default = /*#__PURE__*/__webpack_require__.n(url_url);
 
@@ -21060,7 +21060,7 @@ var extract_es_Extract = /** @class */ (function () {
 //# sourceMappingURL=extract.es.js.map
 
 // EXTERNAL MODULE: ./node_modules/parse-uri/index.js
-var parse_uri = __webpack_require__(5);
+var parse_uri = __webpack_require__(6);
 var parse_uri_default = /*#__PURE__*/__webpack_require__.n(parse_uri);
 
 // EXTERNAL MODULE: ./node_modules/mini-signals/lib/mini-signals.js
@@ -39318,29 +39318,9 @@ module.exports = mouse;
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
+/***/ (function(module) {
 
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
+module.exports = JSON.parse("{\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[40,20],\"tileSize\":[16,16],\"regions\":[{\"continent\":\"Southeast Japan\",\"name\":\"SJ-1\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[50,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"continent\":\"Southeast Japan\",\"name\":\"SJ-2\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[160,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"continent\":\"Southeast Japan\",\"name\":\"SJ-3\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[160,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"continent\":\"Southeast Japan\",\"name\":\"SJ-4\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[50,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]}]}");
 
 /***/ }),
 /* 4 */
@@ -39370,8 +39350,8 @@ module.exports = g;
 
 
 
-var punycode = __webpack_require__(15);
-var util = __webpack_require__(17);
+var punycode = __webpack_require__(16);
+var util = __webpack_require__(19);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -39446,7 +39426,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(18);
+    querystring = __webpack_require__(20);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -40083,6 +40063,32 @@ Url.prototype.parseHost = function() {
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40135,120 +40141,6 @@ function parseURI (str, opts) {
 }
 
 module.exports = parseURI
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(9);
-
-class Keyboard {
-	constructor() {
-		this.keyStates = new Map();
-    this.events = new Events();
-	}
-  
-  clear() {
-    this.keyStates.clear();
-  }
-  
-  update() {
-    this.keyStates.forEach((value, keyCode) => {
-      const event = this.keyStates.get(keyCode);
-
-      event.alreadyPressed = true;
-      
-      if (event.wasReleased) {
-        this.keyStates.delete(keyCode);
-      }
-
-      keyboard.events.call('down', keyCode, event);
-      keyboard.events.call('down_' + keyCode, keyCode, event);
-    });
-  }
-  
-  isKeyDown(...args) {
-    let result = false;
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased)
-        result = true;
-    }
-    
-    return result;
-  }
-  
-  isKeyUp(...args) {
-    return !this.isKeyDown(args);
-  }
-  
-  isKeyPressed(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased && !event.alreadyPressed)
-        result = true;
-    }
-
-    return result;
-  }
-  
-  isKeyReleased(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && event.wasReleased)
-        result = true;
-    }
-
-    return result;
-  }
-}
-
-const keyboard = new Keyboard();
-
-window.addEventListener(
-  "keydown", (event) => {
-    if (!keyboard.keyStates.get(event.code)) {
-      keyboard.keyStates.set(event.code, event);
-      keyboard.events.call('pressed', event.code, event);
-      keyboard.events.call('pressed_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-window.addEventListener(
-  "keyup", (event) => {
-    event = keyboard.keyStates.get(event.code);
-    if (event) {
-      //keyboard.keyStates.set(event.code, event);
-      event.wasReleased = true;
-      keyboard.events.call('released', event.code, event);
-      keyboard.events.call('released_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-/*keyboard.events.on('pressed', null, (keyCode, event) => {
-  console.log('dd', keyCode);
-});*/
-/*
-setInterval(() => {
-  console.log(keyboard.isKeyReleased('KeyA'));
-  keyboard.update();
-}, 0);*/
-
-module.exports = keyboard;
 
 
 /***/ }),
@@ -41284,7 +41176,7 @@ earcut.flatten = function (data) {
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const Events = __webpack_require__(21);
+const Events = __webpack_require__(23);
 
 module.exports = Events;
 
@@ -41636,7 +41528,7 @@ Promise.reject = function(reason){
 
 })(typeof window != 'undefined' ? window : typeof global != 'undefined' ? global : typeof self != 'undefined' ? self : this);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(12).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(13).setImmediate))
 
 /***/ }),
 /* 11 */
@@ -41739,6 +41631,120 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
+const PIXI = __webpack_require__(0);
+const Events = __webpack_require__(9);
+
+class Keyboard {
+	constructor() {
+		this.keyStates = new Map();
+    this.events = new Events();
+	}
+  
+  clear() {
+    this.keyStates.clear();
+  }
+  
+  update() {
+    this.keyStates.forEach((value, keyCode) => {
+      const event = this.keyStates.get(keyCode);
+
+      event.alreadyPressed = true;
+      
+      if (event.wasReleased) {
+        this.keyStates.delete(keyCode);
+      }
+
+      keyboard.events.call('down', keyCode, event);
+      keyboard.events.call('down_' + keyCode, keyCode, event);
+    });
+  }
+  
+  isKeyDown(...args) {
+    let result = false;
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased)
+        result = true;
+    }
+    
+    return result;
+  }
+  
+  isKeyUp(...args) {
+    return !this.isKeyDown(args);
+  }
+  
+  isKeyPressed(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased && !event.alreadyPressed)
+        result = true;
+    }
+
+    return result;
+  }
+  
+  isKeyReleased(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && event.wasReleased)
+        result = true;
+    }
+
+    return result;
+  }
+}
+
+const keyboard = new Keyboard();
+
+window.addEventListener(
+  "keydown", (event) => {
+    if (!keyboard.keyStates.get(event.code)) {
+      keyboard.keyStates.set(event.code, event);
+      keyboard.events.call('pressed', event.code, event);
+      keyboard.events.call('pressed_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+window.addEventListener(
+  "keyup", (event) => {
+    event = keyboard.keyStates.get(event.code);
+    if (event) {
+      //keyboard.keyStates.set(event.code, event);
+      event.wasReleased = true;
+      keyboard.events.call('released', event.code, event);
+      keyboard.events.call('released_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+/*keyboard.events.on('pressed', null, (keyCode, event) => {
+  console.log('dd', keyCode);
+});*/
+/*
+setInterval(() => {
+  console.log(keyboard.isKeyReleased('KeyA'));
+  keyboard.update();
+}, 0);*/
+
+module.exports = keyboard;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
             (typeof self !== "undefined" && self) ||
             window;
@@ -41792,7 +41798,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(13);
+__webpack_require__(14);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -41803,10 +41809,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -41996,10 +42002,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(15)))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -42189,7 +42195,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -42712,10 +42718,10 @@ process.umask = function() { return 0; };
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(16)(module), __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(17)(module), __webpack_require__(18)))
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -42743,7 +42749,33 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42766,18 +42798,18 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(19);
-exports.encode = exports.stringify = __webpack_require__(20);
+exports.decode = exports.parse = __webpack_require__(21);
+exports.encode = exports.stringify = __webpack_require__(22);
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42868,7 +42900,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42960,11 +42992,11 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //const format = require("string-format");
-const Resolver = __webpack_require__(22);
+const Resolver = __webpack_require__(24);
 
 class EventElement {
 	constructor(subEventName, isAsync, funct) {
@@ -43201,7 +43233,7 @@ module.exports = Events;
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 class Resolver {
@@ -43293,7 +43325,7 @@ class Resolver {
 module.exports = Resolver;
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43628,7 +43660,7 @@ const AnimationType = Object.freeze({
 });
 
 // EXTERNAL MODULE: ./node_modules/pixi.js-keyboard/index.js
-var pixi_js_keyboard = __webpack_require__(6);
+var pixi_js_keyboard = __webpack_require__(12);
 var pixi_js_keyboard_default = /*#__PURE__*/__webpack_require__.n(pixi_js_keyboard);
 
 // CONCATENATED MODULE: ./public/src/tilemap.js
@@ -43678,7 +43710,243 @@ class tilemap_TileMap {
 
 /* harmony default export */ var tilemap = (tilemap_TileMap);
 
+// CONCATENATED MODULE: ./public/src/regionLayer.js
+
+
+/*
+{
+    "continent": "Southeast Japan",
+    "hasCastle": false,
+    "hasVillage": false,
+    "polygon": [
+        [25, 432],
+        [26, 462]
+    ]
+}
+*/
+
+const LINE_FILL = [1, 0x00ff00, 1]; // width, color, alpha
+const REGION_COLOR = 0xff0000;
+const REGION_ALPHA = 0.1;
+
+class regionLayer_RegionLayer {
+    constructor(stage, regionData) {
+        this._regionData = regionData;
+
+        for (let region of regionData) {
+            let shape = new pixi_es["Graphics"]();
+
+            shape.lineStyle(LINE_FILL[0], LINE_FILL[1], LINE_FILL[2]);
+            shape.beginFill(REGION_COLOR, REGION_ALPHA);
+            shape.drawPolygon(region.path);
+            shape.endFill();
+
+            shape.position.set(region.position[0], region.position[1]);
+
+            stage.addChild(shape);
+        }
+    }
+
+    getRegionCenter(regionName) {
+        let match = this._regionData.find((reg) => reg.name === regionName);
+        if (!match) throw new Error("YOU SUCK!");
+        return [match.position[0] + match.centerPoint[0], match.position[1] + match.centerPoint[1]];
+    }
+}
+
+/* harmony default export */ var src_regionLayer = (regionLayer_RegionLayer);
+
+// CONCATENATED MODULE: ./public/src/sengine/unitAvatar.js
+
+
+
+const ANIM_INTERVAL = 11.5;
+const SCALE = 1.0;
+const COUNTER_SCALE = 1.5;
+const COUNTER_PATH = "graphics/ui/source/16x16/Set1/Set1-1.png";
+
+/*
+This class is coupled tightly to FinalBossBlue's free character (overworld) tilesheet assets that 
+Go in order of down, left, right, up, with the resting or 'stand' animation in the middle
+*/
+
+class unitAvatar_UnitAvatar {
+    constructor(stage, path, startRect = new pixi_es["Rectangle"](0, 2, 26, 36)) {
+        // Copy texture so we can change frame only for this unit
+        this._texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
+
+        // Default start frame is facing down stand
+        this._direction = "down";
+        this._currentFrame = 1;
+
+        // Keep track of active animation properties
+        this._animating = false;
+        this._looping = false;
+        this._animationElapsed = 0;
+
+        // Walk animation properties
+        this._targetPosition = null;
+
+        let x = startRect.x;
+        let y = startRect.y;
+        this.width = startRect.width;
+        this.height = startRect.height;
+
+        this._frames = {
+            down: [
+                new pixi_es["Rectangle"](x, y, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width, y, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width * 2, y, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width, y, this.width, this.height),
+            ],
+            left: [
+                new pixi_es["Rectangle"](x, y + this.height, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width, y + this.height, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width * 2, y + this.height, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width, y + this.height, this.width, this.height),
+            ],
+            right: [
+                new pixi_es["Rectangle"](x, y + this.height * 2, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width, y + this.height * 2, this.width, this.height),
+                new pixi_es["Rectangle"](
+                    x + this.width * 2,
+                    y + this.height * 2,
+                    this.width,
+                    this.height
+                ),
+                new pixi_es["Rectangle"](x + this.width, y + this.height * 2, this.width, this.height),
+            ],
+            up: [
+                new pixi_es["Rectangle"](x, y + this.height * 3, this.width, this.height),
+                new pixi_es["Rectangle"](x + this.width, y + this.height * 3, this.width, this.height),
+                new pixi_es["Rectangle"](
+                    x + this.width * 2,
+                    y + this.height * 3,
+                    this.width,
+                    this.height
+                ),
+                new pixi_es["Rectangle"](x + this.width, y + this.height * 3, this.width, this.height),
+            ],
+        };
+
+        this._texture.frame = this._frames[this._direction][this._currentFrame];
+
+        // Publicly accessible sprite
+        this.sprite = new pixi_es["Sprite"](this._texture);
+        this.sprite.scale.set(SCALE, SCALE);
+
+        // Create the amount counter
+        let counterTexture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(COUNTER_PATH));
+        this._counterSprite = new pixi_es["Sprite"](counterTexture);
+        this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
+        this._counterLabel = new label(Math.floor(Math.random() * 6), [0, 0], 8, "#ffffff");
+
+        stage.addChild(this.sprite);
+        stage.addChild(this._counterSprite);
+        stage.addChild(this._counterLabel);
+    }
+
+    playWalkAnimation(loop = true) {
+        this._animating = true;
+        this._looping = loop;
+        this._animationElapsed = 0;
+
+        // First frame of walk animation is always 0
+        this._currentFrame = 0;
+    }
+
+    stopAnimation() {
+        this._animating = false;
+        this._looping = false;
+        this._currentFrame = 1;
+    }
+
+    facePoint(point) {
+        let diffX = point[0] - this.sprite.position.x;
+        let diffY = point[1] - this.sprite.position.y;
+
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            if (diffX < 0) {
+                this.setDirection("left");
+            } else if (diffX > 0) {
+                this.setDirection("right");
+            }
+        } else {
+            if (diffY < 0) {
+                this.setDirection("up");
+            } else if (diffY > 0) {
+                this.setDirection("down");
+            }
+        }
+    }
+
+    walk(newPosition) {
+        this._targetPosition = newPosition;
+        this.playWalkAnimation();
+        this.facePoint(newPosition);
+    }
+
+    setPosition(position) {
+        let unitX = position[0] - this.width / 2;
+        let unitY = position[1] - this.height / 2;
+        this.sprite.position.set(unitX, unitY);
+        this._counterSprite.position.set(unitX - 15, unitY - 15);
+        this._counterLabel.position.set(unitX - 7, unitY - 7);
+    }
+
+    setDirection(direction) {
+        if (!["down", "right", "left", "up"].includes(direction)) {
+            throw new Error(`Invalid direction '{direction}'`);
+        }
+
+        this._direction = direction;
+    }
+
+    getDirection() {
+        return this._direction;
+    }
+
+    update(delta) {
+        // If we are currently animating, check elapsed for frame increase
+        if (this._animating) {
+            this._animationElapsed += delta;
+            if (this._animationElapsed >= ANIM_INTERVAL) {
+                this._animationElapsed = 0;
+                this._currentFrame++;
+                if (this._currentFrame > 3) {
+                    if (this._looping) this._currentFrame = 0;
+                    else {
+                        this._currentFrame = 1;
+                        this._animating = false;
+                    }
+                }
+            }
+        }
+
+        // Update position if walking
+        // spos = start.get_position()
+        // epos = end.get_position()
+        // return math.sqrt((spos[0] - epos[0]) * (spos[0] - epos[0]) + (spos[1] - epos[1]) * (spos[1] - epos[1]))
+        if (this._targetPosition) {
+            // direction
+            // distacne ->  delta * WALK_SPEED
+            // apply direction * distance to position vector
+        }
+
+        // Ensure we are displaying the correct frame
+        this._texture.frame = this._frames[this._direction][this._currentFrame];
+    }
+}
+
+/* harmony default export */ var unitAvatar = (unitAvatar_UnitAvatar);
+
+// EXTERNAL MODULE: ./public/dist/maps/japan_tconfig.json
+var japan_tconfig = __webpack_require__(3);
+
 // CONCATENATED MODULE: ./public/src/index.js
+
+
+
 
 
 
@@ -43692,30 +43960,52 @@ pixi_es["utils"].sayHello("WebGL");
 pixi_es["settings"].RESOLUTION = 1.5;
 
 // Initialization
-let app = new pixi_es["Application"]({ width: 800, height: 600, backgroundColor: 0xa0aaa0 });
+let app = new pixi_es["Application"]({ width: 800, height: 600, backgroundColor: 0x000000 });
 document.body.appendChild(app.view);
 
 // Load images into WebGL compatible format
-let imagePaths = ["graphics/tilesets/grassBiome/overworld_tileset_grass.png"];
+let imagePaths = [
+    "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
+    "graphics/ui/source/16x16/Set1/Set1-1.png",
+    ...["bardo_1.png", "executioner_1.png", "knights_1x.png"].map(
+        (path) => `graphics/characters/${path}`
+    ),
+];
+
+let dancers = [];
 
 loader.add(imagePaths).load(() => {
-    console.log("finished loading graphics");
-
     let testMap = new tilemap(
         app.stage,
-        "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
-        [10, 10],
-        [16, 16]
+        japan_tconfig.tilesetPath,
+        japan_tconfig.tileMapSize,
+        japan_tconfig.tileSize
     );
 
+    const regionData = japan_tconfig.regions;
+    let regionLayer = new src_regionLayer(app.stage, regionData);
+
+    let bard = new unitAvatar(app.stage, "graphics/characters/bardo_1.png");
+    bard.setPosition(regionLayer.getRegionCenter("SJ-1"));
+    dancers.push(bard);
+
+    let exec = new unitAvatar(app.stage, "graphics/characters/executioner_1.png");
+    exec.setPosition(regionLayer.getRegionCenter("SJ-2"));
+    dancers.push(exec);
+
+    let knight = new unitAvatar(app.stage, "graphics/characters/knights_1x.png");
+    knight.setPosition(regionLayer.getRegionCenter("SJ-3"));
+    dancers.push(knight);
+
     pixi_js_keyboard_default.a.events.on("released", (keyCode, event) => {
-        switch (keyCode) {
-            case "KeyA":
-                testMap.updateTileIndex(4, 4, 3, 3);
-                break;
-            case "KeyB":
-                testMap.updateTileIndex(3, 3, 4, 4);
-                break;
+        if (keyCode === "KeyA") {
+            for (let human of dancers) {
+                human.playWalkAnimation();
+            }
+        } else if (keyCode === "KeyB") {
+            for (let human of dancers) {
+                human.stopAnimation();
+            }
         }
     });
 
@@ -43725,6 +44015,8 @@ loader.add(imagePaths).load(() => {
 function gameLoop(delta) {
     pixi_js_keyboard_default.a.update();
     pixi_js_mouse_default.a.update();
+
+    dancers.forEach((human) => human.update(delta));
 }
 
 

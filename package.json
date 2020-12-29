@@ -17,9 +17,8 @@
     },
     "scripts": {
         "start": "npx webpack && nodemon index.js",
-        "watch": "webpack --watch",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "watch": "webpack --watch"
     },
-    "author": "Scott Kemperman",
+    "author": "Scott Kemperman, Sam Kemperman",
     "license": "ISC"
 }

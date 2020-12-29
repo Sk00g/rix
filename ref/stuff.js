@@ -21,7 +21,7 @@ document.body.appendChild(app.view);
 //     (path) => `graphics/characters/${path}`
 // );
 // imagePaths.push("graphics/ui/source/source.png");
-let imagePaths = ["graphics/tilesets/grassBiome/overworld_tileset_grass.png];
+let imagePaths = ["graphics/tilesets/grassBiome/overworld_tileset_grass.png"];
 loader.add(imagePaths).load(() => {
     console.log("finished loading graphics");
 
