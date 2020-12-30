@@ -51,6 +51,11 @@ loader.add(imagePaths).load(() => {
     knight.setPosition(regionLayer.getRegionCenter("SJ-3"));
     dancers.push(knight);
 
+    // let conductor = new Conductor();
+    // conductor.playExecuteAttackSequence(attacker, defender, battleOutcome)
+    // conductor.playMoveUnit(unit, region)
+    // conductor.playDeploy(region, amount)
+
     Keyboard.events.on("released", (keyCode, event) => {
         if (keyCode === "KeyA") {
             for (let human of dancers) {
@@ -60,6 +65,29 @@ loader.add(imagePaths).load(() => {
             for (let human of dancers) {
                 human.stopAnimation();
             }
+        } else if (keyCode === "KeyC") {
+            bard.walk([50, 50]);
+        } else if (keyCode === "KeyD") {
+            bard.walk([100, 100]);
+        } else if (keyCode === "KeyE") {
+            bard.walk([200, 100]);
+        } else if (keyCode === "KeyF") {
+            bard.walk([200, 200]);
+        } else if (keyCode === "KeyG") {
+            bard.walk([100, 200]);
+        } else if (keyCode === "KeyH") {
+            bard.setDirection("right");
+            bard.playAttackAnimation();
+        } else if (keyCode === "KeyI") {
+            bard.slide([120, 100], 2);
+        } else if (keyCode === "KeyJ") {
+            bard.shake(3);
+        } else if (keyCode === "KeyK") {
+            bard.morphNumber(2.0, 0.08);
+        } else if (keyCode === "KeyL") {
+            bard.morphNumber(1.0, 0.08);
+        } else if (keyCode === "KeyM") {
+            bard.blendNumberColor("#ff0000", 10);
         }
     });
 

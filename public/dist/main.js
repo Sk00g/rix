@@ -277,10 +277,10 @@ __webpack_require__.d(utils_es_namespaceObject, "trimCanvas", function() { retur
 __webpack_require__.d(utils_es_namespaceObject, "uid", function() { return uid; });
 
 // EXTERNAL MODULE: ./node_modules/es6-promise-polyfill/promise.js
-var promise = __webpack_require__(10);
+var promise = __webpack_require__(11);
 
 // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-var object_assign = __webpack_require__(11);
+var object_assign = __webpack_require__(12);
 var object_assign_default = /*#__PURE__*/__webpack_require__.n(object_assign);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/polyfill/lib/polyfill.es.js
@@ -812,11 +812,11 @@ var settings = {
 //# sourceMappingURL=settings.es.js.map
 
 // EXTERNAL MODULE: ./node_modules/eventemitter3/index.js
-var eventemitter3 = __webpack_require__(7);
+var eventemitter3 = __webpack_require__(8);
 var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
 
 // EXTERNAL MODULE: ./node_modules/earcut/src/earcut.js
-var earcut = __webpack_require__(8);
+var earcut = __webpack_require__(9);
 var earcut_default = /*#__PURE__*/__webpack_require__.n(earcut);
 
 // EXTERNAL MODULE: D:/Dev/games/Rix/node_modules/url/url.js
@@ -39168,7 +39168,7 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(9);
+const Events = __webpack_require__(10);
 
 let canvasElement = null;
 
@@ -40147,6 +40147,120 @@ module.exports = parseURI
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
+const PIXI = __webpack_require__(0);
+const Events = __webpack_require__(10);
+
+class Keyboard {
+	constructor() {
+		this.keyStates = new Map();
+    this.events = new Events();
+	}
+  
+  clear() {
+    this.keyStates.clear();
+  }
+  
+  update() {
+    this.keyStates.forEach((value, keyCode) => {
+      const event = this.keyStates.get(keyCode);
+
+      event.alreadyPressed = true;
+      
+      if (event.wasReleased) {
+        this.keyStates.delete(keyCode);
+      }
+
+      keyboard.events.call('down', keyCode, event);
+      keyboard.events.call('down_' + keyCode, keyCode, event);
+    });
+  }
+  
+  isKeyDown(...args) {
+    let result = false;
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased)
+        result = true;
+    }
+    
+    return result;
+  }
+  
+  isKeyUp(...args) {
+    return !this.isKeyDown(args);
+  }
+  
+  isKeyPressed(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased && !event.alreadyPressed)
+        result = true;
+    }
+
+    return result;
+  }
+  
+  isKeyReleased(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && event.wasReleased)
+        result = true;
+    }
+
+    return result;
+  }
+}
+
+const keyboard = new Keyboard();
+
+window.addEventListener(
+  "keydown", (event) => {
+    if (!keyboard.keyStates.get(event.code)) {
+      keyboard.keyStates.set(event.code, event);
+      keyboard.events.call('pressed', event.code, event);
+      keyboard.events.call('pressed_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+window.addEventListener(
+  "keyup", (event) => {
+    event = keyboard.keyStates.get(event.code);
+    if (event) {
+      //keyboard.keyStates.set(event.code, event);
+      event.wasReleased = true;
+      keyboard.events.call('released', event.code, event);
+      keyboard.events.call('released_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+/*keyboard.events.on('pressed', null, (keyCode, event) => {
+  console.log('dd', keyCode);
+});*/
+/*
+setInterval(() => {
+  console.log(keyboard.isKeyReleased('KeyA'));
+  keyboard.update();
+}, 0);*/
+
+module.exports = keyboard;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -40487,7 +40601,7 @@ if (true) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41173,7 +41287,7 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Events = __webpack_require__(23);
@@ -41181,7 +41295,7 @@ const Events = __webpack_require__(23);
 module.exports = Events;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {var __WEBPACK_AMD_DEFINE_RESULT__;(function(global){
@@ -41531,7 +41645,7 @@ Promise.reject = function(reason){
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(13).setImmediate))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41625,120 +41739,6 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 	return to;
 };
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(9);
-
-class Keyboard {
-	constructor() {
-		this.keyStates = new Map();
-    this.events = new Events();
-	}
-  
-  clear() {
-    this.keyStates.clear();
-  }
-  
-  update() {
-    this.keyStates.forEach((value, keyCode) => {
-      const event = this.keyStates.get(keyCode);
-
-      event.alreadyPressed = true;
-      
-      if (event.wasReleased) {
-        this.keyStates.delete(keyCode);
-      }
-
-      keyboard.events.call('down', keyCode, event);
-      keyboard.events.call('down_' + keyCode, keyCode, event);
-    });
-  }
-  
-  isKeyDown(...args) {
-    let result = false;
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased)
-        result = true;
-    }
-    
-    return result;
-  }
-  
-  isKeyUp(...args) {
-    return !this.isKeyDown(args);
-  }
-  
-  isKeyPressed(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased && !event.alreadyPressed)
-        result = true;
-    }
-
-    return result;
-  }
-  
-  isKeyReleased(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && event.wasReleased)
-        result = true;
-    }
-
-    return result;
-  }
-}
-
-const keyboard = new Keyboard();
-
-window.addEventListener(
-  "keydown", (event) => {
-    if (!keyboard.keyStates.get(event.code)) {
-      keyboard.keyStates.set(event.code, event);
-      keyboard.events.call('pressed', event.code, event);
-      keyboard.events.call('pressed_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-window.addEventListener(
-  "keyup", (event) => {
-    event = keyboard.keyStates.get(event.code);
-    if (event) {
-      //keyboard.keyStates.set(event.code, event);
-      event.wasReleased = true;
-      keyboard.events.call('released', event.code, event);
-      keyboard.events.call('released_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-/*keyboard.events.on('pressed', null, (keyCode, event) => {
-  console.log('dd', keyCode);
-});*/
-/*
-setInterval(() => {
-  console.log(keyboard.isKeyReleased('KeyA'));
-  keyboard.update();
-}, 0);*/
-
-module.exports = keyboard;
 
 
 /***/ }),
@@ -43660,7 +43660,7 @@ const AnimationType = Object.freeze({
 });
 
 // EXTERNAL MODULE: ./node_modules/pixi.js-keyboard/index.js
-var pixi_js_keyboard = __webpack_require__(12);
+var pixi_js_keyboard = __webpack_require__(7);
 var pixi_js_keyboard_default = /*#__PURE__*/__webpack_require__.n(pixi_js_keyboard);
 
 // CONCATENATED MODULE: ./public/src/tilemap.js
@@ -43756,14 +43756,41 @@ class regionLayer_RegionLayer {
 
 /* harmony default export */ var src_regionLayer = (regionLayer_RegionLayer);
 
+// CONCATENATED MODULE: ./public/src/vector.js
+function subtract(vecA, vecB) {
+    return [vecA[0] - vecB[0], vecA[1] - vecB[1]];
+}
+
+function add(vecA, vecB) {
+    return [vecA[0] + vecB[0], vecA[1] + vecB[1]];
+}
+
+function norm(vector) {
+    return Math.sqrt(vector[0] ** 2 + vector[1] ** 2);
+}
+
+function normalize(vector) {
+    let n = norm(vector);
+    return [vector[0] / n, vector[1] / n];
+}
+
+function multiply(vector, value) {
+    return [vector[0] * value, vector[1] * value];
+}
+
 // CONCATENATED MODULE: ./public/src/sengine/unitAvatar.js
 
 
 
-const ANIM_INTERVAL = 11.5;
+
+const WALK_ANIM_INTERVAL = 11.5;
+const ATTACK_ANIM_INTERVAL = 20;
 const SCALE = 1.0;
 const COUNTER_SCALE = 1.5;
 const COUNTER_PATH = "graphics/ui/source/16x16/Set1/Set1-1.png";
+const MIN_MOVE_DISTANCE = 2;
+const WALK_SPEED = 1;
+const SHAKE_INCREMENT_MAX = 3;
 
 /*
 This class is coupled tightly to FinalBossBlue's free character (overworld) tilesheet assets that 
@@ -43780,15 +43807,35 @@ class unitAvatar_UnitAvatar {
         this._currentFrame = 1;
 
         // Keep track of active animation properties
-        this._animating = false;
+        this._animation = null;
         this._looping = false;
         this._animationElapsed = 0;
 
         // Walk animation properties
         this._targetPosition = null;
 
+        // Slide animation properties
+        this._slideTarget = null;
+        this._slideSpeed = 1;
+
+        // Shake animation properties
+        this._shakeMagnitude = null;
+        this._shakeDirection = "right";
+        this._shakeOrigin = null;
+        this._shakeIncrements = 0;
+
+        // Morph number animation properties
+        this._morphTarget = null;
+        this._morphSpeed = 0;
+        this._morphPreviousSize = [0, 0];
+
+        // Blend number animation properties
+        this._blendNumberTarget = null;
+        this._blendNumberSpeed = 0;
+
         let x = startRect.x;
         let y = startRect.y;
+        this._position = [x, y];
         this.width = startRect.width;
         this.height = startRect.height;
 
@@ -43846,8 +43893,35 @@ class unitAvatar_UnitAvatar {
         stage.addChild(this._counterLabel);
     }
 
+    slide(newPosition, speed) {
+        this._slideTarget = newPosition;
+        this._slideSpeed = speed;
+    }
+
+    shake(magnitude) {
+        this._shakeMagnitude = magnitude;
+        this._shakeDirection = "right";
+        this._shakeOrigin = this.getPosition();
+        this._shakeIncrements = 0;
+    }
+
+    morphNumber(newScale, speed) {
+        this._morphTarget = newScale;
+        this._morphSpeed = speed;
+        this._morphPreviousSize = [this._counterLabel.width, this._counterLabel.height];
+    }
+
+    blendNumberColor(newColor, speed) {
+        this._blendNumberTarget = newColor;
+        this._blendNumberSpeed = speed;
+    }
+
+    playDeathAnimation() {
+        // Shake and dissapear
+    }
+
     playWalkAnimation(loop = true) {
-        this._animating = true;
+        this._animation = "walk";
         this._looping = loop;
         this._animationElapsed = 0;
 
@@ -43855,15 +43929,23 @@ class unitAvatar_UnitAvatar {
         this._currentFrame = 0;
     }
 
+    playAttackAnimation(loop = false) {
+        this._animation = "attack";
+        this._looping = loop;
+        this._animationElapsed = 0;
+
+        this._currentFrame = 0;
+    }
+
     stopAnimation() {
-        this._animating = false;
+        this._animation = null;
         this._looping = false;
         this._currentFrame = 1;
     }
 
     facePoint(point) {
-        let diffX = point[0] - this.sprite.position.x;
-        let diffY = point[1] - this.sprite.position.y;
+        let diffX = point[0] - this.getPosition()[0];
+        let diffY = point[1] - this.getPosition()[1];
 
         if (Math.abs(diffX) > Math.abs(diffY)) {
             if (diffX < 0) {
@@ -43886,12 +43968,22 @@ class unitAvatar_UnitAvatar {
         this.facePoint(newPosition);
     }
 
+    getPosition() {
+        return [...this._position];
+    }
+
     setPosition(position) {
+        this._position = [...position];
+
         let unitX = position[0] - this.width / 2;
         let unitY = position[1] - this.height / 2;
         this.sprite.position.set(unitX, unitY);
-        this._counterSprite.position.set(unitX - 15, unitY - 15);
-        this._counterLabel.position.set(unitX - 7, unitY - 7);
+
+        if (!this._shakeMagnitude) {
+            // TODO - Make these magical numbers based on this._counterLabel.width/height
+            this._counterSprite.position.set(unitX - 15, unitY - 15);
+            this._counterLabel.position.set(unitX - 7, unitY - 7);
+        }
     }
 
     setDirection(direction) {
@@ -43906,32 +43998,136 @@ class unitAvatar_UnitAvatar {
         return this._direction;
     }
 
-    update(delta) {
+    _updateAnimation(delta) {
         // If we are currently animating, check elapsed for frame increase
-        if (this._animating) {
+        if (this._animation) {
             this._animationElapsed += delta;
-            if (this._animationElapsed >= ANIM_INTERVAL) {
-                this._animationElapsed = 0;
-                this._currentFrame++;
-                if (this._currentFrame > 3) {
-                    if (this._looping) this._currentFrame = 0;
-                    else {
-                        this._currentFrame = 1;
+            if (this._animation === "walk") {
+                if (this._animationElapsed >= WALK_ANIM_INTERVAL) {
+                    this._animationElapsed = 0;
+                    this._currentFrame++;
+                    if (this._currentFrame > 3) {
+                        if (this._looping) this._currentFrame = 0;
+                        else {
+                            this._currentFrame = 1;
+                            this._animating = false;
+                        }
+                    }
+                }
+            } else if (this._animation === "attack") {
+                if (this._animationElapsed >= ATTACK_ANIM_INTERVAL) {
+                    this._animationElapsed = 0;
+                    this._currentFrame = this._currentFrame === 1 ? 0 : 1;
+
+                    if (!this._looping) {
                         this._animating = false;
+                        this._currentFrame = 1;
                     }
                 }
             }
         }
+    }
 
+    _updateWalking(delta) {
         // Update position if walking
-        // spos = start.get_position()
-        // epos = end.get_position()
-        // return math.sqrt((spos[0] - epos[0]) * (spos[0] - epos[0]) + (spos[1] - epos[1]) * (spos[1] - epos[1]))
         if (this._targetPosition) {
-            // direction
-            // distacne ->  delta * WALK_SPEED
-            // apply direction * distance to position vector
+            let difference = subtract(this._targetPosition, this.getPosition());
+            let distanceLeft = norm(difference);
+
+            if (distanceLeft < MIN_MOVE_DISTANCE) {
+                this.setPosition(this._targetPosition);
+                this._targetPosition = null;
+                this.stopAnimation();
+            } else {
+                let direction = normalize(difference);
+                let newPosition = add(
+                    this.getPosition(),
+                    multiply(direction, delta * WALK_SPEED)
+                );
+                this.setPosition(newPosition);
+            }
         }
+    }
+
+    _updateSlide(delta) {
+        if (this._slideTarget) {
+            let difference = subtract(this._slideTarget, this.getPosition());
+            let distanceLeft = norm(difference);
+
+            if (distanceLeft < this._slideSpeed) {
+                this.setPosition(this._slideTarget);
+                this._slideTarget = null;
+            } else {
+                let direction = normalize(difference);
+                let newPosition = add(
+                    this.getPosition(),
+                    multiply(direction, delta * this._slideSpeed)
+                );
+                this.setPosition(newPosition);
+            }
+        }
+    }
+
+    _updateShake(delta) {
+        if (this._shakeMagnitude) {
+            let sign = this._shakeDirection === "right" ? 1 : -1;
+            let newPosition = [
+                this.getPosition()[0] + sign * this._shakeMagnitude * delta,
+                this.getPosition()[1],
+            ];
+
+            console.log(newPosition);
+            this.setPosition(newPosition);
+
+            this._shakeIncrements++;
+
+            if (this._shakeIncrements === SHAKE_INCREMENT_MAX) {
+                this._shakeIncrements = -SHAKE_INCREMENT_MAX;
+                if (this._shakeDirection === "right") this._shakeDirection = "left";
+                else if (this._shakeDirection === "left") this._shakeDirection = "right";
+                this._shakeMagnitude -= 0.5;
+            }
+        }
+    }
+
+    _updateMorph() {
+        if (this._morphTarget) {
+            let sign = this._morphTarget > this._counterLabel.scale.x ? 1 : -1;
+            this._counterLabel.scale.x += sign * this._morphSpeed;
+            this._counterLabel.scale.y += sign * this._morphSpeed;
+
+            if (Math.abs(this._counterLabel.scale.x - this._morphTarget) < this._morphSpeed) {
+                this._counterLabel.scale.set(this._morphTarget, this._morphTarget);
+                this._morphTarget = null;
+            }
+
+            // Center
+            let diffX = this._counterLabel.width - this._morphPreviousSize[0];
+            let diffY = this._counterLabel.height - this._morphPreviousSize[1];
+
+            this._counterLabel.position.x -= diffX / 2;
+            this._counterLabel.position.y -= diffY / 2;
+
+            this._morphPreviousSize = [this._counterLabel.width, this._counterLabel.height];
+        }
+    }
+
+    _updateBlendNumber() {
+        if (this._blendNumberTarget) {
+            let currentStyle = { ...this._counterLabel.style };
+            currentStyle.fill = "#ff0000";
+            this._counterLabel.style = currentStyle;
+            this._blendNumberTarget = null;
+        }
+    }
+
+    update(delta) {
+        this._updateAnimation(delta);
+        this._updateWalking(delta);
+        this._updateSlide(delta);
+        this._updateShake(delta);
+        this._updateMorph();
+        this._updateBlendNumber();
 
         // Ensure we are displaying the correct frame
         this._texture.frame = this._frames[this._direction][this._currentFrame];
@@ -43997,6 +44193,11 @@ loader.add(imagePaths).load(() => {
     knight.setPosition(regionLayer.getRegionCenter("SJ-3"));
     dancers.push(knight);
 
+    // let conductor = new Conductor();
+    // conductor.playExecuteAttackSequence(attacker, defender, battleOutcome)
+    // conductor.playMoveUnit(unit, region)
+    // conductor.playDeploy(region, amount)
+
     pixi_js_keyboard_default.a.events.on("released", (keyCode, event) => {
         if (keyCode === "KeyA") {
             for (let human of dancers) {
@@ -44006,6 +44207,29 @@ loader.add(imagePaths).load(() => {
             for (let human of dancers) {
                 human.stopAnimation();
             }
+        } else if (keyCode === "KeyC") {
+            bard.walk([50, 50]);
+        } else if (keyCode === "KeyD") {
+            bard.walk([100, 100]);
+        } else if (keyCode === "KeyE") {
+            bard.walk([200, 100]);
+        } else if (keyCode === "KeyF") {
+            bard.walk([200, 200]);
+        } else if (keyCode === "KeyG") {
+            bard.walk([100, 200]);
+        } else if (keyCode === "KeyH") {
+            bard.setDirection("right");
+            bard.playAttackAnimation();
+        } else if (keyCode === "KeyI") {
+            bard.slide([120, 100], 2);
+        } else if (keyCode === "KeyJ") {
+            bard.shake(3);
+        } else if (keyCode === "KeyK") {
+            bard.morphNumber(2.0, 0.08);
+        } else if (keyCode === "KeyL") {
+            bard.morphNumber(1.0, 0.08);
+        } else if (keyCode === "KeyM") {
+            bard.blendNumberColor("#ff0000", 10);
         }
     });
 
