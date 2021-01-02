@@ -277,10 +277,10 @@ __webpack_require__.d(utils_es_namespaceObject, "trimCanvas", function() { retur
 __webpack_require__.d(utils_es_namespaceObject, "uid", function() { return uid; });
 
 // EXTERNAL MODULE: ./node_modules/es6-promise-polyfill/promise.js
-var promise = __webpack_require__(11);
+var promise = __webpack_require__(10);
 
 // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-var object_assign = __webpack_require__(12);
+var object_assign = __webpack_require__(11);
 var object_assign_default = /*#__PURE__*/__webpack_require__.n(object_assign);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/polyfill/lib/polyfill.es.js
@@ -812,15 +812,15 @@ var settings = {
 //# sourceMappingURL=settings.es.js.map
 
 // EXTERNAL MODULE: ./node_modules/eventemitter3/index.js
-var eventemitter3 = __webpack_require__(8);
+var eventemitter3 = __webpack_require__(7);
 var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
 
 // EXTERNAL MODULE: ./node_modules/earcut/src/earcut.js
-var earcut = __webpack_require__(9);
+var earcut = __webpack_require__(8);
 var earcut_default = /*#__PURE__*/__webpack_require__.n(earcut);
 
 // EXTERNAL MODULE: D:/Dev/games/Rix/node_modules/url/url.js
-var url_url = __webpack_require__(4);
+var url_url = __webpack_require__(3);
 var url_default = /*#__PURE__*/__webpack_require__.n(url_url);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/constants/lib/constants.es.js
@@ -21060,7 +21060,7 @@ var extract_es_Extract = /** @class */ (function () {
 //# sourceMappingURL=extract.es.js.map
 
 // EXTERNAL MODULE: ./node_modules/parse-uri/index.js
-var parse_uri = __webpack_require__(6);
+var parse_uri = __webpack_require__(5);
 var parse_uri_default = /*#__PURE__*/__webpack_require__.n(parse_uri);
 
 // EXTERNAL MODULE: ./node_modules/mini-signals/lib/mini-signals.js
@@ -39168,7 +39168,7 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(10);
+const Events = __webpack_require__(9);
 
 let canvasElement = null;
 
@@ -39318,12 +39318,6 @@ module.exports = mouse;
 
 /***/ }),
 /* 3 */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[40,20],\"tileSize\":[16,16],\"regions\":[{\"continent\":\"Southeast Japan\",\"name\":\"SJ-1\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[50,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"continent\":\"Southeast Japan\",\"name\":\"SJ-2\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[160,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"continent\":\"Southeast Japan\",\"name\":\"SJ-3\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[160,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"continent\":\"Southeast Japan\",\"name\":\"SJ-4\",\"hasCastle\":false,\"hasVillage\":false,\"position\":[50,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]}]}");
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40062,7 +40056,7 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports) {
 
 var g;
@@ -40088,7 +40082,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40144,121 +40138,13 @@ module.exports = parseURI
 
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 6 */
+/***/ (function(module) {
 
-const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(10);
-
-class Keyboard {
-	constructor() {
-		this.keyStates = new Map();
-    this.events = new Events();
-	}
-  
-  clear() {
-    this.keyStates.clear();
-  }
-  
-  update() {
-    this.keyStates.forEach((value, keyCode) => {
-      const event = this.keyStates.get(keyCode);
-
-      event.alreadyPressed = true;
-      
-      if (event.wasReleased) {
-        this.keyStates.delete(keyCode);
-      }
-
-      keyboard.events.call('down', keyCode, event);
-      keyboard.events.call('down_' + keyCode, keyCode, event);
-    });
-  }
-  
-  isKeyDown(...args) {
-    let result = false;
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased)
-        result = true;
-    }
-    
-    return result;
-  }
-  
-  isKeyUp(...args) {
-    return !this.isKeyDown(args);
-  }
-  
-  isKeyPressed(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased && !event.alreadyPressed)
-        result = true;
-    }
-
-    return result;
-  }
-  
-  isKeyReleased(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && event.wasReleased)
-        result = true;
-    }
-
-    return result;
-  }
-}
-
-const keyboard = new Keyboard();
-
-window.addEventListener(
-  "keydown", (event) => {
-    if (!keyboard.keyStates.get(event.code)) {
-      keyboard.keyStates.set(event.code, event);
-      keyboard.events.call('pressed', event.code, event);
-      keyboard.events.call('pressed_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-window.addEventListener(
-  "keyup", (event) => {
-    event = keyboard.keyStates.get(event.code);
-    if (event) {
-      //keyboard.keyStates.set(event.code, event);
-      event.wasReleased = true;
-      keyboard.events.call('released', event.code, event);
-      keyboard.events.call('released_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-/*keyboard.events.on('pressed', null, (keyCode, event) => {
-  console.log('dd', keyCode);
-});*/
-/*
-setInterval(() => {
-  console.log(keyboard.isKeyReleased('KeyA'));
-  keyboard.update();
-}, 0);*/
-
-module.exports = keyboard;
-
+module.exports = JSON.parse("{\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[25,19],\"tileSize\":[16,16],\"continents\":[{\"name\":\"South Japan\",\"regions\":[\"SJ-1\",\"SJ-2\"],\"outlineColor\":\"#ff0000\"},{\"name\":\"Southeast Japan\",\"regions\":[\"SEJ-1\",\"SEJ-2\",\"SEJ-3\",\"SEJ-4\"],\"outlineColor\":\"#00ff00\"}],\"regions\":[{\"name\":\"SJ-1\",\"position\":[50,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50],\"borders\":[\"SJ-2\"]},{\"name\":\"SJ-2\",\"position\":[50,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-1\",\"position\":[160,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-2\",\"position\":[270,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-3\",\"position\":[160,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-4\",\"position\":[270,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]}]}");
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40601,7 +40487,7 @@ if (true) {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41287,7 +41173,7 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Events = __webpack_require__(23);
@@ -41295,7 +41181,7 @@ const Events = __webpack_require__(23);
 module.exports = Events;
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {var __WEBPACK_AMD_DEFINE_RESULT__;(function(global){
@@ -41642,10 +41528,10 @@ Promise.reject = function(reason){
 
 })(typeof window != 'undefined' ? window : typeof global != 'undefined' ? global : typeof self != 'undefined' ? self : this);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(13).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(13).setImmediate))
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41742,6 +41628,120 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const PIXI = __webpack_require__(0);
+const Events = __webpack_require__(9);
+
+class Keyboard {
+	constructor() {
+		this.keyStates = new Map();
+    this.events = new Events();
+	}
+  
+  clear() {
+    this.keyStates.clear();
+  }
+  
+  update() {
+    this.keyStates.forEach((value, keyCode) => {
+      const event = this.keyStates.get(keyCode);
+
+      event.alreadyPressed = true;
+      
+      if (event.wasReleased) {
+        this.keyStates.delete(keyCode);
+      }
+
+      keyboard.events.call('down', keyCode, event);
+      keyboard.events.call('down_' + keyCode, keyCode, event);
+    });
+  }
+  
+  isKeyDown(...args) {
+    let result = false;
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased)
+        result = true;
+    }
+    
+    return result;
+  }
+  
+  isKeyUp(...args) {
+    return !this.isKeyDown(args);
+  }
+  
+  isKeyPressed(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased && !event.alreadyPressed)
+        result = true;
+    }
+
+    return result;
+  }
+  
+  isKeyReleased(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && event.wasReleased)
+        result = true;
+    }
+
+    return result;
+  }
+}
+
+const keyboard = new Keyboard();
+
+window.addEventListener(
+  "keydown", (event) => {
+    if (!keyboard.keyStates.get(event.code)) {
+      keyboard.keyStates.set(event.code, event);
+      keyboard.events.call('pressed', event.code, event);
+      keyboard.events.call('pressed_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+window.addEventListener(
+  "keyup", (event) => {
+    event = keyboard.keyStates.get(event.code);
+    if (event) {
+      //keyboard.keyStates.set(event.code, event);
+      event.wasReleased = true;
+      keyboard.events.call('released', event.code, event);
+      keyboard.events.call('released_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+/*keyboard.events.on('pressed', null, (keyCode, event) => {
+  console.log('dd', keyCode);
+});*/
+/*
+setInterval(() => {
+  console.log(keyboard.isKeyReleased('KeyA'));
+  keyboard.update();
+}, 0);*/
+
+module.exports = keyboard;
+
+
+/***/ }),
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -41809,7 +41809,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
 
 /***/ }),
 /* 14 */
@@ -42002,7 +42002,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(15)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(15)))
 
 /***/ }),
 /* 15 */
@@ -43667,8 +43667,114 @@ const AnimationType = Object.freeze({
     STAND: "STAND",
 });
 
+// CONCATENATED MODULE: ./public/src/logService.js
+const LogLevel = Object.freeze({
+    DEBUG: "DEBUG",
+    INFO: "INFO",
+    WARNING: "WARNING",
+    ERROR: "ERROR",
+    CRITICAL: "CRITICAL",
+});
+
+function logService(level, message, source = "APP", production = false) {
+    // Use synthetic Error object to retrieve stacktrace data
+    let stack = new Error().stack;
+    let fileTokens = stack.split("\n")[2].split("\\");
+    let trace = "unknown";
+    try {
+        trace = fileTokens[fileTokens.length - 1].substring(
+            0,
+            fileTokens[fileTokens.length - 1].length - 2
+        );
+    } catch (err) {}
+
+    let log = `${new Date().toLocaleTimeString()} (${level}) - ${source}: ${message}`;
+
+    switch (level) {
+        case LogLevel.DEBUG:
+            console.debug(log);
+            break;
+        case LogLevel.INFO:
+            console.log(log);
+            break;
+        case LogLevel.WARNING:
+            console.warn(log);
+            break;
+        case LogLevel.ERROR:
+            console.error(log);
+            break;
+        case LogLevel.CRITICAL:
+            console.error(log);
+            break;
+    }
+}
+
+// CONCATENATED MODULE: ./public/src/game_data/graphics.js
+/* harmony default export */ var graphics = ({
+    categories: ["interface", "avatar", "environment"],
+    interface: {
+        source: "graphics/ui/source/source.png",
+        button_frame_brown: "graphics/ui/source/16x16/Set1/Set1-1.png",
+        button_frame_blue: "graphics/ui/source/16x16/Set2/Set2-1.png",
+        arrow_green: "graphics/ui/arrow-green.png",
+        arrow_gray: "graphics/ui/arrow-gray.png",
+    },
+    avatar: {
+        bard: "graphics/characters/bardo_1.png",
+        exec: "graphics/characters/executioner_1.png",
+        knight: "graphics/characters/knights_1x.png",
+        ghost: "graphics/characters/ghost1.png",
+    },
+    environment: {
+        tileset_grass: "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
+    },
+});
+
+// CONCATENATED MODULE: ./public/src/assetLoader.js
+
+
+
+
+/* harmony default export */ var assetLoader = ({
+    initialize: function (loader, callback) {
+        let loadCount = 0;
+        let totalAssets = 0;
+        let imagePaths = [];
+
+        loader.onProgress.add((loader, resource) => {
+            loadCount++;
+            if (resource.error) {
+                logService(LogLevel.ERROR, `asset loading error: ${resource.error}`, "ASSET");
+            } else {
+                logService(
+                    LogLevel.DEBUG,
+                    `[${loadCount} of ${totalAssets} (${Math.round(loader.progress)}%)] - LOADED ${
+                        resource.url
+                    }`,
+                    "ASSET"
+                );
+            }
+
+            if (loadCount === totalAssets)
+                logService(LogLevel.INFO, "asset loading complete", "ASSET");
+        });
+
+        for (let category of graphics.categories) {
+            totalAssets += Object.keys(graphics[category]).length;
+            imagePaths.push(
+                ...Object.keys(graphics[category]).map((key) => graphics[category][key])
+            );
+        }
+
+        loader.add(imagePaths).load(callback);
+    },
+    loadTexture: function (path) {
+        return new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
+    },
+});
+
 // EXTERNAL MODULE: ./node_modules/pixi.js-keyboard/index.js
-var pixi_js_keyboard = __webpack_require__(7);
+var pixi_js_keyboard = __webpack_require__(12);
 var pixi_js_keyboard_default = /*#__PURE__*/__webpack_require__.n(pixi_js_keyboard);
 
 // CONCATENATED MODULE: ./public/src/tilemap.js
@@ -43676,8 +43782,11 @@ var pixi_js_keyboard_default = /*#__PURE__*/__webpack_require__.n(pixi_js_keyboa
 
 // Class used for displaying tilemap
 class tilemap_TileMap {
-    constructor(stage, path, size, tileSize) {
-        this._tileSize = tileSize;
+    constructor(stage, mapData, scale) {
+        const path = mapData.tilesetPath;
+        const size = mapData.tileMapSize;
+
+        this._tileSize = mapData.tileSize;
         this._tileIndices = [];
         this._tileSprites = [];
 
@@ -43688,11 +43797,12 @@ class tilemap_TileMap {
                 let texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
                 let sprite = new pixi_es["Sprite"](texture);
 
-                sprite.position.set(x * tileSize[0], y * tileSize[1]);
+                sprite.position.set(x * this._tileSize[0] * scale, y * this._tileSize[1] * scale);
+                sprite.scale.set(scale, scale);
 
                 this._tileSprites[x][y] = sprite;
 
-                this.updateTileIndex(x, y, 0, 0);
+                this.updateTileIndex(x, y, Math.floor(Math.random() * 3), 0);
 
                 stage.addChild(sprite);
             }
@@ -43703,7 +43813,7 @@ class tilemap_TileMap {
         this._tileIndices[tileX][tileY] = [indexX, indexY];
         this._tileSprites[tileX][tileY].texture.frame = new pixi_es["Rectangle"](
             indexX * this._tileSize[0],
-            indexX * this._tileSize[1],
+            indexY * this._tileSize[1],
             this._tileSize[0],
             this._tileSize[1]
         );
@@ -43759,21 +43869,8 @@ function isPointWithinPolygon(point, vertices) {
 
 
 
-/*
-{
-    "continent": "Southeast Japan",
-    "hasCastle": false,
-    "hasVillage": false,
-    "polygon": [
-        [25, 432],
-        [26, 462]
-    ]
-}
-*/
-
-const LINE_FILL = [1, 0x8282f0, 0.8]; // width, color, alpha
-const REGION_COLOR = 0xffffff;
-const REGION_ALPHA = 0.05;
+const DEFAULT_REGION_COLOR = 0xffffff;
+const DEFAULT_REGION_ALPHA = 0.05;
 
 class regionLayer_Region {
     constructor(data, stage) {
@@ -43793,9 +43890,11 @@ class regionLayer_Region {
             ]);
         }
 
-        this._fillColor = REGION_COLOR;
-        this._fillAlpha = REGION_ALPHA;
-        this._outlineFill = LINE_FILL;
+        this._fillColor = DEFAULT_REGION_COLOR;
+        this._fillAlpha = DEFAULT_REGION_ALPHA;
+        this._outlineWidth = 1;
+        this._outlineColor = 0x0000ff;
+        this._outlineAlpha = 0.8;
         this._shape = null;
 
         this._render();
@@ -43804,7 +43903,9 @@ class regionLayer_Region {
     setStyle(style) {
         if ("fillColor" in style) this._fillColor = style.fillColor;
         if ("fillAlpha" in style) this._fillAlpha = style.fillAlpha;
-        if ("outline" in style) this._outlineFill = style.outline;
+        if ("outlineWidth" in style) this._outlineWidth = style.outlineWidth;
+        if ("outlineColor" in style) this._outlineColor = style.outlineColor;
+        if ("outlineAlpha" in style) this._outlineAlpha = style.outlineAlpha;
 
         this._render();
     }
@@ -43820,8 +43921,8 @@ class regionLayer_Region {
         if (this._shape) this._stage.removeChild(this._shape);
 
         this._shape = new pixi_es["Graphics"]();
-
-        this._shape.lineStyle(this._outlineFill[0], this._outlineFill[1], this._outlineFill[2]);
+        console.log(this._outlineColor);
+        this._shape.lineStyle(this._outlineWidth, this._outlineColor, this._outlineAlpha);
         this._shape.beginFill(this._fillColor, this._fillAlpha);
         this._shape.drawPolygon(this._static.path);
         this._shape.endFill();
@@ -43833,13 +43934,21 @@ class regionLayer_Region {
 }
 
 class regionLayer_RegionLayer {
-    constructor(stage, regionData) {
-        this._staticData = regionData;
+    constructor(stage, mapData) {
+        this._staticData = { ...mapData };
         this._stage = stage;
         this._regions = {};
 
-        for (let data of regionData) {
+        for (let data of mapData.regions) {
             this._regions[data.name] = new regionLayer_Region(data, stage);
+        }
+
+        // Set the continent colors for each region
+        for (let cont of mapData.continents) {
+            for (let name of cont.regions)
+                this._regions[name].setStyle({
+                    outlineColor: parseInt(cont.outlineColor.substr(1), 16),
+                });
         }
     }
 
@@ -43851,7 +43960,7 @@ class regionLayer_RegionLayer {
         for (let key in this._regions) {
             let region = this._regions[key];
             if (isPointWithinPolygon(mousePos, region.absoluteVertices)) {
-                region.setStyle({ outline: [1, 0x8282f0, 1], fillAlpha: 0.1 });
+                // region.setStyle({ outlineColor: 0x8282f0, outlineAlpha: 0.1 });
             }
         }
     }
@@ -43865,12 +43974,12 @@ class regionLayer_RegionLayer {
 
 
 
+
+
 const WALK_ANIM_INTERVAL = 11.5;
 const ATTACK_ANIM_INTERVAL = 20;
 const SCALE = 1.5;
 const COUNTER_SCALE = 1.75;
-const COUNTER_PATH = "graphics/ui/source/16x16/Set1/Set1-1.png";
-const ALT_COUNTER_PATH = "graphics/ui/source/16x16/Set2/Set2-1.png";
 const MIN_MOVE_DISTANCE = 2;
 const WALK_SPEED = 1;
 const SHAKE_INCREMENT_MAX = 3;
@@ -43885,7 +43994,7 @@ class unitAvatar_UnitAvatar {
         this._stage = stage;
 
         // Copy texture so we can change frame only for this unit
-        this._texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
+        this._texture = assetLoader.loadTexture(path);
 
         // Default start frame is facing down stand
         this._direction = "down";
@@ -43977,8 +44086,10 @@ class unitAvatar_UnitAvatar {
         this.sprite.scale.set(SCALE, SCALE);
 
         // Create the amount counter
-        let counterTexture = new pixi_es["Texture"](
-            pixi_es["BaseTexture"].from(altCounter ? ALT_COUNTER_PATH : COUNTER_PATH)
+        let counterTexture = assetLoader.loadTexture(
+            altCounter
+                ? graphics.interface.button_frame_blue
+                : graphics.interface.button_frame_brown
         );
         this._counterSprite = new pixi_es["Sprite"](counterTexture);
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
@@ -44297,7 +44408,7 @@ class unitAvatar_UnitAvatar {
 /* harmony default export */ var unitAvatar = (unitAvatar_UnitAvatar);
 
 // EXTERNAL MODULE: ./public/dist/maps/japan_tconfig.json
-var japan_tconfig = __webpack_require__(3);
+var japan_tconfig = __webpack_require__(6);
 
 // CONCATENATED MODULE: ./public/src/index.js
 
@@ -44310,137 +44421,57 @@ var japan_tconfig = __webpack_require__(3);
 
 
 
-const loader = pixi_es["Loader"].shared;
+
+
+
+const src_loader = pixi_es["Loader"].shared;
 
 pixi_es["utils"].sayHello("WebGL");
 pixi_es["settings"].RESOLUTION = 1.0;
 
 // Initialization
-let app = new pixi_es["Application"]({ width: 800, height: 600, backgroundColor: 0x000000 });
+let app = new pixi_es["Application"]({ width: 800, height: 608, backgroundColor: 0x000000 });
 document.body.appendChild(app.view);
 
-// Load images into WebGL compatible format
-let imagePaths = [
-    "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
-    "graphics/ui/source/16x16/Set1/Set1-1.png",
-    "graphics/ui/source/16x16/Set2/Set2-1.png",
-    "graphics/ui/arrow-green.png",
-    "graphics/ui/arrow-gray.png",
-    ...["bardo_1.png", "executioner_1.png", "knights_1x.png"].map(
-        (path) => `graphics/characters/${path}`
-    ),
-];
+// Load all assets from game_data/* files
+assetLoader.initialize(src_loader, main);
 
 let dancers = [];
 let src_regionLayer = null;
+let tileMap = null;
+function main() {
+    logService(LogLevel.INFO, "initializing application");
 
-loader.add(imagePaths).load(() => {
-    let testMap = new tilemap(
-        app.stage,
-        japan_tconfig.tilesetPath,
-        japan_tconfig.tileMapSize,
-        japan_tconfig.tileSize
-    );
+    tileMap = new tilemap(app.stage, japan_tconfig, 2.0);
+    src_regionLayer = new regionLayer(app.stage, japan_tconfig);
 
-    const regionData = japan_tconfig.regions;
-    src_regionLayer = new regionLayer(app.stage, regionData);
-
-    let bard = new unitAvatar(app.stage, "graphics/characters/bardo_1.png", true);
+    let bard = new unitAvatar(app.stage, graphics.avatar.bard, true);
     bard.setPosition(src_regionLayer.get("SJ-1").getCenter());
     dancers.push(bard);
 
-    let exec = new unitAvatar(app.stage, "graphics/characters/executioner_1.png");
+    let exec = new unitAvatar(app.stage, graphics.avatar.exec);
     exec.setPosition(src_regionLayer.get("SJ-2").getCenter());
     dancers.push(exec);
 
-    let knight = new unitAvatar(app.stage, "graphics/characters/knights_1x.png");
-    knight.setPosition(src_regionLayer.get("SJ-3").getCenter());
-    dancers.push(knight);
-
-    let texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-green.png"));
-    let arrow = new pixi_es["Sprite"](texture);
-    arrow.position.set(300, 100);
-    arrow.rotation = Math.PI / 3.254;
-    arrow.scale.set(0.9, 0.9);
-    arrow.alpha = 0.5;
-    app.stage.addChild(arrow);
-
-    texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-green.png"));
-    let arrow2 = new pixi_es["Sprite"](texture);
-    arrow2.position.set(350, 100);
-    arrow2.rotation = Math.PI / 3.254;
-    arrow2.scale.set(0.9, 0.9);
-    app.stage.addChild(arrow2);
-
-    texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-gray.png"));
-    let arrowGray = new pixi_es["Sprite"](texture);
-    arrowGray.position.set(400, 100);
-    arrowGray.rotation = Math.PI / 3.254;
-    arrowGray.scale.set(0.9, 0.9);
-    arrowGray.alpha = 0.5;
-    app.stage.addChild(arrowGray);
-
-    texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-gray.png"));
-    let arrowGray2 = new pixi_es["Sprite"](texture);
-    arrowGray2.position.set(450, 100);
-    arrowGray2.rotation = Math.PI / 3.254;
-    arrowGray2.scale.set(0.9, 0.9);
-    app.stage.addChild(arrowGray2);
-
-    // let conductor = new Conductor();
-    // conductor.playExecuteAttackSequence(attacker, defender, battleOutcome)
-    // conductor.playMoveUnit(unit, region)
-    // conductor.playDeploy(region, amount)
+    let ghost = new unitAvatar(app.stage, graphics.avatar.ghost);
+    ghost.setPosition(src_regionLayer.get("SEJ-1").getCenter());
+    dancers.push(ghost);
 
     pixi_js_keyboard_default.a.events.on("released", (keyCode, event) => {
         if (keyCode === "KeyA") {
             for (let human of dancers) {
                 human.playWalkAnimation();
             }
-        } else if (keyCode === "KeyB") {
-            for (let human of dancers) {
-                human.stopAnimation();
-            }
-        } else if (keyCode === "KeyC") {
-            bard.walk([50, 50]);
-        } else if (keyCode === "KeyD") {
-            bard.walk([100, 100]);
-        } else if (keyCode === "KeyE") {
-            bard.walk([200, 100]);
-        } else if (keyCode === "KeyF") {
-            bard.walk([200, 200]);
-        } else if (keyCode === "KeyG") {
-            bard.walk([100, 200]);
-        } else if (keyCode === "KeyH") {
-            bard.setDirection("right");
-            bard.playAttackAnimation();
-        } else if (keyCode === "KeyI") {
-            bard.slide([120, 100], 2);
-        } else if (keyCode === "KeyJ") {
-            bard.shake(3);
-        } else if (keyCode === "KeyK") {
-            bard.morphNumber(2.0, 0.08);
-        } else if (keyCode === "KeyL") {
-            bard.morphNumber(1.0, 0.08);
-        } else if (keyCode === "KeyM") {
-            bard.blendNumberColor("#ff0000", 50);
-        } else if (keyCode === "KeyN") {
-            bard.blendNumberColor("#00ff88", 30);
-        } else if (keyCode === "KeyO") {
-            bard.fade(0.2, 0.01);
-        } else if (keyCode === "KeyP") {
-            bard.fade(1.0, 0.01);
-        } else if (keyCode === "KeyQ") {
-            bard.playDeathAnimation();
-        } else if (keyCode === "KeyR") {
-            bard.morph(2.0, 0.05);
-        } else if (keyCode === "KeyS") {
-            bard.morph(1.0, 0.08);
         }
     });
 
+    // let conductor = new Conductor();
+    // conductor.playExecuteAttackSequence(attacker, defender, battleOutcome)
+    // conductor.playMoveUnit(unit, region)
+    // conductor.playDeploy(region, amount)
+
     app.ticker.add(gameLoop);
-});
+}
 
 function gameLoop(delta) {
     pixi_js_keyboard_default.a.update();

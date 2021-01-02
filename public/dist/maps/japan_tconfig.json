@@ -1,42 +1,55 @@
 {
     "maxPlayers": 4,
     "tilesetPath": "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
-    "tileMapSize": [40, 20],
+    "tileMapSize": [25, 19],
     "tileSize": [16, 16],
+    "continents": [
+        {
+            "name": "South Japan",
+            "regions": ["SJ-1", "SJ-2"],
+            "outlineColor": "#ff0000"
+        },
+        {
+            "name": "Southeast Japan",
+            "regions": ["SEJ-1", "SEJ-2", "SEJ-3", "SEJ-4"],
+            "outlineColor": "#00ff00"
+        }
+    ],
     "regions": [
         {
-            "continent": "Southeast Japan",
             "name": "SJ-1",
-            "hasCastle": false,
-            "hasVillage": false,
             "position": [50, 50],
+            "path": [0, 0, 100, 0, 100, 100, 0, 100],
+            "centerPoint": [50, 50],
+            "borders": ["SJ-2"]
+        },
+        {
+            "name": "SJ-2",
+            "position": [50, 160],
             "path": [0, 0, 100, 0, 100, 100, 0, 100],
             "centerPoint": [50, 50]
         },
         {
-            "continent": "Southeast Japan",
-            "name": "SJ-2",
-            "hasCastle": false,
-            "hasVillage": false,
+            "name": "SEJ-1",
             "position": [160, 50],
             "path": [0, 0, 100, 0, 100, 100, 0, 100],
             "centerPoint": [50, 50]
         },
         {
-            "continent": "Southeast Japan",
-            "name": "SJ-3",
-            "hasCastle": false,
-            "hasVillage": false,
+            "name": "SEJ-2",
+            "position": [270, 50],
+            "path": [0, 0, 100, 0, 100, 100, 0, 100],
+            "centerPoint": [50, 50]
+        },
+        {
+            "name": "SEJ-3",
             "position": [160, 160],
             "path": [0, 0, 100, 0, 100, 100, 0, 100],
             "centerPoint": [50, 50]
         },
         {
-            "continent": "Southeast Japan",
-            "name": "SJ-4",
-            "hasCastle": false,
-            "hasVillage": false,
-            "position": [50, 160],
+            "name": "SEJ-4",
+            "position": [270, 160],
             "path": [0, 0, 100, 0, 100, 100, 0, 100],
             "centerPoint": [50, 50]
         }

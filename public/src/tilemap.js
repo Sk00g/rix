@@ -2,8 +2,11 @@ import * as PIXI from "pixi.js";
 
 // Class used for displaying tilemap
 class TileMap {
-    constructor(stage, path, size, tileSize) {
-        this._tileSize = tileSize;
+    constructor(stage, mapData, scale) {
+        const path = mapData.tilesetPath;
+        const size = mapData.tileMapSize;
+
+        this._tileSize = mapData.tileSize;
         this._tileIndices = [];
         this._tileSprites = [];
 
@@ -14,11 +17,12 @@ class TileMap {
                 let texture = new PIXI.Texture(PIXI.BaseTexture.from(path));
                 let sprite = new PIXI.Sprite(texture);
 
-                sprite.position.set(x * tileSize[0], y * tileSize[1]);
+                sprite.position.set(x * this._tileSize[0] * scale, y * this._tileSize[1] * scale);
+                sprite.scale.set(scale, scale);
 
                 this._tileSprites[x][y] = sprite;
 
-                this.updateTileIndex(x, y, 0, 0);
+                this.updateTileIndex(x, y, Math.floor(Math.random() * 3), 0);
 
                 stage.addChild(sprite);
             }
@@ -29,7 +33,7 @@ class TileMap {
         this._tileIndices[tileX][tileY] = [indexX, indexY];
         this._tileSprites[tileX][tileY].texture.frame = new PIXI.Rectangle(
             indexX * this._tileSize[0],
-            indexX * this._tileSize[1],
+            indexY * this._tileSize[1],
             this._tileSize[0],
             this._tileSize[1]
         );

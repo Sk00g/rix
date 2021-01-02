@@ -1,14 +1,14 @@
 import * as PIXI from "pixi.js";
 import * as V from "../vector.js";
 import * as utils from "./utils.js";
+import assetLoader from "../assetLoader.js";
 import Label from "./suie/label.js";
+import graphics from "../game_data/graphics.js";
 
 const WALK_ANIM_INTERVAL = 11.5;
 const ATTACK_ANIM_INTERVAL = 20;
 const SCALE = 1.5;
 const COUNTER_SCALE = 1.75;
-const COUNTER_PATH = "graphics/ui/source/16x16/Set1/Set1-1.png";
-const ALT_COUNTER_PATH = "graphics/ui/source/16x16/Set2/Set2-1.png";
 const MIN_MOVE_DISTANCE = 2;
 const WALK_SPEED = 1;
 const SHAKE_INCREMENT_MAX = 3;
@@ -23,7 +23,7 @@ class UnitAvatar {
         this._stage = stage;
 
         // Copy texture so we can change frame only for this unit
-        this._texture = new PIXI.Texture(PIXI.BaseTexture.from(path));
+        this._texture = assetLoader.loadTexture(path);
 
         // Default start frame is facing down stand
         this._direction = "down";
@@ -115,8 +115,10 @@ class UnitAvatar {
         this.sprite.scale.set(SCALE, SCALE);
 
         // Create the amount counter
-        let counterTexture = new PIXI.Texture(
-            PIXI.BaseTexture.from(altCounter ? ALT_COUNTER_PATH : COUNTER_PATH)
+        let counterTexture = assetLoader.loadTexture(
+            altCounter
+                ? graphics.interface.button_frame_blue
+                : graphics.interface.button_frame_brown
         );
         this._counterSprite = new PIXI.Sprite(counterTexture);
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);

@@ -1,0 +1,69 @@
+:JAN 2021-01-01:
+
+FOR EACH GAME STATE:
+- initialization()
+- transitions()
+- end()
+- update()
+- render()
+
+stateManager.pop()
+
+ORIGIN_SELECTION -> TARGET_SELECTION
+
+
+
+OVERARCHING APP STATES:
+
+LOGIN -> LOBBY -> GAMEPLAY 
+            -> STATSVIEW
+            -> CREATE GAME
+
+
+GAMEPLAY STATES:
+
+VIEW_ONLY -> REPLAY_TURN -> DEPLOY -> ORDER
+
+ORDER STATES:
+    -> PRE_SELECT 
+        * hover action on region if has more than one unit
+        * can select a region for a new order, or an existing order
+    -> ORDER_EDIT (can't end order phase from this state)
+        * on init -> highlight the order so it's clear it's selected
+        * arrows from gray to green
+        * put up amount GUI [X][M] -1 +1 +5 [Y]
+        * while in this state, can select a new region to target
+        * state can be easily cancelled by clicks / hotkeys
+        * place holder for an order is pathway of gray areas, 50% faded / smaller? avatar with num?
+    -> TARGET_SELECT
+        * when you select a valid region
+        * strong fading on all regions that are no longer clickable
+        * fairly strong highlighting of selected region, walking unit, grow 0.25
+        * highlight viable targets with slightly different hover based on ally / enemy
+        * when region is selected -> ORDER_EDIT
+    -> CONFIRM
+        * obvious message section bottom / right
+        * throughout state, all orders are laid out somewhere in HUD for review (also in actual map)
+        * units march out of owned region into middle ground on arrow (or occurs during ORDER_EDIT?)
+
+DEPLOY STATES:
+    -> REGION_SELECTION (hover action on region)
+        * in this state, can end deployment with a button / hotkey -> CONFIRM
+    -> EDIT_AMOUNT 
+        * select graphics on region, edit numbers UI [X][M] -1 +1 +5 [Y]
+        * faded counter beside actual counter with current value
+        * deselect by other region or explicit ENTER or check ([Y])
+            -> on deselect, do the walk-in fade thing animation, stay 75%
+        * buttons graying out when you can't
+        * HUD includes side bar with little army dudes that disappear as you deploy
+    -> CONFIRM 
+        * optional confirmation, very obvious message section bottom / right
+        * exits deploy into ORDER state
+        * run final animation with opaqueness, number glow, etc.
+
+General Notes:
+    - player own units are bright and others dimmed in DEPLOY or ORDER states
+
+
+#TODO
+* switch counter number button things to palette based on player
