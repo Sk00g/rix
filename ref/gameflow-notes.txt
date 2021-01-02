@@ -20,6 +20,7 @@ LOGIN -> LOBBY -> GAMEPLAY
             -> CREATE GAME
 
 
+
 GAMEPLAY STATES:
 
 VIEW_ONLY -> REPLAY_TURN -> DEPLOY -> ORDER
@@ -67,3 +68,5 @@ General Notes:
 
 #TODO
 * switch counter number button things to palette based on player
+* make game state manager (for GAMEPLAY only)
+* 

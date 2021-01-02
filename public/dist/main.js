@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 24);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -277,10 +277,10 @@ __webpack_require__.d(utils_es_namespaceObject, "trimCanvas", function() { retur
 __webpack_require__.d(utils_es_namespaceObject, "uid", function() { return uid; });
 
 // EXTERNAL MODULE: ./node_modules/es6-promise-polyfill/promise.js
-var promise = __webpack_require__(10);
+var promise = __webpack_require__(11);
 
 // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-var object_assign = __webpack_require__(11);
+var object_assign = __webpack_require__(12);
 var object_assign_default = /*#__PURE__*/__webpack_require__.n(object_assign);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/polyfill/lib/polyfill.es.js
@@ -812,15 +812,15 @@ var settings = {
 //# sourceMappingURL=settings.es.js.map
 
 // EXTERNAL MODULE: ./node_modules/eventemitter3/index.js
-var eventemitter3 = __webpack_require__(7);
+var eventemitter3 = __webpack_require__(8);
 var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
 
 // EXTERNAL MODULE: ./node_modules/earcut/src/earcut.js
-var earcut = __webpack_require__(8);
+var earcut = __webpack_require__(9);
 var earcut_default = /*#__PURE__*/__webpack_require__.n(earcut);
 
-// EXTERNAL MODULE: D:/Dev/games/Rix/node_modules/url/url.js
-var url_url = __webpack_require__(3);
+// EXTERNAL MODULE: ./node_modules/url/url.js
+var url_url = __webpack_require__(4);
 var url_default = /*#__PURE__*/__webpack_require__.n(url_url);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/constants/lib/constants.es.js
@@ -39168,7 +39168,7 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(9);
+const Events = __webpack_require__(10);
 
 let canvasElement = null;
 
@@ -39318,6 +39318,32 @@ module.exports = mouse;
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39345,7 +39371,7 @@ module.exports = mouse;
 
 
 var punycode = __webpack_require__(16);
-var util = __webpack_require__(19);
+var util = __webpack_require__(18);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -39420,7 +39446,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(20);
+    querystring = __webpack_require__(19);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -40056,32 +40082,6 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -40139,12 +40139,126 @@ module.exports = parseURI
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const PIXI = __webpack_require__(0);
+const Events = __webpack_require__(10);
+
+class Keyboard {
+	constructor() {
+		this.keyStates = new Map();
+    this.events = new Events();
+	}
+  
+  clear() {
+    this.keyStates.clear();
+  }
+  
+  update() {
+    this.keyStates.forEach((value, keyCode) => {
+      const event = this.keyStates.get(keyCode);
+
+      event.alreadyPressed = true;
+      
+      if (event.wasReleased) {
+        this.keyStates.delete(keyCode);
+      }
+
+      keyboard.events.call('down', keyCode, event);
+      keyboard.events.call('down_' + keyCode, keyCode, event);
+    });
+  }
+  
+  isKeyDown(...args) {
+    let result = false;
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased)
+        result = true;
+    }
+    
+    return result;
+  }
+  
+  isKeyUp(...args) {
+    return !this.isKeyDown(args);
+  }
+  
+  isKeyPressed(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased && !event.alreadyPressed)
+        result = true;
+    }
+
+    return result;
+  }
+  
+  isKeyReleased(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && event.wasReleased)
+        result = true;
+    }
+
+    return result;
+  }
+}
+
+const keyboard = new Keyboard();
+
+window.addEventListener(
+  "keydown", (event) => {
+    if (!keyboard.keyStates.get(event.code)) {
+      keyboard.keyStates.set(event.code, event);
+      keyboard.events.call('pressed', event.code, event);
+      keyboard.events.call('pressed_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+window.addEventListener(
+  "keyup", (event) => {
+    event = keyboard.keyStates.get(event.code);
+    if (event) {
+      //keyboard.keyStates.set(event.code, event);
+      event.wasReleased = true;
+      keyboard.events.call('released', event.code, event);
+      keyboard.events.call('released_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+/*keyboard.events.on('pressed', null, (keyCode, event) => {
+  console.log('dd', keyCode);
+});*/
+/*
+setInterval(() => {
+  console.log(keyboard.isKeyReleased('KeyA'));
+  keyboard.update();
+}, 0);*/
+
+module.exports = keyboard;
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module) {
 
 module.exports = JSON.parse("{\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[25,19],\"tileSize\":[16,16],\"continents\":[{\"name\":\"South Japan\",\"regions\":[\"SJ-1\",\"SJ-2\"],\"outlineColor\":\"#ff0000\"},{\"name\":\"Southeast Japan\",\"regions\":[\"SEJ-1\",\"SEJ-2\",\"SEJ-3\",\"SEJ-4\"],\"outlineColor\":\"#00ff00\"}],\"regions\":[{\"name\":\"SJ-1\",\"position\":[50,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50],\"borders\":[\"SJ-2\"]},{\"name\":\"SJ-2\",\"position\":[50,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-1\",\"position\":[160,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-2\",\"position\":[270,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-3\",\"position\":[160,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-4\",\"position\":[270,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]}]}");
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40487,7 +40601,7 @@ if (true) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41173,15 +41287,15 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const Events = __webpack_require__(23);
+const Events = __webpack_require__(22);
 
 module.exports = Events;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {var __WEBPACK_AMD_DEFINE_RESULT__;(function(global){
@@ -41528,10 +41642,10 @@ Promise.reject = function(reason){
 
 })(typeof window != 'undefined' ? window : typeof global != 'undefined' ? global : typeof self != 'undefined' ? self : this);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(13).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(13).setImmediate))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41628,120 +41742,6 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(9);
-
-class Keyboard {
-	constructor() {
-		this.keyStates = new Map();
-    this.events = new Events();
-	}
-  
-  clear() {
-    this.keyStates.clear();
-  }
-  
-  update() {
-    this.keyStates.forEach((value, keyCode) => {
-      const event = this.keyStates.get(keyCode);
-
-      event.alreadyPressed = true;
-      
-      if (event.wasReleased) {
-        this.keyStates.delete(keyCode);
-      }
-
-      keyboard.events.call('down', keyCode, event);
-      keyboard.events.call('down_' + keyCode, keyCode, event);
-    });
-  }
-  
-  isKeyDown(...args) {
-    let result = false;
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased)
-        result = true;
-    }
-    
-    return result;
-  }
-  
-  isKeyUp(...args) {
-    return !this.isKeyDown(args);
-  }
-  
-  isKeyPressed(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased && !event.alreadyPressed)
-        result = true;
-    }
-
-    return result;
-  }
-  
-  isKeyReleased(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && event.wasReleased)
-        result = true;
-    }
-
-    return result;
-  }
-}
-
-const keyboard = new Keyboard();
-
-window.addEventListener(
-  "keydown", (event) => {
-    if (!keyboard.keyStates.get(event.code)) {
-      keyboard.keyStates.set(event.code, event);
-      keyboard.events.call('pressed', event.code, event);
-      keyboard.events.call('pressed_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-window.addEventListener(
-  "keyup", (event) => {
-    event = keyboard.keyStates.get(event.code);
-    if (event) {
-      //keyboard.keyStates.set(event.code, event);
-      event.wasReleased = true;
-      keyboard.events.call('released', event.code, event);
-      keyboard.events.call('released_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-/*keyboard.events.on('pressed', null, (keyCode, event) => {
-  console.log('dd', keyCode);
-});*/
-/*
-setInterval(() => {
-  console.log(keyboard.isKeyReleased('KeyA'));
-  keyboard.update();
-}, 0);*/
-
-module.exports = keyboard;
-
-
-/***/ }),
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -41809,7 +41809,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
 
 /***/ }),
 /* 14 */
@@ -42002,7 +42002,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(15)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(15)))
 
 /***/ }),
 /* 15 */
@@ -42718,7 +42718,7 @@ process.umask = function() { return 0; };
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(17)(module), __webpack_require__(18)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(17)(module), __webpack_require__(3)))
 
 /***/ }),
 /* 17 */
@@ -42750,32 +42750,6 @@ module.exports = function(module) {
 
 /***/ }),
 /* 18 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42798,18 +42772,18 @@ module.exports = {
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(21);
-exports.encode = exports.stringify = __webpack_require__(22);
+exports.decode = exports.parse = __webpack_require__(20);
+exports.encode = exports.stringify = __webpack_require__(21);
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42900,7 +42874,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42992,11 +42966,11 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //const format = require("string-format");
-const Resolver = __webpack_require__(24);
+const Resolver = __webpack_require__(23);
 
 class EventElement {
 	constructor(subEventName, isAsync, funct) {
@@ -43233,7 +43207,7 @@ module.exports = Events;
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports) {
 
 class Resolver {
@@ -43325,7 +43299,7 @@ class Resolver {
 module.exports = Resolver;
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43774,7 +43748,7 @@ function logService(level, message, source = "APP", production = false) {
 });
 
 // EXTERNAL MODULE: ./node_modules/pixi.js-keyboard/index.js
-var pixi_js_keyboard = __webpack_require__(12);
+var pixi_js_keyboard = __webpack_require__(6);
 var pixi_js_keyboard_default = /*#__PURE__*/__webpack_require__.n(pixi_js_keyboard);
 
 // CONCATENATED MODULE: ./public/src/tilemap.js
@@ -44408,7 +44382,7 @@ class unitAvatar_UnitAvatar {
 /* harmony default export */ var unitAvatar = (unitAvatar_UnitAvatar);
 
 // EXTERNAL MODULE: ./public/dist/maps/japan_tconfig.json
-var japan_tconfig = __webpack_require__(6);
+var japan_tconfig = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./public/src/index.js
 
