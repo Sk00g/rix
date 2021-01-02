@@ -43650,13 +43650,21 @@ class textButton_TextButton extends pixi_es["Container"] {
 });
 
 // CONCATENATED MODULE: ./public/src/sengine/utils.js
+function RGBFromString(hexString) {
+    if (hexString.substr(0, 1) === "#") hexString = hexString.substr(1);
+    let num = parseInt(hexString, 16);
+    return { r: num >> 16, g: (num >> 8) & 0xff, b: num & 0xff };
+}
+
+function StringFromRGB(rgbValues) {
+    return `#${Math.max(0, rgbValues.r).toString(16).padStart(2, "0")}${Math.max(0, rgbValues.g)
+        .toString(16)
+        .padStart(2, "0")}${Math.max(0, rgbValues.b).toString(16).padStart(2, "0")}`;
+}
+
 const AnimationType = Object.freeze({
     WALK: "WALK",
     STAND: "STAND",
-});
-
-/* harmony default export */ var utils = ({
-    AnimationType: AnimationType,
 });
 
 // EXTERNAL MODULE: ./node_modules/pixi.js-keyboard/index.js
@@ -43710,52 +43718,6 @@ class tilemap_TileMap {
 
 /* harmony default export */ var tilemap = (tilemap_TileMap);
 
-// CONCATENATED MODULE: ./public/src/regionLayer.js
-
-
-/*
-{
-    "continent": "Southeast Japan",
-    "hasCastle": false,
-    "hasVillage": false,
-    "polygon": [
-        [25, 432],
-        [26, 462]
-    ]
-}
-*/
-
-const LINE_FILL = [1, 0x00ff00, 1]; // width, color, alpha
-const REGION_COLOR = 0xff0000;
-const REGION_ALPHA = 0.1;
-
-class regionLayer_RegionLayer {
-    constructor(stage, regionData) {
-        this._regionData = regionData;
-
-        for (let region of regionData) {
-            let shape = new pixi_es["Graphics"]();
-
-            shape.lineStyle(LINE_FILL[0], LINE_FILL[1], LINE_FILL[2]);
-            shape.beginFill(REGION_COLOR, REGION_ALPHA);
-            shape.drawPolygon(region.path);
-            shape.endFill();
-
-            shape.position.set(region.position[0], region.position[1]);
-
-            stage.addChild(shape);
-        }
-    }
-
-    getRegionCenter(regionName) {
-        let match = this._regionData.find((reg) => reg.name === regionName);
-        if (!match) throw new Error("YOU SUCK!");
-        return [match.position[0] + match.centerPoint[0], match.position[1] + match.centerPoint[1]];
-    }
-}
-
-/* harmony default export */ var src_regionLayer = (regionLayer_RegionLayer);
-
 // CONCATENATED MODULE: ./public/src/vector.js
 function subtract(vecA, vecB) {
     return [vecA[0] - vecB[0], vecA[1] - vecB[1]];
@@ -43778,16 +43740,137 @@ function multiply(vector, value) {
     return [vector[0] * value, vector[1] * value];
 }
 
+function isPointWithinPolygon(point, vertices) {
+    let minX = 999999;
+    let maxX = -1;
+    let minY = 999999;
+    let maxY = -1;
+    for (let vert of vertices) {
+        if (vert[0] < minX) minX = vert[0];
+        else if (vert[0] > maxX) maxX = vert[0];
+        if (vert[1] < minY) minY = vert[1];
+        else if (vert[1] > maxY) maxY = vert[1];
+    }
+
+    return point[0] < maxX && point[0] > minX && point[1] < maxY && point[1] > minY;
+}
+
+// CONCATENATED MODULE: ./public/src/regionLayer.js
+
+
+
+/*
+{
+    "continent": "Southeast Japan",
+    "hasCastle": false,
+    "hasVillage": false,
+    "polygon": [
+        [25, 432],
+        [26, 462]
+    ]
+}
+*/
+
+const LINE_FILL = [1, 0x8282f0, 0.8]; // width, color, alpha
+const REGION_COLOR = 0xffffff;
+const REGION_ALPHA = 0.05;
+
+class regionLayer_Region {
+    constructor(data, stage) {
+        this._stage = stage;
+
+        // Data from the actual map file is considered 'static' because it can't change after init
+        this._static = { ...data };
+
+        // PUBLICLY ACCESSIBLE BECAUSE THEY WOULD NEVER BE CHANGED ANYWAYS
+        this.vertices = [];
+        this.absoluteVertices = [];
+        for (let i = 0; i < data.path.length; i += 2) {
+            this.vertices.push([data.path[i], data.path[i + 1]]);
+            this.absoluteVertices.push([
+                data.path[i] + data.position[0],
+                data.path[i + 1] + data.position[1],
+            ]);
+        }
+
+        this._fillColor = REGION_COLOR;
+        this._fillAlpha = REGION_ALPHA;
+        this._outlineFill = LINE_FILL;
+        this._shape = null;
+
+        this._render();
+    }
+
+    setStyle(style) {
+        if ("fillColor" in style) this._fillColor = style.fillColor;
+        if ("fillAlpha" in style) this._fillAlpha = style.fillAlpha;
+        if ("outline" in style) this._outlineFill = style.outline;
+
+        this._render();
+    }
+
+    getCenter() {
+        return [
+            this._static.position[0] + this._static.centerPoint[0],
+            this._static.position[1] + this._static.centerPoint[1],
+        ];
+    }
+
+    _render() {
+        if (this._shape) this._stage.removeChild(this._shape);
+
+        this._shape = new pixi_es["Graphics"]();
+
+        this._shape.lineStyle(this._outlineFill[0], this._outlineFill[1], this._outlineFill[2]);
+        this._shape.beginFill(this._fillColor, this._fillAlpha);
+        this._shape.drawPolygon(this._static.path);
+        this._shape.endFill();
+
+        this._shape.position.set(this._static.position[0], this._static.position[1]);
+
+        this._stage.addChild(this._shape);
+    }
+}
+
+class regionLayer_RegionLayer {
+    constructor(stage, regionData) {
+        this._staticData = regionData;
+        this._stage = stage;
+        this._regions = {};
+
+        for (let data of regionData) {
+            this._regions[data.name] = new regionLayer_Region(data, stage);
+        }
+    }
+
+    get(name) {
+        return this._regions[name];
+    }
+
+    update(delta, mousePos) {
+        for (let key in this._regions) {
+            let region = this._regions[key];
+            if (isPointWithinPolygon(mousePos, region.absoluteVertices)) {
+                region.setStyle({ outline: [1, 0x8282f0, 1], fillAlpha: 0.1 });
+            }
+        }
+    }
+}
+
+/* harmony default export */ var regionLayer = (regionLayer_RegionLayer);
+
 // CONCATENATED MODULE: ./public/src/sengine/unitAvatar.js
+
 
 
 
 
 const WALK_ANIM_INTERVAL = 11.5;
 const ATTACK_ANIM_INTERVAL = 20;
-const SCALE = 1.0;
-const COUNTER_SCALE = 1.5;
+const SCALE = 1.5;
+const COUNTER_SCALE = 1.75;
 const COUNTER_PATH = "graphics/ui/source/16x16/Set1/Set1-1.png";
+const ALT_COUNTER_PATH = "graphics/ui/source/16x16/Set2/Set2-1.png";
 const MIN_MOVE_DISTANCE = 2;
 const WALK_SPEED = 1;
 const SHAKE_INCREMENT_MAX = 3;
@@ -43798,7 +43881,9 @@ Go in order of down, left, right, up, with the resting or 'stand' animation in t
 */
 
 class unitAvatar_UnitAvatar {
-    constructor(stage, path, startRect = new pixi_es["Rectangle"](0, 2, 26, 36)) {
+    constructor(stage, path, altCounter = false, startRect = new pixi_es["Rectangle"](0, 2, 26, 36)) {
+        this._stage = stage;
+
         // Copy texture so we can change frame only for this unit
         this._texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
 
@@ -43825,13 +43910,22 @@ class unitAvatar_UnitAvatar {
         this._shakeIncrements = 0;
 
         // Morph number animation properties
-        this._morphTarget = null;
-        this._morphSpeed = 0;
+        this._morphNumberTarget = null;
+        this._morphNumberSpeed = 0;
         this._morphPreviousSize = [0, 0];
 
         // Blend number animation properties
         this._blendNumberTarget = null;
-        this._blendNumberSpeed = 0;
+        this._blendNumberSpeeds = null;
+        this._blendNumberIncrementsRemaining = 0;
+
+        // Fade avatar animation properties
+        this._fadeTarget = null;
+        this._fadeSpeed = 0;
+
+        // Morph avatar animation properties
+        this._morphTarget = null;
+        this._morphSpeed = 0;
 
         let x = startRect.x;
         let y = startRect.y;
@@ -43883,10 +43977,12 @@ class unitAvatar_UnitAvatar {
         this.sprite.scale.set(SCALE, SCALE);
 
         // Create the amount counter
-        let counterTexture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(COUNTER_PATH));
+        let counterTexture = new pixi_es["Texture"](
+            pixi_es["BaseTexture"].from(altCounter ? ALT_COUNTER_PATH : COUNTER_PATH)
+        );
         this._counterSprite = new pixi_es["Sprite"](counterTexture);
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
-        this._counterLabel = new label(Math.floor(Math.random() * 6), [0, 0], 8, "#ffffff");
+        this._counterLabel = new label(Math.floor(Math.random() * 6), [0, 0], 12, "#ffffff");
 
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
@@ -43905,19 +44001,39 @@ class unitAvatar_UnitAvatar {
         this._shakeIncrements = 0;
     }
 
-    morphNumber(newScale, speed) {
+    morph(newScale, speed) {
         this._morphTarget = newScale;
         this._morphSpeed = speed;
+    }
+
+    morphNumber(newScale, speed) {
+        this._morphNumberTarget = newScale;
+        this._morphNumberSpeed = speed;
         this._morphPreviousSize = [this._counterLabel.width, this._counterLabel.height];
     }
 
-    blendNumberColor(newColor, speed) {
+    blendNumberColor(newColor, increments) {
         this._blendNumberTarget = newColor;
-        this._blendNumberSpeed = speed;
+        this._blendNumberIncrementsRemaining = increments;
+        let targetColors = RGBFromString(newColor);
+        let currentColors = RGBFromString(this._counterLabel.style.fill);
+
+        // Store speeds for R / G / B values separately based on increment
+        this._blendNumberSpeeds = {};
+        for (let key in targetColors)
+            this._blendNumberSpeeds[key] = Math.round(
+                (targetColors[key] - currentColors[key]) / increments
+            );
+    }
+
+    fade(newAlpha, speed) {
+        this._fadeTarget = newAlpha;
+        this._fadeSpeed = speed;
     }
 
     playDeathAnimation() {
-        // Shake and dissapear
+        this.shake(4);
+        setTimeout(() => this.fade(0.01, 0.01), 500);
     }
 
     playWalkAnimation(loop = true) {
@@ -43975,8 +44091,8 @@ class unitAvatar_UnitAvatar {
     setPosition(position) {
         this._position = [...position];
 
-        let unitX = position[0] - this.width / 2;
-        let unitY = position[1] - this.height / 2;
+        let unitX = position[0] - (this.width / 2) * SCALE;
+        let unitY = position[1] - (this.height / 2) * SCALE;
         this.sprite.position.set(unitX, unitY);
 
         if (!this._shakeMagnitude) {
@@ -44076,7 +44192,6 @@ class unitAvatar_UnitAvatar {
                 this.getPosition()[1],
             ];
 
-            console.log(newPosition);
             this.setPosition(newPosition);
 
             this._shakeIncrements++;
@@ -44090,15 +44205,18 @@ class unitAvatar_UnitAvatar {
         }
     }
 
-    _updateMorph() {
-        if (this._morphTarget) {
-            let sign = this._morphTarget > this._counterLabel.scale.x ? 1 : -1;
-            this._counterLabel.scale.x += sign * this._morphSpeed;
-            this._counterLabel.scale.y += sign * this._morphSpeed;
+    _updateMorphNumber() {
+        if (this._morphNumberTarget) {
+            let sign = this._morphNumberTarget > this._counterLabel.scale.x ? 1 : -1;
+            this._counterLabel.scale.x += sign * this._morphNumberSpeed;
+            this._counterLabel.scale.y += sign * this._morphNumberSpeed;
 
-            if (Math.abs(this._counterLabel.scale.x - this._morphTarget) < this._morphSpeed) {
-                this._counterLabel.scale.set(this._morphTarget, this._morphTarget);
-                this._morphTarget = null;
+            if (
+                Math.abs(this._counterLabel.scale.x - this._morphNumberTarget) <
+                this._morphNumberSpeed
+            ) {
+                this._counterLabel.scale.set(this._morphNumberTarget, this._morphNumberTarget);
+                this._morphNumberTarget = null;
             }
 
             // Center
@@ -44114,10 +44232,50 @@ class unitAvatar_UnitAvatar {
 
     _updateBlendNumber() {
         if (this._blendNumberTarget) {
-            let currentStyle = { ...this._counterLabel.style };
-            currentStyle.fill = "#ff0000";
-            this._counterLabel.style = currentStyle;
-            this._blendNumberTarget = null;
+            let colors = RGBFromString(this._counterLabel.style._fill);
+            for (let key in colors)
+                colors[key] = Math.max(
+                    Math.min(255, colors[key] + this._blendNumberSpeeds[key]),
+                    0
+                );
+            this._blendNumberIncrementsRemaining--;
+
+            let style = { ...this._counterLabel.style };
+            style.fill =
+                this._blendNumberIncrementsRemaining === 0
+                    ? this._blendNumberTarget
+                    : StringFromRGB(colors);
+
+            this._counterLabel.style = style;
+
+            if (this._blendNumberIncrementsRemaining === 0) {
+                this._blendNumberTarget = null;
+            }
+        }
+    }
+
+    _updateFade() {
+        if (this._fadeTarget) {
+            if (Math.abs(this.sprite.alpha - this._fadeTarget) < this._fadeSpeed) {
+                this.sprite.alpha = this._fadeTarget;
+                this._fadeTarget = null;
+            } else {
+                let sign = this._fadeTarget > this.sprite.alpha ? 1 : -1;
+                this.sprite.alpha += sign * this._fadeSpeed;
+            }
+        }
+    }
+
+    _updateMorph() {
+        if (this._morphTarget) {
+            let sign = this._morphTarget > this.sprite.scale.x ? 1 : -1;
+            this.sprite.scale.x += sign * this._morphSpeed;
+            this.sprite.scale.y += sign * this._morphSpeed;
+
+            if (Math.abs(this.sprite.scale.x - this._morphTarget) < this._morphSpeed) {
+                this.sprite.scale.set(this._morphTarget, this._morphTarget);
+                this._morphTarget = null;
+            }
         }
     }
 
@@ -44127,6 +44285,8 @@ class unitAvatar_UnitAvatar {
         this._updateSlide(delta);
         this._updateShake(delta);
         this._updateMorph();
+        this._updateFade();
+        this._updateMorphNumber();
         this._updateBlendNumber();
 
         // Ensure we are displaying the correct frame
@@ -44153,7 +44313,7 @@ var japan_tconfig = __webpack_require__(3);
 const loader = pixi_es["Loader"].shared;
 
 pixi_es["utils"].sayHello("WebGL");
-pixi_es["settings"].RESOLUTION = 1.5;
+pixi_es["settings"].RESOLUTION = 1.0;
 
 // Initialization
 let app = new pixi_es["Application"]({ width: 800, height: 600, backgroundColor: 0x000000 });
@@ -44163,12 +44323,16 @@ document.body.appendChild(app.view);
 let imagePaths = [
     "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
     "graphics/ui/source/16x16/Set1/Set1-1.png",
+    "graphics/ui/source/16x16/Set2/Set2-1.png",
+    "graphics/ui/arrow-green.png",
+    "graphics/ui/arrow-gray.png",
     ...["bardo_1.png", "executioner_1.png", "knights_1x.png"].map(
         (path) => `graphics/characters/${path}`
     ),
 ];
 
 let dancers = [];
+let src_regionLayer = null;
 
 loader.add(imagePaths).load(() => {
     let testMap = new tilemap(
@@ -44179,19 +44343,49 @@ loader.add(imagePaths).load(() => {
     );
 
     const regionData = japan_tconfig.regions;
-    let regionLayer = new src_regionLayer(app.stage, regionData);
+    src_regionLayer = new regionLayer(app.stage, regionData);
 
-    let bard = new unitAvatar(app.stage, "graphics/characters/bardo_1.png");
-    bard.setPosition(regionLayer.getRegionCenter("SJ-1"));
+    let bard = new unitAvatar(app.stage, "graphics/characters/bardo_1.png", true);
+    bard.setPosition(src_regionLayer.get("SJ-1").getCenter());
     dancers.push(bard);
 
     let exec = new unitAvatar(app.stage, "graphics/characters/executioner_1.png");
-    exec.setPosition(regionLayer.getRegionCenter("SJ-2"));
+    exec.setPosition(src_regionLayer.get("SJ-2").getCenter());
     dancers.push(exec);
 
     let knight = new unitAvatar(app.stage, "graphics/characters/knights_1x.png");
-    knight.setPosition(regionLayer.getRegionCenter("SJ-3"));
+    knight.setPosition(src_regionLayer.get("SJ-3").getCenter());
     dancers.push(knight);
+
+    let texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-green.png"));
+    let arrow = new pixi_es["Sprite"](texture);
+    arrow.position.set(300, 100);
+    arrow.rotation = Math.PI / 3.254;
+    arrow.scale.set(0.9, 0.9);
+    arrow.alpha = 0.5;
+    app.stage.addChild(arrow);
+
+    texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-green.png"));
+    let arrow2 = new pixi_es["Sprite"](texture);
+    arrow2.position.set(350, 100);
+    arrow2.rotation = Math.PI / 3.254;
+    arrow2.scale.set(0.9, 0.9);
+    app.stage.addChild(arrow2);
+
+    texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-gray.png"));
+    let arrowGray = new pixi_es["Sprite"](texture);
+    arrowGray.position.set(400, 100);
+    arrowGray.rotation = Math.PI / 3.254;
+    arrowGray.scale.set(0.9, 0.9);
+    arrowGray.alpha = 0.5;
+    app.stage.addChild(arrowGray);
+
+    texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from("graphics/ui/arrow-gray.png"));
+    let arrowGray2 = new pixi_es["Sprite"](texture);
+    arrowGray2.position.set(450, 100);
+    arrowGray2.rotation = Math.PI / 3.254;
+    arrowGray2.scale.set(0.9, 0.9);
+    app.stage.addChild(arrowGray2);
 
     // let conductor = new Conductor();
     // conductor.playExecuteAttackSequence(attacker, defender, battleOutcome)
@@ -44229,7 +44423,19 @@ loader.add(imagePaths).load(() => {
         } else if (keyCode === "KeyL") {
             bard.morphNumber(1.0, 0.08);
         } else if (keyCode === "KeyM") {
-            bard.blendNumberColor("#ff0000", 10);
+            bard.blendNumberColor("#ff0000", 50);
+        } else if (keyCode === "KeyN") {
+            bard.blendNumberColor("#00ff88", 30);
+        } else if (keyCode === "KeyO") {
+            bard.fade(0.2, 0.01);
+        } else if (keyCode === "KeyP") {
+            bard.fade(1.0, 0.01);
+        } else if (keyCode === "KeyQ") {
+            bard.playDeathAnimation();
+        } else if (keyCode === "KeyR") {
+            bard.morph(2.0, 0.05);
+        } else if (keyCode === "KeyS") {
+            bard.morph(1.0, 0.08);
         }
     });
 
@@ -44240,6 +44446,7 @@ function gameLoop(delta) {
     pixi_js_keyboard_default.a.update();
     pixi_js_mouse_default.a.update();
 
+    src_regionLayer.update(delta, [pixi_js_mouse_default.a.posLocalX, pixi_js_mouse_default.a.posLocalY]);
     dancers.forEach((human) => human.update(delta));
 }
 

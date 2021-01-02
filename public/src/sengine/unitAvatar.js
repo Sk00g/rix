@@ -1,12 +1,14 @@
 import * as PIXI from "pixi.js";
 import * as V from "../vector.js";
+import * as utils from "./utils.js";
 import Label from "./suie/label.js";
 
 const WALK_ANIM_INTERVAL = 11.5;
 const ATTACK_ANIM_INTERVAL = 20;
-const SCALE = 1.0;
-const COUNTER_SCALE = 1.5;
+const SCALE = 1.5;
+const COUNTER_SCALE = 1.75;
 const COUNTER_PATH = "graphics/ui/source/16x16/Set1/Set1-1.png";
+const ALT_COUNTER_PATH = "graphics/ui/source/16x16/Set2/Set2-1.png";
 const MIN_MOVE_DISTANCE = 2;
 const WALK_SPEED = 1;
 const SHAKE_INCREMENT_MAX = 3;
@@ -17,7 +19,9 @@ Go in order of down, left, right, up, with the resting or 'stand' animation in t
 */
 
 class UnitAvatar {
-    constructor(stage, path, startRect = new PIXI.Rectangle(0, 2, 26, 36)) {
+    constructor(stage, path, altCounter = false, startRect = new PIXI.Rectangle(0, 2, 26, 36)) {
+        this._stage = stage;
+
         // Copy texture so we can change frame only for this unit
         this._texture = new PIXI.Texture(PIXI.BaseTexture.from(path));
 
@@ -44,13 +48,22 @@ class UnitAvatar {
         this._shakeIncrements = 0;
 
         // Morph number animation properties
-        this._morphTarget = null;
-        this._morphSpeed = 0;
+        this._morphNumberTarget = null;
+        this._morphNumberSpeed = 0;
         this._morphPreviousSize = [0, 0];
 
         // Blend number animation properties
         this._blendNumberTarget = null;
-        this._blendNumberSpeed = 0;
+        this._blendNumberSpeeds = null;
+        this._blendNumberIncrementsRemaining = 0;
+
+        // Fade avatar animation properties
+        this._fadeTarget = null;
+        this._fadeSpeed = 0;
+
+        // Morph avatar animation properties
+        this._morphTarget = null;
+        this._morphSpeed = 0;
 
         let x = startRect.x;
         let y = startRect.y;
@@ -102,10 +115,12 @@ class UnitAvatar {
         this.sprite.scale.set(SCALE, SCALE);
 
         // Create the amount counter
-        let counterTexture = new PIXI.Texture(PIXI.BaseTexture.from(COUNTER_PATH));
+        let counterTexture = new PIXI.Texture(
+            PIXI.BaseTexture.from(altCounter ? ALT_COUNTER_PATH : COUNTER_PATH)
+        );
         this._counterSprite = new PIXI.Sprite(counterTexture);
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
-        this._counterLabel = new Label(Math.floor(Math.random() * 6), [0, 0], 8, "#ffffff");
+        this._counterLabel = new Label(Math.floor(Math.random() * 6), [0, 0], 12, "#ffffff");
 
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
@@ -124,19 +139,39 @@ class UnitAvatar {
         this._shakeIncrements = 0;
     }
 
-    morphNumber(newScale, speed) {
+    morph(newScale, speed) {
         this._morphTarget = newScale;
         this._morphSpeed = speed;
+    }
+
+    morphNumber(newScale, speed) {
+        this._morphNumberTarget = newScale;
+        this._morphNumberSpeed = speed;
         this._morphPreviousSize = [this._counterLabel.width, this._counterLabel.height];
     }
 
-    blendNumberColor(newColor, speed) {
+    blendNumberColor(newColor, increments) {
         this._blendNumberTarget = newColor;
-        this._blendNumberSpeed = speed;
+        this._blendNumberIncrementsRemaining = increments;
+        let targetColors = utils.RGBFromString(newColor);
+        let currentColors = utils.RGBFromString(this._counterLabel.style.fill);
+
+        // Store speeds for R / G / B values separately based on increment
+        this._blendNumberSpeeds = {};
+        for (let key in targetColors)
+            this._blendNumberSpeeds[key] = Math.round(
+                (targetColors[key] - currentColors[key]) / increments
+            );
+    }
+
+    fade(newAlpha, speed) {
+        this._fadeTarget = newAlpha;
+        this._fadeSpeed = speed;
     }
 
     playDeathAnimation() {
-        // Shake and dissapear
+        this.shake(4);
+        setTimeout(() => this.fade(0.01, 0.01), 500);
     }
 
     playWalkAnimation(loop = true) {
@@ -194,8 +229,8 @@ class UnitAvatar {
     setPosition(position) {
         this._position = [...position];
 
-        let unitX = position[0] - this.width / 2;
-        let unitY = position[1] - this.height / 2;
+        let unitX = position[0] - (this.width / 2) * SCALE;
+        let unitY = position[1] - (this.height / 2) * SCALE;
         this.sprite.position.set(unitX, unitY);
 
         if (!this._shakeMagnitude) {
@@ -295,7 +330,6 @@ class UnitAvatar {
                 this.getPosition()[1],
             ];
 
-            console.log(newPosition);
             this.setPosition(newPosition);
 
             this._shakeIncrements++;
@@ -309,15 +343,18 @@ class UnitAvatar {
         }
     }
 
-    _updateMorph() {
-        if (this._morphTarget) {
-            let sign = this._morphTarget > this._counterLabel.scale.x ? 1 : -1;
-            this._counterLabel.scale.x += sign * this._morphSpeed;
-            this._counterLabel.scale.y += sign * this._morphSpeed;
+    _updateMorphNumber() {
+        if (this._morphNumberTarget) {
+            let sign = this._morphNumberTarget > this._counterLabel.scale.x ? 1 : -1;
+            this._counterLabel.scale.x += sign * this._morphNumberSpeed;
+            this._counterLabel.scale.y += sign * this._morphNumberSpeed;
 
-            if (Math.abs(this._counterLabel.scale.x - this._morphTarget) < this._morphSpeed) {
-                this._counterLabel.scale.set(this._morphTarget, this._morphTarget);
-                this._morphTarget = null;
+            if (
+                Math.abs(this._counterLabel.scale.x - this._morphNumberTarget) <
+                this._morphNumberSpeed
+            ) {
+                this._counterLabel.scale.set(this._morphNumberTarget, this._morphNumberTarget);
+                this._morphNumberTarget = null;
             }
 
             // Center
@@ -333,10 +370,50 @@ class UnitAvatar {
 
     _updateBlendNumber() {
         if (this._blendNumberTarget) {
-            let currentStyle = { ...this._counterLabel.style };
-            currentStyle.fill = "#ff0000";
-            this._counterLabel.style = currentStyle;
-            this._blendNumberTarget = null;
+            let colors = utils.RGBFromString(this._counterLabel.style._fill);
+            for (let key in colors)
+                colors[key] = Math.max(
+                    Math.min(255, colors[key] + this._blendNumberSpeeds[key]),
+                    0
+                );
+            this._blendNumberIncrementsRemaining--;
+
+            let style = { ...this._counterLabel.style };
+            style.fill =
+                this._blendNumberIncrementsRemaining === 0
+                    ? this._blendNumberTarget
+                    : utils.StringFromRGB(colors);
+
+            this._counterLabel.style = style;
+
+            if (this._blendNumberIncrementsRemaining === 0) {
+                this._blendNumberTarget = null;
+            }
+        }
+    }
+
+    _updateFade() {
+        if (this._fadeTarget) {
+            if (Math.abs(this.sprite.alpha - this._fadeTarget) < this._fadeSpeed) {
+                this.sprite.alpha = this._fadeTarget;
+                this._fadeTarget = null;
+            } else {
+                let sign = this._fadeTarget > this.sprite.alpha ? 1 : -1;
+                this.sprite.alpha += sign * this._fadeSpeed;
+            }
+        }
+    }
+
+    _updateMorph() {
+        if (this._morphTarget) {
+            let sign = this._morphTarget > this.sprite.scale.x ? 1 : -1;
+            this.sprite.scale.x += sign * this._morphSpeed;
+            this.sprite.scale.y += sign * this._morphSpeed;
+
+            if (Math.abs(this.sprite.scale.x - this._morphTarget) < this._morphSpeed) {
+                this.sprite.scale.set(this._morphTarget, this._morphTarget);
+                this._morphTarget = null;
+            }
         }
     }
 
@@ -346,6 +423,8 @@ class UnitAvatar {
         this._updateSlide(delta);
         this._updateShake(delta);
         this._updateMorph();
+        this._updateFade();
+        this._updateMorphNumber();
         this._updateBlendNumber();
 
         // Ensure we are displaying the correct frame
