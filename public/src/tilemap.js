@@ -9,6 +9,7 @@ class TileMap {
         this._tileSize = mapData.tileSize;
         this._tileIndices = [];
         this._tileSprites = [];
+        this._spriteContainer = new PIXI.Container();
 
         for (let x = 0; x < size[0]; x++) {
             this._tileIndices[x] = [];
@@ -24,9 +25,11 @@ class TileMap {
 
                 this.updateTileIndex(x, y, Math.floor(Math.random() * 3), 0);
 
-                stage.addChild(sprite);
+                this._spriteContainer.addChild(sprite);
             }
         }
+
+        stage.addChild(this._spriteContainer);
     }
 
     updateTileIndex(tileX, tileY, indexX, indexY) {

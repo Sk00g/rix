@@ -11,9 +11,13 @@ class Region {
     constructor(mapData, data, stage, tileScale) {
         this._stage = stage;
         this._tileScale = tileScale;
+        this._spriteContainer = new PIXI.Container();
 
         // Data from the actual map file is considered 'static' because it can't change after init
         this._static = { ...data };
+
+        // Public access properties
+        this.name = data.name;
 
         this._blipSprites = [];
         this._shadePath = [];
@@ -28,7 +32,7 @@ class Region {
                 blipY + (mapData.tileSize[0] * BLIP_SCALE) / 2
             );
             blip.position.set(blipX, blipY);
-            stage.addChild(blip);
+            this._spriteContainer.addChild(blip);
             this._blipSprites.push(blip);
         }
 
@@ -36,11 +40,17 @@ class Region {
         this._fillAlpha = DEFAULT_REGION_ALPHA;
         this._shape = null;
 
+        stage.addChild(this._spriteContainer);
+
         this._render();
     }
 
     getHitPath() {
         return this._blipSprites.map((sprite) => [sprite.position.x, sprite.position.y]);
+    }
+
+    resetStyle() {
+        this.setStyle(this._defaultStyle);
     }
 
     setStyle(style) {
@@ -61,7 +71,7 @@ class Region {
     }
 
     _render() {
-        if (this._shape) this._stage.removeChild(this._shape);
+        if (this._shape) this._spriteContainer.removeChild(this._shape);
 
         this._shape = new PIXI.Graphics();
         this._shape.lineStyle(this._outlineWidth, this._outlineColor, this._outlineAlpha);
@@ -71,7 +81,7 @@ class Region {
 
         // this._shape.position.set(this._static.position[0], this._static.position[1]);
 
-        this._stage.addChild(this._shape);
+        this._spriteContainer.addChild(this._shape);
     }
 }
 
@@ -87,12 +97,17 @@ class RegionLayer {
 
         // Set the continent colors for each region
         for (let cont of mapData.continents) {
-            for (let name of cont.regions)
-                this._regions[name].setStyle({
+            for (let name of cont.regions) {
+                this._regions[name]._defaultStyle = {
                     outlineColor: parseInt(cont.color.substr(1), 16),
+                    outlineAlpha: 1.0,
                     fillColor: parseInt(cont.color.substr(1), 16),
-                });
+                    fillAlpha: DEFAULT_REGION_ALPHA,
+                };
+            }
         }
+
+        this.clearAllStyles();
 
         this._eventHandlers = {
             mouseEnter: [], // handlers are passed the region that fired the event
@@ -108,17 +123,23 @@ class RegionLayer {
         return this._regions[name];
     }
 
+    clearAllStyles() {
+        for (let key in this._regions) {
+            this._regions[key].resetStyle();
+        }
+    }
+
     update(delta, mousePos) {
         for (let key in this._regions) {
             let region = this._regions[key];
             if (V.isPointWithinPolygon(mousePos, region.getHitPath())) {
                 if (!region.isHovering)
-                    for (let handler in this._eventHandlers.mouseEnter) handler(region);
+                    for (let handler of this._eventHandlers.mouseEnter) handler(region);
 
                 region.isHovering = true;
             } else {
                 if (region.isHovering)
-                    for (let handler in this._eventHandlers.mouseExit) handler(region);
+                    for (let handler of this._eventHandlers.mouseExit) handler(region);
                 region.isHovering = false;
             }
         }

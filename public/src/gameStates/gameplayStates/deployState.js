@@ -8,14 +8,23 @@ export const DeployStateType = Object.freeze({
 
 // Will remove these from this file if they get too big
 class RegionSelectState {
-    constructor(gameData) {}
+    constructor(gameData) {
+        this._gameData = gameData;
+        this.regionLayer = this._gameData.regionVisuals;
+    }
 
     activate() {
-        console.log("setting up activate");
         this._gameData.regionVisuals.on("mouseEnter", (region) => {
-            console.log(`Entered region ${region.name}`);
+            this.regionLayer.clearAllStyles();
+            region.setStyle({ fillAlpha: 0.25 });
+        });
+
+        this._gameData.regionVisuals.on("mouseExit", (region) => {
+            this.regionLayer.clearAllStyles();
         });
     }
+
+    update() {}
 }
 class EditAmountState {
     constructor(gameData) {
@@ -56,5 +65,8 @@ export default class DeployState extends StateManagerBase {
 
     dispose() {}
 
-    update(delta) {}
+    update(delta) {
+        let currentState = this.getActiveState();
+        if (currentState && currentState.update) currentState.update(delta);
+    }
 }

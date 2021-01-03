@@ -29,21 +29,20 @@ export default class StateManagerBase {
 
         let currentState = this._stateStack.pop();
         logService(LogLevel.DEBUG, `removing state ${currentState.stateType} from stack`);
-        if (currentState.hasOwnProperty("deactivate")) currentState.deactivate();
-        if (currentState.hasOwnProperty("dispose")) currentState.dispose();
+        if (currentState.deactivate) currentState.deactivate();
+        if (currentState.dispose) currentState.dispose();
 
         let nextState = this.getActiveState();
-        if (nextState && nextState.hasOwnProperty("activate")) nextState.activate();
+        if (nextState && nextState.activate) nextState.activate();
     }
 
     // Push a new state on top of the current stack
     pushState(stateType) {
         let currentState = this.getActiveState();
-        if (currentState && currentState.hasOwnProperty("deactivate")) currentState.deactivate();
+        if (currentState && currentState.deactivate) currentState.deactivate();
 
         let newState = this._generateState(stateType);
         newState.stateType = stateType;
-        console.log(newState);
         if (newState.activate) newState.activate();
         logService(LogLevel.DEBUG, `adding new state ${stateType} to stack`, "STATE");
         this._stateStack.push(newState);

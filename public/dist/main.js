@@ -43503,9 +43503,13 @@ class regionLayer_Region {
     constructor(mapData, data, stage, tileScale) {
         this._stage = stage;
         this._tileScale = tileScale;
+        this._spriteContainer = new pixi_es["Container"]();
 
         // Data from the actual map file is considered 'static' because it can't change after init
         this._static = { ...data };
+
+        // Public access properties
+        this.name = data.name;
 
         this._blipSprites = [];
         this._shadePath = [];
@@ -43520,7 +43524,7 @@ class regionLayer_Region {
                 blipY + (mapData.tileSize[0] * BLIP_SCALE) / 2
             );
             blip.position.set(blipX, blipY);
-            stage.addChild(blip);
+            this._spriteContainer.addChild(blip);
             this._blipSprites.push(blip);
         }
 
@@ -43528,11 +43532,17 @@ class regionLayer_Region {
         this._fillAlpha = DEFAULT_REGION_ALPHA;
         this._shape = null;
 
+        stage.addChild(this._spriteContainer);
+
         this._render();
     }
 
     getHitPath() {
         return this._blipSprites.map((sprite) => [sprite.position.x, sprite.position.y]);
+    }
+
+    resetStyle() {
+        this.setStyle(this._defaultStyle);
     }
 
     setStyle(style) {
@@ -43553,7 +43563,7 @@ class regionLayer_Region {
     }
 
     _render() {
-        if (this._shape) this._stage.removeChild(this._shape);
+        if (this._shape) this._spriteContainer.removeChild(this._shape);
 
         this._shape = new pixi_es["Graphics"]();
         this._shape.lineStyle(this._outlineWidth, this._outlineColor, this._outlineAlpha);
@@ -43563,7 +43573,7 @@ class regionLayer_Region {
 
         // this._shape.position.set(this._static.position[0], this._static.position[1]);
 
-        this._stage.addChild(this._shape);
+        this._spriteContainer.addChild(this._shape);
     }
 }
 
@@ -43579,12 +43589,17 @@ class regionLayer_RegionLayer {
 
         // Set the continent colors for each region
         for (let cont of mapData.continents) {
-            for (let name of cont.regions)
-                this._regions[name].setStyle({
+            for (let name of cont.regions) {
+                this._regions[name]._defaultStyle = {
                     outlineColor: parseInt(cont.color.substr(1), 16),
+                    outlineAlpha: 1.0,
                     fillColor: parseInt(cont.color.substr(1), 16),
-                });
+                    fillAlpha: DEFAULT_REGION_ALPHA,
+                };
+            }
         }
+
+        this.clearAllStyles();
 
         this._eventHandlers = {
             mouseEnter: [], // handlers are passed the region that fired the event
@@ -43600,17 +43615,23 @@ class regionLayer_RegionLayer {
         return this._regions[name];
     }
 
+    clearAllStyles() {
+        for (let key in this._regions) {
+            this._regions[key].resetStyle();
+        }
+    }
+
     update(delta, mousePos) {
         for (let key in this._regions) {
             let region = this._regions[key];
             if (isPointWithinPolygon(mousePos, region.getHitPath())) {
                 if (!region.isHovering)
-                    for (let handler in this._eventHandlers.mouseEnter) handler(region);
+                    for (let handler of this._eventHandlers.mouseEnter) handler(region);
 
                 region.isHovering = true;
             } else {
                 if (region.isHovering)
-                    for (let handler in this._eventHandlers.mouseExit) handler(region);
+                    for (let handler of this._eventHandlers.mouseExit) handler(region);
                 region.isHovering = false;
             }
         }
@@ -44114,6 +44135,7 @@ class tilemap_TileMap {
         this._tileSize = mapData.tileSize;
         this._tileIndices = [];
         this._tileSprites = [];
+        this._spriteContainer = new pixi_es["Container"]();
 
         for (let x = 0; x < size[0]; x++) {
             this._tileIndices[x] = [];
@@ -44129,9 +44151,11 @@ class tilemap_TileMap {
 
                 this.updateTileIndex(x, y, Math.floor(Math.random() * 3), 0);
 
-                stage.addChild(sprite);
+                this._spriteContainer.addChild(sprite);
             }
         }
+
+        stage.addChild(this._spriteContainer);
     }
 
     updateTileIndex(tileX, tileY, indexX, indexY) {
@@ -44185,21 +44209,20 @@ class stateManagerBase_StateManagerBase {
 
         let currentState = this._stateStack.pop();
         logService(LogLevel.DEBUG, `removing state ${currentState.stateType} from stack`);
-        if (currentState.hasOwnProperty("deactivate")) currentState.deactivate();
-        if (currentState.hasOwnProperty("dispose")) currentState.dispose();
+        if (currentState.deactivate) currentState.deactivate();
+        if (currentState.dispose) currentState.dispose();
 
         let nextState = this.getActiveState();
-        if (nextState && nextState.hasOwnProperty("activate")) nextState.activate();
+        if (nextState && nextState.activate) nextState.activate();
     }
 
     // Push a new state on top of the current stack
     pushState(stateType) {
         let currentState = this.getActiveState();
-        if (currentState && currentState.hasOwnProperty("deactivate")) currentState.deactivate();
+        if (currentState && currentState.deactivate) currentState.deactivate();
 
         let newState = this._generateState(stateType);
         newState.stateType = stateType;
-        console.log(newState);
         if (newState.activate) newState.activate();
         logService(LogLevel.DEBUG, `adding new state ${stateType} to stack`, "STATE");
         this._stateStack.push(newState);
@@ -44217,14 +44240,23 @@ const DeployStateType = Object.freeze({
 
 // Will remove these from this file if they get too big
 class RegionSelectState {
-    constructor(gameData) {}
+    constructor(gameData) {
+        this._gameData = gameData;
+        this.regionLayer = this._gameData.regionVisuals;
+    }
 
     activate() {
-        console.log("setting up activate");
         this._gameData.regionVisuals.on("mouseEnter", (region) => {
-            console.log(`Entered region ${region.name}`);
+            this.regionLayer.clearAllStyles();
+            region.setStyle({ fillAlpha: 0.25 });
+        });
+
+        this._gameData.regionVisuals.on("mouseExit", (region) => {
+            this.regionLayer.clearAllStyles();
         });
     }
+
+    update() {}
 }
 class EditAmountState {
     constructor(gameData) {
@@ -44265,7 +44297,10 @@ class deployState_DeployState extends stateManagerBase_StateManagerBase {
 
     dispose() {}
 
-    update(delta) {}
+    update(delta) {
+        let currentState = this.getActiveState();
+        if (currentState && currentState.update) currentState.update(delta);
+    }
 }
 
 // CONCATENATED MODULE: ./public/src/gameStates/gameplayStates/orderState.js
