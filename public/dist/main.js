@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 24);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -277,10 +277,10 @@ __webpack_require__.d(utils_es_namespaceObject, "trimCanvas", function() { retur
 __webpack_require__.d(utils_es_namespaceObject, "uid", function() { return uid; });
 
 // EXTERNAL MODULE: ./node_modules/es6-promise-polyfill/promise.js
-var promise = __webpack_require__(11);
+var promise = __webpack_require__(10);
 
 // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-var object_assign = __webpack_require__(12);
+var object_assign = __webpack_require__(11);
 var object_assign_default = /*#__PURE__*/__webpack_require__.n(object_assign);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/polyfill/lib/polyfill.es.js
@@ -812,15 +812,15 @@ var settings = {
 //# sourceMappingURL=settings.es.js.map
 
 // EXTERNAL MODULE: ./node_modules/eventemitter3/index.js
-var eventemitter3 = __webpack_require__(8);
+var eventemitter3 = __webpack_require__(7);
 var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
 
 // EXTERNAL MODULE: ./node_modules/earcut/src/earcut.js
-var earcut = __webpack_require__(9);
+var earcut = __webpack_require__(8);
 var earcut_default = /*#__PURE__*/__webpack_require__.n(earcut);
 
-// EXTERNAL MODULE: ./node_modules/url/url.js
-var url_url = __webpack_require__(4);
+// EXTERNAL MODULE: D:/Dev/games/Rix/node_modules/url/url.js
+var url_url = __webpack_require__(3);
 var url_default = /*#__PURE__*/__webpack_require__.n(url_url);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/constants/lib/constants.es.js
@@ -39168,7 +39168,7 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(10);
+const Events = __webpack_require__(9);
 
 let canvasElement = null;
 
@@ -39318,32 +39318,6 @@ module.exports = mouse;
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39370,7 +39344,7 @@ module.exports = g;
 
 
 
-var punycode = __webpack_require__(16);
+var punycode = __webpack_require__(15);
 var util = __webpack_require__(18);
 
 exports.parse = urlParse;
@@ -40082,6 +40056,32 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -40142,7 +40142,7 @@ module.exports = parseURI
 /***/ (function(module, exports, __webpack_require__) {
 
 const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(10);
+const Events = __webpack_require__(9);
 
 class Keyboard {
 	constructor() {
@@ -40253,12 +40253,6 @@ module.exports = keyboard;
 
 /***/ }),
 /* 7 */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[25,19],\"tileSize\":[16,16],\"continents\":[{\"name\":\"South Japan\",\"regions\":[\"SJ-1\",\"SJ-2\"],\"outlineColor\":\"#ff0000\"},{\"name\":\"Southeast Japan\",\"regions\":[\"SEJ-1\",\"SEJ-2\",\"SEJ-3\",\"SEJ-4\"],\"outlineColor\":\"#00ff00\"}],\"regions\":[{\"name\":\"SJ-1\",\"position\":[50,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50],\"borders\":[\"SJ-2\"]},{\"name\":\"SJ-2\",\"position\":[50,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-1\",\"position\":[160,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-2\",\"position\":[270,50],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-3\",\"position\":[160,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]},{\"name\":\"SEJ-4\",\"position\":[270,160],\"path\":[0,0,100,0,100,100,0,100],\"centerPoint\":[50,50]}]}");
-
-/***/ }),
-/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40601,7 +40595,7 @@ if (true) {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41287,7 +41281,7 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Events = __webpack_require__(22);
@@ -41295,7 +41289,7 @@ const Events = __webpack_require__(22);
 module.exports = Events;
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {var __WEBPACK_AMD_DEFINE_RESULT__;(function(global){
@@ -41642,10 +41636,10 @@ Promise.reject = function(reason){
 
 })(typeof window != 'undefined' ? window : typeof global != 'undefined' ? global : typeof self != 'undefined' ? self : this);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(13).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(12).setImmediate))
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41742,7 +41736,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -41798,7 +41792,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(14);
+__webpack_require__(13);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -41809,10 +41803,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -42002,10 +41996,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(15)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(14)))
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -42195,7 +42189,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -42718,10 +42712,10 @@ process.umask = function() { return 0; };
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(17)(module), __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(16)(module), __webpack_require__(17)))
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -42746,6 +42740,32 @@ module.exports = function(module) {
 	}
 	return module;
 };
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
 
 
 /***/ }),
@@ -43300,6 +43320,12 @@ module.exports = Resolver;
 
 /***/ }),
 /* 24 */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"name\":\"Japan\",\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[25,19],\"tileSize\":[16,16],\"connectedEmpireReinforceIncrement\":3,\"defaultReinforce\":\"3\",\"continents\":[{\"name\":\"South Japan\",\"regions\":[\"SJ-1\",\"SJ-2\"],\"color\":\"#ff4030\",\"ownershipValue\":2},{\"name\":\"Southeast Japan\",\"regions\":[\"SEJ-1\",\"SEJ-2\"],\"color\":\"#30ff40\",\"ownershipValue\":2}],\"regions\":[{\"name\":\"SJ-1\",\"borderTiles\":[[2,2],[3,2],[4,2],[5,2],[5,3],[5,4],[5,5],[4,5],[3,5],[2,5],[2,4],[2,3]],\"unitPoint\":[124,124],\"borderRegions\":[\"SEJ-1\",\"SJ-2\"]},{\"name\":\"SEJ-2\",\"borderTiles\":[[6,6],[7,6],[8,6],[9,6],[9,7],[9,8],[9,9],[8,9],[7,9],[6,9],[6,8],[6,7]],\"unitPoint\":[250,250],\"borderRegions\":[\"SEJ-1\",\"SJ-2\"]},{\"name\":\"SJ-2\",\"borderTiles\":[[2,6],[3,6],[4,6],[5,6],[5,7],[5,8],[5,9],[4,9],[3,9],[2,9],[2,8],[2,7]],\"unitPoint\":[124,250],\"borderRegions\":[\"SEJ-2\",\"SJ-1\"]},{\"name\":\"SEJ-1\",\"borderTiles\":[[6,2],[7,2],[8,2],[9,2],[9,3],[9,4],[9,5],[8,5],[7,5],[6,5],[6,4],[6,3]],\"unitPoint\":[250,124],\"borderRegions\":[\"SEJ-2\",\"SJ-1\"]}]}");
+
+/***/ }),
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43308,338 +43334,6 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/pixi.js/lib/pixi.es.js + 37 modules
 var pixi_es = __webpack_require__(0);
-
-// CONCATENATED MODULE: ./public/src/sengine/suie/core.js
-const SOURCE_PATH = "graphics/ui/source/source.png";
-const RESOLUTION_SCALE = 1.5;
-
-const PanelColor = Object.freeze({
-    BLUE: "blue",
-    ORANGE: "orange",
-});
-
-const PanelSize = Object.freeze({
-    LARGE: "large",
-    SMALL: "small",
-});
-
-/* harmony default export */ var core = ({
-    PanelColor: PanelColor,
-    PanelSize: PanelSize,
-    SOURCE_PATH: SOURCE_PATH,
-    RESOLUTION_SCALE: RESOLUTION_SCALE,
-});
-
-// CONCATENATED MODULE: ./public/src/sengine/suie/panel.js
-
-
-
-const BORDER_FRAMES = {
-    [core.PanelSize.LARGE]: {
-        [core.PanelColor.BLUE]: {
-            tl: [384, 96, 16, 16],
-            t: [407, 96, 16, 16],
-            tr: [432, 96, 16, 16],
-            r: [432, 121, 16, 16],
-            br: [432, 160, 16, 16],
-            b: [407, 160, 16, 16],
-            bl: [384, 160, 16, 16],
-            l: [384, 121, 16, 16],
-        },
-        [core.PanelColor.ORANGE]: {
-            tl: [320, 96, 16, 16],
-            t: [339, 96, 16, 16],
-            tr: [368, 96, 16, 16],
-            r: [368, 136, 16, 16],
-            br: [368, 160, 16, 16],
-            b: [353, 160, 16, 16],
-            bl: [320, 160, 16, 16],
-            l: [320, 127, 16, 16],
-        },
-    },
-    [core.PanelSize.SMALL]: {
-        [core.PanelColor.BLUE]: {
-            l: [368, 32, 8, 16],
-            m: [381, 32, 8, 16],
-            r: [392, 32, 8, 16],
-        },
-        [core.PanelColor.ORANGE]: {
-            l: [240, 32, 8, 16],
-            m: [252, 32, 8, 16],
-            r: [264, 32, 8, 16],
-        },
-    },
-};
-const BACKGROUND_COLOR = {
-    [core.PanelColor.BLUE]: 0x417291,
-    [core.PanelColor.ORANGE]: 0xd36b41,
-};
-const RAW_BORDER_WIDTH = {
-    [core.PanelSize.LARGE]: 16,
-    [core.PanelSize.SMALL]: 8,
-};
-const RAW_BORDER_HEIGHT = {
-    [core.PanelSize.LARGE]: 16,
-    [core.PanelSize.SMALL]: 8,
-};
-
-class panel_Panel extends pixi_es["Container"] {
-    constructor(rect, panelSize = core.PanelSize.LARGE, panelColor = core.PanelColor.BLUE) {
-        super();
-
-        this.position.set(rect.x, rect.y);
-        this._size = [rect.width, rect.height];
-        this._borderScale = 1.0;
-        this._color = panelColor;
-        this._panelSize = panelSize;
-        this._panelChildren = [];
-
-        this._assemble();
-    }
-
-    addMember(child) {
-        this._panelChildren.push(child);
-        this._assemble();
-    }
-
-    _getBorderSprite(border) {
-        let texture = new pixi_es["Texture"](
-            pixi_es["BaseTexture"].from(core.SOURCE_PATH),
-            new pixi_es["Rectangle"](...BORDER_FRAMES[this._panelSize][this._color][border])
-        );
-        let sprite = new pixi_es["Sprite"](texture);
-        sprite.scale.set(this._borderScale, this._borderScale);
-        return sprite;
-    }
-
-    _assemble() {
-        let w = this._size[0];
-        let h = this._size[1];
-        let bw = Math.floor(RAW_BORDER_WIDTH[this._panelSize] * this._borderScale);
-        let bh = Math.floor(RAW_BORDER_HEIGHT[this._panelSize] * this._borderScale);
-
-        this.removeChildren();
-
-        let bckgr = new pixi_es["Graphics"]();
-        bckgr.beginFill(BACKGROUND_COLOR[this._color]);
-        bckgr.drawRect(Math.floor(bw / 2), Math.floor(bh / 2), w - bw, h - bh);
-        bckgr.endFill();
-        this.addChild(bckgr);
-
-        // Corner borders
-        let borders = {};
-        for (let border of ["tl", "tr", "br", "bl"]) {
-            borders[border] = this._getBorderSprite(border);
-        }
-        borders.tr.x = w - bw;
-        borders.br.position.set(w - bw, h - bh);
-        borders.bl.y = h - bh;
-        this.addChild(borders.tl, borders.tr, borders.br, borders.bl);
-
-        // Horizontal edges
-        let curx = bw;
-        while (curx < w - bw * 2) {
-            let top = this._getBorderSprite("t");
-            let bot = this._getBorderSprite("b");
-            top.x = curx;
-            bot.position.set(curx, h - bh);
-
-            this.addChild(top, bot);
-            curx += bw;
-        }
-        let topFill = this._getBorderSprite("t");
-        topFill.x = w - bw * 2;
-        let botFill = this._getBorderSprite("b");
-        botFill.position.set(w - bw * 2, h - bh);
-        this.addChild(topFill, botFill);
-
-        // Vertical edges
-        let cury = bh;
-        while (cury < h - bh * 2) {
-            let left = this._getBorderSprite("l");
-            let right = this._getBorderSprite("r");
-            left.y = cury;
-            right.position.set(w - bw, cury);
-
-            this.addChild(left, right);
-            cury += bh;
-        }
-        let leftFill = this._getBorderSprite("l");
-        leftFill.y = h - bh * 2;
-        let rightFill = this._getBorderSprite("r");
-        rightFill.position.set(w - bw, h - bh * 2);
-        this.addChild(leftFill, rightFill);
-
-        if (this._panelChildren.length > 0) this.addChild(...this._panelChildren);
-
-        console.log("finished render");
-    }
-}
-
-/* harmony default export */ var panel = (panel_Panel);
-
-// CONCATENATED MODULE: ./public/src/sengine/suie/label.js
-
-
-class label_Label extends pixi_es["Text"] {
-    constructor(text, position, fontSize = 6, fontColor = "#dddddd") {
-        super(text, { fontFamily: "emulogic", fontSize: fontSize, fill: fontColor });
-
-        this.position.set(...position);
-    }
-}
-
-/* harmony default export */ var label = (label_Label);
-
-// EXTERNAL MODULE: ./node_modules/pixi.js-mouse/index.js
-var pixi_js_mouse = __webpack_require__(2);
-var pixi_js_mouse_default = /*#__PURE__*/__webpack_require__.n(pixi_js_mouse);
-
-// CONCATENATED MODULE: ./public/src/sengine/suie/textButton.js
-
-
-
-
-
-const textButton_BORDER_FRAMES = {
-    [core.PanelColor.BLUE]: {
-        l: [368, 32, 8, 16],
-        m: [381, 32, 8, 16],
-        r: [392, 32, 8, 16],
-    },
-    [core.PanelColor.ORANGE]: {
-        l: [240, 32, 8, 16],
-        m: [252, 32, 8, 16],
-        r: [264, 32, 8, 16],
-    },
-};
-const BORDER_WIDTH = 8;
-
-class textButton_TextButton extends pixi_es["Container"] {
-    constructor(text, position, action, color = core.PanelColor.BLUE) {
-        super();
-
-        this._text = text;
-        this._color = color;
-        this._suieChildren = [];
-        this._isPressed = false;
-        this._length = 20 + this._text.length * 6;
-        this._action = action;
-        this.position.set(...position);
-
-        this._highlight = new pixi_es["Graphics"]();
-        this._highlight.beginFill(0xffffff, 0.15);
-        this._highlight.drawRect(2, 2, this._length - 4, 12);
-        this._highlight.endFill();
-        this._highlight.visible = false;
-        this._suieChildren.push(this._highlight);
-
-        this._label = new label(text, [10, 4]);
-        this._suieChildren.push(this._label);
-
-        pixi_js_mouse_default.a.events.on("pressed", (code, event) => this._mouseDown(code, event));
-        pixi_js_mouse_default.a.events.on("released", (code, event) => this._mouseUp(code, event));
-
-        this._assemble();
-    }
-
-    _isPointWithin(x, y) {
-        let thisX = this.getGlobalPosition().x;
-        let thisY = this.getGlobalPosition().y;
-        return x < thisX + this._length && x > thisX && y > thisY && y < thisY + 16;
-    }
-
-    _mouseDown(code, event) {
-        let x = Math.floor(event.offsetX / core.RESOLUTION_SCALE);
-        let y = Math.floor(event.offsetY / core.RESOLUTION_SCALE);
-        if (this._isPointWithin(x, y)) {
-            this._isPressed = true;
-            this._highlight.visible = true;
-            this._label.x += 1;
-            this._label.y += 1;
-        }
-    }
-
-    _mouseUp(code, event) {
-        if (this._isPressed) {
-            let x = Math.floor(event.offsetX / core.RESOLUTION_SCALE);
-            let y = Math.floor(event.offsetY / core.RESOLUTION_SCALE);
-
-            this._isPressed = false;
-            this._highlight.visible = false;
-            this._label.x -= 1;
-            this._label.y -= 1;
-            if (this._isPointWithin(x, y) && this._action) this._action();
-        }
-    }
-
-    _getBorderSprite(border) {
-        let texture = new pixi_es["Texture"](
-            pixi_es["BaseTexture"].from(core.SOURCE_PATH),
-            new pixi_es["Rectangle"](...textButton_BORDER_FRAMES[this._color][border])
-        );
-        let sprite = new pixi_es["Sprite"](texture);
-        return sprite;
-    }
-
-    _assemble() {
-        this.removeChildren();
-
-        let w = this._length;
-
-        this.addChild(this._getBorderSprite("l"));
-        let right = this._getBorderSprite("r");
-        right.x = w - BORDER_WIDTH;
-        this.addChild(right);
-
-        let curx = BORDER_WIDTH;
-        while (curx < w - BORDER_WIDTH * 2) {
-            let mid = this._getBorderSprite("m");
-            mid.x = curx;
-            curx += BORDER_WIDTH;
-            this.addChild(mid);
-        }
-        let fill = this._getBorderSprite("m");
-        fill.x = w - BORDER_WIDTH * 2;
-        this.addChild(fill);
-
-        if (this._suieChildren.length > 0) this.addChild(...this._suieChildren);
-    }
-}
-
-/* harmony default export */ var textButton = (textButton_TextButton);
-
-// CONCATENATED MODULE: ./public/src/sengine/suie/suie.js
-
-
-
-
-
-/* harmony default export */ var suie = ({
-    Panel: panel,
-    PanelColor: core.PanelColor,
-    PanelSize: core.PanelSize,
-    Label: label,
-    TextButton: textButton,
-});
-
-// CONCATENATED MODULE: ./public/src/sengine/utils.js
-function RGBFromString(hexString) {
-    if (hexString.substr(0, 1) === "#") hexString = hexString.substr(1);
-    let num = parseInt(hexString, 16);
-    return { r: num >> 16, g: (num >> 8) & 0xff, b: num & 0xff };
-}
-
-function StringFromRGB(rgbValues) {
-    return `#${Math.max(0, rgbValues.r).toString(16).padStart(2, "0")}${Math.max(0, rgbValues.g)
-        .toString(16)
-        .padStart(2, "0")}${Math.max(0, rgbValues.b).toString(16).padStart(2, "0")}`;
-}
-
-const AnimationType = Object.freeze({
-    WALK: "WALK",
-    STAND: "STAND",
-});
 
 // CONCATENATED MODULE: ./public/src/logService.js
 const LogLevel = Object.freeze({
@@ -43690,8 +43384,11 @@ function logService(level, message, source = "APP", production = false) {
         source: "graphics/ui/source/source.png",
         button_frame_brown: "graphics/ui/source/16x16/Set1/Set1-1.png",
         button_frame_blue: "graphics/ui/source/16x16/Set2/Set2-1.png",
+        button_frame_white: "graphics/ui/source/16x16/Set3/Set3-1.png",
         arrow_green: "graphics/ui/arrow-green.png",
         arrow_gray: "graphics/ui/arrow-gray.png",
+        blip_white: "graphics/ui/blip-white.png",
+        blip_green: "graphics/ui/blip-green.png",
     },
     avatar: {
         bard: "graphics/characters/bardo_1.png",
@@ -43751,56 +43448,9 @@ function logService(level, message, source = "APP", production = false) {
 var pixi_js_keyboard = __webpack_require__(6);
 var pixi_js_keyboard_default = /*#__PURE__*/__webpack_require__.n(pixi_js_keyboard);
 
-// CONCATENATED MODULE: ./public/src/tilemap.js
-
-
-// Class used for displaying tilemap
-class tilemap_TileMap {
-    constructor(stage, mapData, scale) {
-        const path = mapData.tilesetPath;
-        const size = mapData.tileMapSize;
-
-        this._tileSize = mapData.tileSize;
-        this._tileIndices = [];
-        this._tileSprites = [];
-
-        for (let x = 0; x < size[0]; x++) {
-            this._tileIndices[x] = [];
-            this._tileSprites[x] = [];
-            for (let y = 0; y < size[1]; y++) {
-                let texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
-                let sprite = new pixi_es["Sprite"](texture);
-
-                sprite.position.set(x * this._tileSize[0] * scale, y * this._tileSize[1] * scale);
-                sprite.scale.set(scale, scale);
-
-                this._tileSprites[x][y] = sprite;
-
-                this.updateTileIndex(x, y, Math.floor(Math.random() * 3), 0);
-
-                stage.addChild(sprite);
-            }
-        }
-    }
-
-    updateTileIndex(tileX, tileY, indexX, indexY) {
-        this._tileIndices[tileX][tileY] = [indexX, indexY];
-        this._tileSprites[tileX][tileY].texture.frame = new pixi_es["Rectangle"](
-            indexX * this._tileSize[0],
-            indexY * this._tileSize[1],
-            this._tileSize[0],
-            this._tileSize[1]
-        );
-    }
-
-    exportToDataFile(fileName) {
-        // collect all internal variables into a single data object
-        // convert said object into text (let text = JSON.stringify(data))
-        // download said text to the browser-user's computer
-    }
-}
-
-/* harmony default export */ var tilemap = (tilemap_TileMap);
+// EXTERNAL MODULE: ./node_modules/pixi.js-mouse/index.js
+var pixi_js_mouse = __webpack_require__(2);
+var pixi_js_mouse_default = /*#__PURE__*/__webpack_require__.n(pixi_js_mouse);
 
 // CONCATENATED MODULE: ./public/src/vector.js
 function subtract(vecA, vecB) {
@@ -43843,87 +43493,107 @@ function isPointWithinPolygon(point, vertices) {
 
 
 
+
+
 const DEFAULT_REGION_COLOR = 0xffffff;
-const DEFAULT_REGION_ALPHA = 0.05;
+const DEFAULT_REGION_ALPHA = 0.1;
+const BLIP_SCALE = 1.25;
 
 class regionLayer_Region {
-    constructor(data, stage) {
+    constructor(mapData, data, stage, tileScale) {
         this._stage = stage;
+        this._tileScale = tileScale;
 
         // Data from the actual map file is considered 'static' because it can't change after init
         this._static = { ...data };
 
-        // PUBLICLY ACCESSIBLE BECAUSE THEY WOULD NEVER BE CHANGED ANYWAYS
-        this.vertices = [];
-        this.absoluteVertices = [];
-        for (let i = 0; i < data.path.length; i += 2) {
-            this.vertices.push([data.path[i], data.path[i + 1]]);
-            this.absoluteVertices.push([
-                data.path[i] + data.position[0],
-                data.path[i + 1] + data.position[1],
-            ]);
+        this._blipSprites = [];
+        this._shadePath = [];
+        for (let i = 0; i < data.borderTiles.length; i++) {
+            let tile = data.borderTiles[i];
+            let blip = new pixi_es["Sprite"](assetLoader.loadTexture(graphics.interface.blip_white));
+            blip.scale.set(BLIP_SCALE, BLIP_SCALE);
+            let blipX = mapData.tileSize[0] * tileScale * tile[0];
+            let blipY = mapData.tileSize[1] * tileScale * tile[1];
+            this._shadePath.push(
+                blipX + (mapData.tileSize[0] * BLIP_SCALE) / 2,
+                blipY + (mapData.tileSize[0] * BLIP_SCALE) / 2
+            );
+            blip.position.set(blipX, blipY);
+            stage.addChild(blip);
+            this._blipSprites.push(blip);
         }
 
         this._fillColor = DEFAULT_REGION_COLOR;
         this._fillAlpha = DEFAULT_REGION_ALPHA;
-        this._outlineWidth = 1;
-        this._outlineColor = 0x0000ff;
-        this._outlineAlpha = 0.8;
         this._shape = null;
 
         this._render();
     }
 
+    getHitPath() {
+        return this._blipSprites.map((sprite) => [sprite.position.x, sprite.position.y]);
+    }
+
     setStyle(style) {
         if ("fillColor" in style) this._fillColor = style.fillColor;
         if ("fillAlpha" in style) this._fillAlpha = style.fillAlpha;
-        if ("outlineWidth" in style) this._outlineWidth = style.outlineWidth;
-        if ("outlineColor" in style) this._outlineColor = style.outlineColor;
-        if ("outlineAlpha" in style) this._outlineAlpha = style.outlineAlpha;
+
+        // All blips are the same, so only compare to the first
+        if ("outlineAlpha" in style && this._blipSprites[0].alpha !== style.outlineAlpha)
+            for (let blip of this._blipSprites) blip.alpha = style.outlineAlpha;
+        if ("outlineColor" in style && this._blipSprites[0].tint !== style.outlineColor)
+            for (let blip of this._blipSprites) blip.tint = style.outlineColor;
 
         this._render();
     }
 
-    getCenter() {
-        return [
-            this._static.position[0] + this._static.centerPoint[0],
-            this._static.position[1] + this._static.centerPoint[1],
-        ];
+    getUnitCenter() {
+        return [this._static.unitPoint[0], this._static.unitPoint[1]];
     }
 
     _render() {
         if (this._shape) this._stage.removeChild(this._shape);
 
         this._shape = new pixi_es["Graphics"]();
-        console.log(this._outlineColor);
         this._shape.lineStyle(this._outlineWidth, this._outlineColor, this._outlineAlpha);
         this._shape.beginFill(this._fillColor, this._fillAlpha);
-        this._shape.drawPolygon(this._static.path);
+        this._shape.drawPolygon(this._shadePath);
         this._shape.endFill();
 
-        this._shape.position.set(this._static.position[0], this._static.position[1]);
+        // this._shape.position.set(this._static.position[0], this._static.position[1]);
 
         this._stage.addChild(this._shape);
     }
 }
 
 class regionLayer_RegionLayer {
-    constructor(stage, mapData) {
+    constructor(stage, mapData, tileScale) {
         this._staticData = { ...mapData };
         this._stage = stage;
         this._regions = {};
 
         for (let data of mapData.regions) {
-            this._regions[data.name] = new regionLayer_Region(data, stage);
+            this._regions[data.name] = new regionLayer_Region(mapData, data, stage, tileScale);
         }
 
         // Set the continent colors for each region
         for (let cont of mapData.continents) {
             for (let name of cont.regions)
                 this._regions[name].setStyle({
-                    outlineColor: parseInt(cont.outlineColor.substr(1), 16),
+                    outlineColor: parseInt(cont.color.substr(1), 16),
+                    fillColor: parseInt(cont.color.substr(1), 16),
                 });
         }
+
+        this._eventHandlers = {
+            mouseEnter: [], // handlers are passed the region that fired the event
+            mouseExit: [], // handlers are passed the region that fired the event
+        };
+    }
+
+    on(eventType, func) {
+        this._eventHandlers[eventType].push(func);
     }
 
     get(name) {
@@ -43933,14 +43603,58 @@ class regionLayer_RegionLayer {
     update(delta, mousePos) {
         for (let key in this._regions) {
             let region = this._regions[key];
-            if (isPointWithinPolygon(mousePos, region.absoluteVertices)) {
-                // region.setStyle({ outlineColor: 0x8282f0, outlineAlpha: 0.1 });
+            if (isPointWithinPolygon(mousePos, region.getHitPath())) {
+                if (!region.isHovering)
+                    for (let handler in this._eventHandlers.mouseEnter) handler(region);
+
+                region.isHovering = true;
+            } else {
+                if (region.isHovering)
+                    for (let handler in this._eventHandlers.mouseExit) handler(region);
+                region.isHovering = false;
             }
         }
     }
 }
 
 /* harmony default export */ var regionLayer = (regionLayer_RegionLayer);
+
+// CONCATENATED MODULE: ./public/src/sengine/utils.js
+function RGBFromString(hexString) {
+    if (hexString.substr(0, 1) === "#") hexString = hexString.substr(1);
+    let num = parseInt(hexString, 16);
+    return { r: num >> 16, g: (num >> 8) & 0xff, b: num & 0xff };
+}
+
+function StringFromRGB(rgbValues) {
+    return `#${Math.max(0, rgbValues.r).toString(16).padStart(2, "0")}${Math.max(0, rgbValues.g)
+        .toString(16)
+        .padStart(2, "0")}${Math.max(0, rgbValues.b).toString(16).padStart(2, "0")}`;
+}
+
+const AnimationType = Object.freeze({
+    WALK: "WALK",
+    STAND: "STAND",
+});
+
+const NationColor = Object.freeze({
+    RED: 0xff0000,
+    GREEN: 0x40ff50,
+    BLUE: 0x4050ff,
+});
+
+// CONCATENATED MODULE: ./public/src/sengine/suie/label.js
+
+
+class label_Label extends pixi_es["Text"] {
+    constructor(text, position, fontSize = 6, fontColor = "#dddddd") {
+        super(text, { fontFamily: "emulogic", fontSize: fontSize, fill: fontColor });
+
+        this.position.set(...position);
+    }
+}
+
+/* harmony default export */ var label = (label_Label);
 
 // CONCATENATED MODULE: ./public/src/sengine/unitAvatar.js
 
@@ -43964,7 +43678,7 @@ Go in order of down, left, right, up, with the resting or 'stand' animation in t
 */
 
 class unitAvatar_UnitAvatar {
-    constructor(stage, path, altCounter = false, startRect = new pixi_es["Rectangle"](0, 2, 26, 36)) {
+    constructor(stage, path, nationColor, startRect = new pixi_es["Rectangle"](0, 2, 26, 36)) {
         this._stage = stage;
 
         // Copy texture so we can change frame only for this unit
@@ -44060,18 +43774,25 @@ class unitAvatar_UnitAvatar {
         this.sprite.scale.set(SCALE, SCALE);
 
         // Create the amount counter
-        let counterTexture = assetLoader.loadTexture(
-            altCounter
-                ? graphics.interface.button_frame_blue
-                : graphics.interface.button_frame_brown
-        );
+        let counterTexture = assetLoader.loadTexture(graphics.interface.button_frame_white);
         this._counterSprite = new pixi_es["Sprite"](counterTexture);
+        this._counterSprite.tint = nationColor;
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
-        this._counterLabel = new label(Math.floor(Math.random() * 6), [0, 0], 12, "#ffffff");
+        this._counterLabel = new label(1, [0, 0], 12, "#ffffff");
 
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
         stage.addChild(this._counterLabel);
+    }
+
+    getCounter() {
+        return this._counter;
+    }
+
+    setCounter(newAmount, skipAnimation = false) {
+        this._counter = newAmount;
+        this._counterLabel.text = newAmount;
+        // Perhaps add animation logic in here for changing amount?
     }
 
     slide(newPosition, speed) {
@@ -44381,8 +44102,294 @@ class unitAvatar_UnitAvatar {
 
 /* harmony default export */ var unitAvatar = (unitAvatar_UnitAvatar);
 
+// CONCATENATED MODULE: ./public/src/tilemap.js
+
+
+// Class used for displaying tilemap
+class tilemap_TileMap {
+    constructor(stage, mapData, scale) {
+        const path = mapData.tilesetPath;
+        const size = mapData.tileMapSize;
+
+        this._tileSize = mapData.tileSize;
+        this._tileIndices = [];
+        this._tileSprites = [];
+
+        for (let x = 0; x < size[0]; x++) {
+            this._tileIndices[x] = [];
+            this._tileSprites[x] = [];
+            for (let y = 0; y < size[1]; y++) {
+                let texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
+                let sprite = new pixi_es["Sprite"](texture);
+
+                sprite.position.set(x * this._tileSize[0] * scale, y * this._tileSize[1] * scale);
+                sprite.scale.set(scale, scale);
+
+                this._tileSprites[x][y] = sprite;
+
+                this.updateTileIndex(x, y, Math.floor(Math.random() * 3), 0);
+
+                stage.addChild(sprite);
+            }
+        }
+    }
+
+    updateTileIndex(tileX, tileY, indexX, indexY) {
+        this._tileIndices[tileX][tileY] = [indexX, indexY];
+        this._tileSprites[tileX][tileY].texture.frame = new pixi_es["Rectangle"](
+            indexX * this._tileSize[0],
+            indexY * this._tileSize[1],
+            this._tileSize[0],
+            this._tileSize[1]
+        );
+    }
+
+    exportToDataFile(fileName) {
+        // collect all internal variables into a single data object
+        // convert said object into text (let text = JSON.stringify(data))
+        // download said text to the browser-user's computer
+    }
+}
+
+/* harmony default export */ var tilemap = (tilemap_TileMap);
+
+// CONCATENATED MODULE: ./public/src/gameStates/stateManagerBase.js
+
+
+class stateManagerBase_StateManagerBase {
+    constructor() {
+        this._stateStack = [];
+    }
+
+    // Must override as this base class is unaware of specific states
+    _generateState(type) {
+        throw new Error("Must override this function in the child class!");
+    }
+
+    // Gets the currently activate state (on top of stack)
+    getActiveState() {
+        return this._stateStack[this._stateStack.length - 1];
+    }
+
+    // Remove all states from the stack and reset to only the given state
+    resetState(stateType) {
+        while (this.getActiveState()) this.popState();
+
+        this.pushState(stateType);
+    }
+
+    // Pop off the top state from current stack
+    popState() {
+        // Do nothing if the stack is already empty
+        if (!this._stateStack) return;
+
+        let currentState = this._stateStack.pop();
+        logService(LogLevel.DEBUG, `removing state ${currentState.stateType} from stack`);
+        if (currentState.hasOwnProperty("deactivate")) currentState.deactivate();
+        if (currentState.hasOwnProperty("dispose")) currentState.dispose();
+
+        let nextState = this.getActiveState();
+        if (nextState && nextState.hasOwnProperty("activate")) nextState.activate();
+    }
+
+    // Push a new state on top of the current stack
+    pushState(stateType) {
+        let currentState = this.getActiveState();
+        if (currentState && currentState.hasOwnProperty("deactivate")) currentState.deactivate();
+
+        let newState = this._generateState(stateType);
+        newState.stateType = stateType;
+        console.log(newState);
+        if (newState.activate) newState.activate();
+        logService(LogLevel.DEBUG, `adding new state ${stateType} to stack`, "STATE");
+        this._stateStack.push(newState);
+    }
+}
+
+// CONCATENATED MODULE: ./public/src/gameStates/gameplayStates/deployState.js
+
+
+const DeployStateType = Object.freeze({
+    REGION_SELECT: "REGION_SELECT",
+    EDIT_AMOUNT: "EDIT_AMOUNT",
+    CONFIRM: "CONFIRM",
+});
+
+// Will remove these from this file if they get too big
+class RegionSelectState {
+    constructor(gameData) {}
+
+    activate() {
+        console.log("setting up activate");
+        this._gameData.regionVisuals.on("mouseEnter", (region) => {
+            console.log(`Entered region ${region.name}`);
+        });
+    }
+}
+class EditAmountState {
+    constructor(gameData) {
+        console.log("creating edit amount state");
+    }
+}
+class ConfirmState {
+    constructor(gameData) {
+        console.log("creating confirm state");
+    }
+}
+
+class deployState_DeployState extends stateManagerBase_StateManagerBase {
+    constructor(gameData) {
+        super();
+
+        this._gameData = gameData;
+
+        // Setup HUD according to deployment state
+
+        this.resetState(DeployStateType.REGION_SELECT);
+    }
+
+    _generateState(type) {
+        switch (type) {
+            case DeployStateType.REGION_SELECT:
+                return new RegionSelectState(this._gameData);
+            case DeployStateType.EDIT_AMOUNT:
+                return new EditAmountState(this._gameData);
+            case DeployStateType.CONFIRM:
+                return new ConfirmState(this._gameData);
+        }
+    }
+
+    activate() {}
+
+    deactivate() {}
+
+    dispose() {}
+
+    update(delta) {}
+}
+
+// CONCATENATED MODULE: ./public/src/gameStates/gameplayStates/orderState.js
+class OrderState {
+    constructor(gameData) {}
+
+    activate() {}
+
+    deactivate() {}
+
+    dispose() {}
+
+    update(delta) {}
+}
+
+// CONCATENATED MODULE: ./public/src/gameStates/gameplayState.js
+
+
+
+
+
+
+
+
+
+
+
+
+const GameplayStateType = Object.freeze({
+    VIEW_ONLY: "VIEW_ONLY",
+    REPLAY_TURN: "REPLAY_TURN",
+    DEPLOY: "DEPLOY",
+    ORDER: "ORDER",
+});
+
+/* This class is the state manager for various GamePlayState classes
+ * In the future it will also extend a more general GameState class
+
+ All GameplayStateType sub-state classes must implement the following:
+
+    constructor(game_data)  - For state instance creation on resetState and pushState
+    function activate()     - Called after constructor, or when becoming the top state
+    function deactivate()   - Called when another state is thrown on top
+    function dispose()      - Called before removal from stack (deletion)
+
+The current game data will be passed into each state on construction, this can be used to 
+build the initial graphics and reactions upon entering a new state
+
+ */
+const LOG_TAG = "GAMEPLAY";
+
+class gameplayState_GameplayState extends stateManagerBase_StateManagerBase {
+    constructor(stage, mapData, gameState) {
+        super();
+
+        // Since this constructor is the entry point for all front-end game display, we need to
+        // begin by instantiating all of the graphics objects for gameplay. Only include
+        // graphics / objects that will be used all the time or by all sub-states. State-specific
+        // graphics should be handled internally by the sub-state itself
+        logService(LogLevel.DEBUG, "generating tile and region visuals", LOG_TAG);
+        this._stage = stage;
+        this._tileMap = new tilemap(stage, mapData, 2.0);
+        this._regionVisuals = new regionLayer(stage, mapData, 2.0);
+        this._gameState = { ...gameState };
+
+        this._regionAvatars = [];
+        logService(LogLevel.DEBUG, "generating unit avatars", LOG_TAG);
+        for (let regionName in this._gameState.regionData) {
+            let rdata = this._gameState.regionData[regionName];
+            let ownerInfo = this._gameState.players[rdata.ownedBy];
+            let rvisual = this._regionVisuals.get(regionName);
+
+            let avatar = new unitAvatar(
+                stage,
+                graphics.avatar[ownerInfo.avatar],
+                NationColor[ownerInfo.nationColor]
+            );
+            avatar.setPosition(rvisual.getUnitCenter());
+            avatar.setCounter(rdata.armySize);
+            avatar.setDirection("down");
+            avatar.playWalkAnimation(true);
+
+            this._regionAvatars.push(avatar);
+        }
+
+        this._gameData = {
+            stage: stage,
+            tileMap: this._tileMap,
+            regionVisuals: this._regionVisuals,
+            avatars: this._regionAvatars,
+        };
+
+        logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
+        // Initial state of GAMEPLAY will normally be view only
+        // this.resetState(GameplayStateType.VIEW_ONLY, this._gameData);
+
+        // For testing will go straight to deployment phase
+        this.resetState(GameplayStateType.DEPLOY, this._gameData);
+    }
+
+    // Factory pattern for generating new gameplay state objects
+    _generateState(type) {
+        switch (type) {
+            case GameplayStateType.DEPLOY:
+                return new deployState_DeployState(this._gameData);
+            case GameplayStateType.ORDER:
+                return new OrderState(this._gameData);
+        }
+    }
+
+    update(delta) {
+        // Before calling child classes, update necessary game graphics
+        for (let i = 0; i < this._regionAvatars.length; i++) this._regionAvatars[i].update(delta);
+        this._regionVisuals.update(delta, [pixi_js_mouse_default.a.posLocalX, pixi_js_mouse_default.a.posLocalY]);
+
+        if (this._stateStack) this.getActiveState().update(delta);
+    }
+}
+
+// EXTERNAL MODULE: ./public/src/game_data/gameStateTEST.json
+var gameStateTEST = __webpack_require__(26);
+
 // EXTERNAL MODULE: ./public/dist/maps/japan_tconfig.json
-var japan_tconfig = __webpack_require__(7);
+var japan_tconfig = __webpack_require__(24);
 
 // CONCATENATED MODULE: ./public/src/index.js
 
@@ -44392,9 +44399,8 @@ var japan_tconfig = __webpack_require__(7);
 
 
 
-
-
-
+// In the future, map data and game state data should be pulled from the server, for testing
+// we will use hard-coded JSON test data instead
 
 
 
@@ -44410,51 +44416,28 @@ document.body.appendChild(app.view);
 // Load all assets from game_data/* files
 assetLoader.initialize(src_loader, main);
 
-let dancers = [];
-let src_regionLayer = null;
-let tileMap = null;
 function main() {
     logService(LogLevel.INFO, "initializing application");
 
-    tileMap = new tilemap(app.stage, japan_tconfig, 2.0);
-    src_regionLayer = new regionLayer(app.stage, japan_tconfig);
+    // For production, this will be another level above for managing overall game state
+    // For testing we will jump straight into gameplay with fake data imported above
+    logService(LogLevel.WARNING, "running in DEV mode");
+    let testState = new gameplayState_GameplayState(app.stage, japan_tconfig, gameStateTEST);
 
-    let bard = new unitAvatar(app.stage, graphics.avatar.bard, true);
-    bard.setPosition(src_regionLayer.get("SJ-1").getCenter());
-    dancers.push(bard);
+    app.ticker.add((delta) => {
+        pixi_js_keyboard_default.a.update();
+        pixi_js_mouse_default.a.update();
 
-    let exec = new unitAvatar(app.stage, graphics.avatar.exec);
-    exec.setPosition(src_regionLayer.get("SJ-2").getCenter());
-    dancers.push(exec);
-
-    let ghost = new unitAvatar(app.stage, graphics.avatar.ghost);
-    ghost.setPosition(src_regionLayer.get("SEJ-1").getCenter());
-    dancers.push(ghost);
-
-    pixi_js_keyboard_default.a.events.on("released", (keyCode, event) => {
-        if (keyCode === "KeyA") {
-            for (let human of dancers) {
-                human.playWalkAnimation();
-            }
-        }
+        testState.update(delta);
     });
-
-    // let conductor = new Conductor();
-    // conductor.playExecuteAttackSequence(attacker, defender, battleOutcome)
-    // conductor.playMoveUnit(unit, region)
-    // conductor.playDeploy(region, amount)
-
-    app.ticker.add(gameLoop);
 }
 
-function gameLoop(delta) {
-    pixi_js_keyboard_default.a.update();
-    pixi_js_mouse_default.a.update();
 
-    src_regionLayer.update(delta, [pixi_js_mouse_default.a.posLocalX, pixi_js_mouse_default.a.posLocalY]);
-    dancers.forEach((human) => human.update(delta));
-}
+/***/ }),
+/* 26 */
+/***/ (function(module) {
 
+module.exports = JSON.parse("{\"mapName\":\"Japan\",\"players\":{\"Sk00g\":{\"avatar\":\"bard\",\"nationColor\":\"GREEN\"},\"JKase\":{\"avatar\":\"knight\",\"nationColor\":\"BLUE\"}},\"dateStarted\":\"2021-01-02T16:01:00\",\"turnHistory\":[],\"regionData\":{\"SJ-1\":{\"ownedBy\":\"Sk00g\",\"armySize\":2},\"SJ-2\":{\"ownedBy\":\"Sk00g\",\"armySize\":3},\"SEJ-1\":{\"ownedBy\":\"JKase\",\"armySize\":3},\"SEJ-2\":{\"ownedBy\":\"JKase\",\"armySize\":2}}}");
 
 /***/ })
 /******/ ]);

@@ -67,6 +67,6 @@ General Notes:
 
 
 #TODO
-* switch counter number button things to palette based on player
-* make game state manager (for GAMEPLAY only)
-* 
+* make conductor class to handle animation sequences
+* make core game object class Region (switch current Region to RegionVisual)????
+* make class for order, ORDER game state creates a list of these

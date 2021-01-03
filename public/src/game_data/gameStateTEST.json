@@ -1,0 +1,21 @@
+{
+    "mapName": "Japan",
+    "players": {
+        "Sk00g": {
+            "avatar": "bard",
+            "nationColor": "GREEN"
+        },
+        "JKase": {
+            "avatar": "knight",
+            "nationColor": "BLUE"
+        }
+    },
+    "dateStarted": "2021-01-02T16:01:00",
+    "turnHistory": [],
+    "regionData": {
+        "SJ-1": { "ownedBy": "Sk00g", "armySize": 2 },
+        "SJ-2": { "ownedBy": "Sk00g", "armySize": 3 },
+        "SEJ-1": { "ownedBy": "JKase", "armySize": 3 },
+        "SEJ-2": { "ownedBy": "JKase", "armySize": 2 }
+    }
+}

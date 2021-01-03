@@ -19,7 +19,7 @@ Go in order of down, left, right, up, with the resting or 'stand' animation in t
 */
 
 class UnitAvatar {
-    constructor(stage, path, altCounter = false, startRect = new PIXI.Rectangle(0, 2, 26, 36)) {
+    constructor(stage, path, nationColor, startRect = new PIXI.Rectangle(0, 2, 26, 36)) {
         this._stage = stage;
 
         // Copy texture so we can change frame only for this unit
@@ -115,18 +115,25 @@ class UnitAvatar {
         this.sprite.scale.set(SCALE, SCALE);
 
         // Create the amount counter
-        let counterTexture = assetLoader.loadTexture(
-            altCounter
-                ? graphics.interface.button_frame_blue
-                : graphics.interface.button_frame_brown
-        );
+        let counterTexture = assetLoader.loadTexture(graphics.interface.button_frame_white);
         this._counterSprite = new PIXI.Sprite(counterTexture);
+        this._counterSprite.tint = nationColor;
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
-        this._counterLabel = new Label(Math.floor(Math.random() * 6), [0, 0], 12, "#ffffff");
+        this._counterLabel = new Label(1, [0, 0], 12, "#ffffff");
 
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
         stage.addChild(this._counterLabel);
+    }
+
+    getCounter() {
+        return this._counter;
+    }
+
+    setCounter(newAmount, skipAnimation = false) {
+        this._counter = newAmount;
+        this._counterLabel.text = newAmount;
+        // Perhaps add animation logic in here for changing amount?
     }
 
     slide(newPosition, speed) {

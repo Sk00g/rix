@@ -14,3 +14,9 @@ export const AnimationType = Object.freeze({
     WALK: "WALK",
     STAND: "STAND",
 });
+
+export const NationColor = Object.freeze({
+    RED: 0xff0000,
+    GREEN: 0x40ff50,
+    BLUE: 0x4050ff,
+});
