@@ -16,6 +16,7 @@ class TileMap {
             this._tileSprites[x] = [];
             for (let y = 0; y < size[1]; y++) {
                 let texture = new PIXI.Texture(PIXI.BaseTexture.from(path));
+                texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
                 let sprite = new PIXI.Sprite(texture);
 
                 sprite.position.set(x * this._tileSize[0] * scale, y * this._tileSize[1] * scale);
@@ -40,12 +41,6 @@ class TileMap {
             this._tileSize[0],
             this._tileSize[1]
         );
-    }
-
-    exportToDataFile(fileName) {
-        // collect all internal variables into a single data object
-        // convert said object into text (let text = JSON.stringify(data))
-        // download said text to the browser-user's computer
     }
 }
 
