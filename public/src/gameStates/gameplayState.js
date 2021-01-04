@@ -9,6 +9,8 @@ import { NationColor } from "../sengine/utils.js";
 import StateManagerBase from "./stateManagerBase.js";
 import DeployState from "./gameplayStates/deployState.js";
 import OrderState from "./gameplayStates/orderState.js";
+import GameData from "../game_data/gameData.js";
+import AppContext from "../appContext.js";
 
 export const GameplayStateType = Object.freeze({
     VIEW_ONLY: "VIEW_ONLY",
@@ -34,7 +36,7 @@ build the initial graphics and reactions upon entering a new state
 const LOG_TAG = "GAMEPLAY";
 
 export class GameplayState extends StateManagerBase {
-    constructor(stage, mapData, gameState) {
+    constructor(mapData, gameState) {
         super();
 
         // Since this constructor is the entry point for all front-end game display, we need to
@@ -42,37 +44,12 @@ export class GameplayState extends StateManagerBase {
         // graphics / objects that will be used all the time or by all sub-states. State-specific
         // graphics should be handled internally by the sub-state itself
         logService(LogLevel.DEBUG, "generating tile and region visuals", LOG_TAG);
-        this._stage = stage;
-        this._tileMap = new TileMap(stage, mapData, 2.0);
-        this._regionVisuals = new RegionLayer(stage, mapData, 2.0);
-        this._gameState = { ...gameState };
+        this._tileMap = new TileMap(AppContext.stage, mapData, 2.0);
+        this._regionVisuals = new RegionLayer(AppContext.stage, mapData, 2.0);
 
-        this._regionAvatars = [];
-        logService(LogLevel.DEBUG, "generating unit avatars", LOG_TAG);
-        for (let regionName in this._gameState.regionData) {
-            let rdata = this._gameState.regionData[regionName];
-            let ownerInfo = this._gameState.players[rdata.ownedBy];
-            let rvisual = this._regionVisuals.get(regionName);
-
-            let avatar = new UnitAvatar(
-                stage,
-                graphics.avatar[ownerInfo.avatar],
-                NationColor[ownerInfo.nationColor]
-            );
-            avatar.setPosition(rvisual.getUnitCenter());
-            avatar.setCounter(rdata.armySize);
-            avatar.setDirection("down");
-            avatar.playWalkAnimation(true);
-
-            this._regionAvatars.push(avatar);
-        }
-
-        this._gameData = {
-            stage: stage,
-            tileMap: this._tileMap,
-            regionVisuals: this._regionVisuals,
-            avatars: this._regionAvatars,
-        };
+        // This object is passed to all sub-states, contains all necessary game state data
+        // and many helper functions to simplify interaction with the game board / map
+        this._gameData = new GameData(mapData, gameState, this._regionVisuals);
 
         logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
         // Initial state of GAMEPLAY will normally be view only
@@ -83,19 +60,19 @@ export class GameplayState extends StateManagerBase {
     }
 
     // Factory pattern for generating new gameplay state objects
-    _generateState(type) {
+    _generateState(type, initData = null) {
         switch (type) {
             case GameplayStateType.DEPLOY:
-                return new DeployState(this._gameData);
+                return new DeployState(this, this._gameData, initData);
             case GameplayStateType.ORDER:
-                return new OrderState(this._gameData);
+                return new OrderState(this, this._gameData, initData);
         }
     }
 
     update(delta) {
         // Before calling child classes, update necessary game graphics
-        for (let i = 0; i < this._regionAvatars.length; i++) this._regionAvatars[i].update(delta);
         this._regionVisuals.update(delta, [Mouse.posLocalX, Mouse.posLocalY]);
+        this._gameData.update(delta);
 
         if (this._stateStack) this.getActiveState().update(delta);
     }

@@ -5,7 +5,8 @@
     "tileMapSize": [25, 19],
     "tileSize": [16, 16],
     "connectedEmpireReinforceIncrement": 3,
-    "defaultReinforce": "3",
+    "generalRegionReinforceIncrement": 3,
+    "defaultReinforce": 3,
     "continents": [
         {
             "name": "South Japan",

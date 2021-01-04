@@ -16,10 +16,10 @@ export default class StateManagerBase {
     }
 
     // Remove all states from the stack and reset to only the given state
-    resetState(stateType) {
+    resetState(stateType, initData = null) {
         while (this.getActiveState()) this.popState();
 
-        this.pushState(stateType);
+        this.pushState(stateType, initData);
     }
 
     // Pop off the top state from current stack
@@ -37,11 +37,11 @@ export default class StateManagerBase {
     }
 
     // Push a new state on top of the current stack
-    pushState(stateType) {
+    pushState(stateType, initData = null) {
         let currentState = this.getActiveState();
         if (currentState && currentState.deactivate) currentState.deactivate();
 
-        let newState = this._generateState(stateType);
+        let newState = this._generateState(stateType, initData);
         newState.stateType = stateType;
         if (newState.activate) newState.activate();
         logService(LogLevel.DEBUG, `adding new state ${stateType} to stack`, "STATE");

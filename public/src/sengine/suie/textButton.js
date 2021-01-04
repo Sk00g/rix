@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import Label from "./label";
-import core from "./core";
+import * as core from "./core";
 import Mouse from "pixi.js-mouse";
 
 const BORDER_FRAMES = {
@@ -21,6 +21,7 @@ class TextButton extends PIXI.Container {
     constructor(text, position, action, color = core.PanelColor.BLUE) {
         super();
 
+        this._uid = core.UID++;
         this._text = text;
         this._color = color;
         this._suieChildren = [];
@@ -39,8 +40,8 @@ class TextButton extends PIXI.Container {
         this._label = new Label(text, [10, 4]);
         this._suieChildren.push(this._label);
 
-        Mouse.events.on("pressed", (code, event) => this._mouseDown(code, event));
-        Mouse.events.on("released", (code, event) => this._mouseUp(code, event));
+        Mouse.events.on("pressed", this._uid, (code, event) => this._mouseDown(code, event));
+        Mouse.events.on("released", this._uid, (code, event) => this._mouseUp(code, event));
 
         this._assemble();
     }
@@ -106,6 +107,11 @@ class TextButton extends PIXI.Container {
         this.addChild(fill);
 
         if (this._suieChildren.length > 0) this.addChild(...this._suieChildren);
+    }
+
+    destroy() {
+        Mouse.events.remove("pressed", this._uid);
+        Mouse.events.remove("released", this._uid);
     }
 }
 

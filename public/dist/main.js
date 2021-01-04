@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 26);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -820,7 +820,7 @@ var earcut = __webpack_require__(8);
 var earcut_default = /*#__PURE__*/__webpack_require__.n(earcut);
 
 // EXTERNAL MODULE: D:/Dev/games/Rix/node_modules/url/url.js
-var url_url = __webpack_require__(3);
+var url_url = __webpack_require__(4);
 var url_default = /*#__PURE__*/__webpack_require__.n(url_url);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/constants/lib/constants.es.js
@@ -21060,11 +21060,11 @@ var extract_es_Extract = /** @class */ (function () {
 //# sourceMappingURL=extract.es.js.map
 
 // EXTERNAL MODULE: ./node_modules/parse-uri/index.js
-var parse_uri = __webpack_require__(5);
+var parse_uri = __webpack_require__(6);
 var parse_uri_default = /*#__PURE__*/__webpack_require__.n(parse_uri);
 
 // EXTERNAL MODULE: ./node_modules/mini-signals/lib/mini-signals.js
-var mini_signals = __webpack_require__(1);
+var mini_signals = __webpack_require__(3);
 var mini_signals_default = /*#__PURE__*/__webpack_require__.n(mini_signals);
 
 // CONCATENATED MODULE: ./node_modules/resource-loader/dist/resource-loader.esm.js
@@ -38995,6 +38995,273 @@ var pixi_es_filters = {
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
+const PIXI = __webpack_require__(0);
+const Events = __webpack_require__(9);
+
+let canvasElement = null;
+
+function getMousePos(event) {
+  const rect = canvasElement.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  };
+}
+
+class Mouse {
+	constructor() {
+    this.Button = {LEFT: 0, MIDDLE: 1, RIGHT: 2, FOURTH: 3, FIFTH: 4};
+    
+    setTimeout(() => {
+      canvasElement = document.getElementById('main') || document.getElementsByTagName('canvas')[0];
+      canvasElement.addEventListener("mousemove", (event) => {
+        if (this.posLocalX != event.clientX || this.posLocalY != event.clientY) {
+          this.events.call('move', event.clientX, this.posLocalY);
+          this.events.call('moveLocal', event.clientX, this.posLocalY);
+          this.posLocalX = event.clientX; this.posLocalY = event.clientY;
+        }
+        
+        if (this.posGlobalX != event.screenX || this.posGlobalY != event.screenY) {
+          this.events.call('moveGlobal', event.screenX, event.screenY);
+          this.posGlobalX = event.screenX; this.posGlobalY = event.screenY;
+        }
+      });
+      
+      canvasElement.addEventListener("mousedown", (event) => {
+        let buttonCode = event.button;
+        if (!mouse.buttonStates.get(buttonCode)) {
+          event.posLocalX = this.getPosLocalX(); event.posLocalY = this.getPosLocalY();
+          mouse.buttonStates.set(buttonCode, event);
+          mouse.events.call('pressed', buttonCode, event, this.getPosLocalX(), this.getPosLocalY());
+          mouse.events.call('pressed_' + buttonCode, buttonCode, event, this.getPosLocalX(), this.getPosLocalY());
+        }
+      });
+      
+      canvasElement.addEventListener("mouseup", (event) => {
+        let buttonCode = event.button;
+        event = mouse.buttonStates.get(buttonCode);
+        if (event) {
+          event.wasReleased = true;
+          mouse.events.call('released', buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
+          mouse.events.call('released_' + buttonCode, buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
+        }
+      });
+    }, 0);
+    
+		this.buttonStates = new Map();
+    this.events = new Events();
+	}
+  
+  getPosGlobalX() {
+    return this.posGlobalX;
+  }
+  
+  getPosGlobalY() {
+    return this.posGlobalY;
+  }
+  
+  getPosLocalX() {
+    return this.posLocalX;
+  }
+  
+  getPosLocalY() {
+    return this.posLocalY;
+  }
+  
+  getPosX() {
+    return this.getPosLocalX();
+  }
+  
+  getPosY() {
+    return this.getPosLocalY();
+  }
+  
+  clear() {
+    this.buttonStates.clear();
+  }
+  
+  update() {
+    this.buttonStates.forEach((value, buttonCode) => {
+      const event = this.buttonStates.get(buttonCode);
+
+      event.alreadyPressed = true;
+      if (event.wasReleased)
+        this.buttonStates.delete(buttonCode);
+
+      mouse.events.call('down', buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
+      mouse.events.call('down_' + buttonCode, buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
+    });
+  }
+  
+  isButtonDown(...args) {
+    let result = false;
+    for(let buttonCode of args) {
+      const key = this.buttonStates.get(buttonCode);
+      if (key && !key.wasReleased)
+        result = true;
+    }
+    
+    return result;
+  }
+  
+  isButtonUp(...args) {
+    return !this.isButtonDown(args);
+  }
+  
+  isButtonPressed(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let buttonCode of args) {
+      const event = this.buttonStates.get(buttonCode);
+      if (event && !event.wasReleased && !event.alreadyPressed)
+        result = true;
+    }
+
+    return result;
+  }
+  
+  isButtonReleased(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let buttonCode of args) {
+      const event = this.buttonStates.get(buttonCode);
+      if (event && event.wasReleased)
+        result = true;
+    }
+
+    return result;
+  }
+}
+
+const mouse = new Mouse();
+
+module.exports = mouse;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const PIXI = __webpack_require__(0);
+const Events = __webpack_require__(9);
+
+class Keyboard {
+	constructor() {
+		this.keyStates = new Map();
+    this.events = new Events();
+	}
+  
+  clear() {
+    this.keyStates.clear();
+  }
+  
+  update() {
+    this.keyStates.forEach((value, keyCode) => {
+      const event = this.keyStates.get(keyCode);
+
+      event.alreadyPressed = true;
+      
+      if (event.wasReleased) {
+        this.keyStates.delete(keyCode);
+      }
+
+      keyboard.events.call('down', keyCode, event);
+      keyboard.events.call('down_' + keyCode, keyCode, event);
+    });
+  }
+  
+  isKeyDown(...args) {
+    let result = false;
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased)
+        result = true;
+    }
+    
+    return result;
+  }
+  
+  isKeyUp(...args) {
+    return !this.isKeyDown(args);
+  }
+  
+  isKeyPressed(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && !event.wasReleased && !event.alreadyPressed)
+        result = true;
+    }
+
+    return result;
+  }
+  
+  isKeyReleased(...args) {
+    let result = false;
+    
+    if (args.length == 0)
+      return false;
+    
+    for(let keyCode of args) {
+      const event = this.keyStates.get(keyCode);
+      if (event && event.wasReleased)
+        result = true;
+    }
+
+    return result;
+  }
+}
+
+const keyboard = new Keyboard();
+
+window.addEventListener(
+  "keydown", (event) => {
+    if (!keyboard.keyStates.get(event.code)) {
+      keyboard.keyStates.set(event.code, event);
+      keyboard.events.call('pressed', event.code, event);
+      keyboard.events.call('pressed_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+window.addEventListener(
+  "keyup", (event) => {
+    event = keyboard.keyStates.get(event.code);
+    if (event) {
+      //keyboard.keyStates.set(event.code, event);
+      event.wasReleased = true;
+      keyboard.events.call('released', event.code, event);
+      keyboard.events.call('released_' + event.code, event.code, event);
+    }
+  }, false
+);
+
+/*keyboard.events.on('pressed', null, (keyCode, event) => {
+  console.log('dd', keyCode);
+});*/
+/*
+setInterval(() => {
+  console.log(keyboard.isKeyReleased('KeyA'));
+  keyboard.update();
+}, 0);*/
+
+module.exports = keyboard;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -39164,160 +39431,7 @@ module.exports = exports['default'];
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(9);
-
-let canvasElement = null;
-
-function getMousePos(event) {
-  const rect = canvasElement.getBoundingClientRect();
-  return {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top
-  };
-}
-
-class Mouse {
-	constructor() {
-    this.Button = {LEFT: 0, MIDDLE: 1, RIGHT: 2, FOURTH: 3, FIFTH: 4};
-    
-    setTimeout(() => {
-      canvasElement = document.getElementById('main') || document.getElementsByTagName('canvas')[0];
-      canvasElement.addEventListener("mousemove", (event) => {
-        if (this.posLocalX != event.clientX || this.posLocalY != event.clientY) {
-          this.events.call('move', event.clientX, this.posLocalY);
-          this.events.call('moveLocal', event.clientX, this.posLocalY);
-          this.posLocalX = event.clientX; this.posLocalY = event.clientY;
-        }
-        
-        if (this.posGlobalX != event.screenX || this.posGlobalY != event.screenY) {
-          this.events.call('moveGlobal', event.screenX, event.screenY);
-          this.posGlobalX = event.screenX; this.posGlobalY = event.screenY;
-        }
-      });
-      
-      canvasElement.addEventListener("mousedown", (event) => {
-        let buttonCode = event.button;
-        if (!mouse.buttonStates.get(buttonCode)) {
-          event.posLocalX = this.getPosLocalX(); event.posLocalY = this.getPosLocalY();
-          mouse.buttonStates.set(buttonCode, event);
-          mouse.events.call('pressed', buttonCode, event, this.getPosLocalX(), this.getPosLocalY());
-          mouse.events.call('pressed_' + buttonCode, buttonCode, event, this.getPosLocalX(), this.getPosLocalY());
-        }
-      });
-      
-      canvasElement.addEventListener("mouseup", (event) => {
-        let buttonCode = event.button;
-        event = mouse.buttonStates.get(buttonCode);
-        if (event) {
-          event.wasReleased = true;
-          mouse.events.call('released', buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
-          mouse.events.call('released_' + buttonCode, buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
-        }
-      });
-    }, 0);
-    
-		this.buttonStates = new Map();
-    this.events = new Events();
-	}
-  
-  getPosGlobalX() {
-    return this.posGlobalX;
-  }
-  
-  getPosGlobalY() {
-    return this.posGlobalY;
-  }
-  
-  getPosLocalX() {
-    return this.posLocalX;
-  }
-  
-  getPosLocalY() {
-    return this.posLocalY;
-  }
-  
-  getPosX() {
-    return this.getPosLocalX();
-  }
-  
-  getPosY() {
-    return this.getPosLocalY();
-  }
-  
-  clear() {
-    this.buttonStates.clear();
-  }
-  
-  update() {
-    this.buttonStates.forEach((value, buttonCode) => {
-      const event = this.buttonStates.get(buttonCode);
-
-      event.alreadyPressed = true;
-      if (event.wasReleased)
-        this.buttonStates.delete(buttonCode);
-
-      mouse.events.call('down', buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
-      mouse.events.call('down_' + buttonCode, buttonCode, event, this.getPosLocalX(), this.getPosLocalY(), event.posLocalX, event.posLocalY, this.getPosLocalX() - event.posLocalX, this.getPosLocalY() - event.posLocalY);
-    });
-  }
-  
-  isButtonDown(...args) {
-    let result = false;
-    for(let buttonCode of args) {
-      const key = this.buttonStates.get(buttonCode);
-      if (key && !key.wasReleased)
-        result = true;
-    }
-    
-    return result;
-  }
-  
-  isButtonUp(...args) {
-    return !this.isButtonDown(args);
-  }
-  
-  isButtonPressed(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let buttonCode of args) {
-      const event = this.buttonStates.get(buttonCode);
-      if (event && !event.wasReleased && !event.alreadyPressed)
-        result = true;
-    }
-
-    return result;
-  }
-  
-  isButtonReleased(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let buttonCode of args) {
-      const event = this.buttonStates.get(buttonCode);
-      if (event && event.wasReleased)
-        result = true;
-    }
-
-    return result;
-  }
-}
-
-const mouse = new Mouse();
-
-module.exports = mouse;
-
-
-/***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39344,8 +39458,8 @@ module.exports = mouse;
 
 
 
-var punycode = __webpack_require__(15);
-var util = __webpack_require__(18);
+var punycode = __webpack_require__(17);
+var util = __webpack_require__(20);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -39420,7 +39534,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(19);
+    querystring = __webpack_require__(21);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -40056,7 +40170,7 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 var g;
@@ -40082,7 +40196,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -40135,120 +40249,6 @@ function parseURI (str, opts) {
 }
 
 module.exports = parseURI
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const PIXI = __webpack_require__(0);
-const Events = __webpack_require__(9);
-
-class Keyboard {
-	constructor() {
-		this.keyStates = new Map();
-    this.events = new Events();
-	}
-  
-  clear() {
-    this.keyStates.clear();
-  }
-  
-  update() {
-    this.keyStates.forEach((value, keyCode) => {
-      const event = this.keyStates.get(keyCode);
-
-      event.alreadyPressed = true;
-      
-      if (event.wasReleased) {
-        this.keyStates.delete(keyCode);
-      }
-
-      keyboard.events.call('down', keyCode, event);
-      keyboard.events.call('down_' + keyCode, keyCode, event);
-    });
-  }
-  
-  isKeyDown(...args) {
-    let result = false;
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased)
-        result = true;
-    }
-    
-    return result;
-  }
-  
-  isKeyUp(...args) {
-    return !this.isKeyDown(args);
-  }
-  
-  isKeyPressed(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && !event.wasReleased && !event.alreadyPressed)
-        result = true;
-    }
-
-    return result;
-  }
-  
-  isKeyReleased(...args) {
-    let result = false;
-    
-    if (args.length == 0)
-      return false;
-    
-    for(let keyCode of args) {
-      const event = this.keyStates.get(keyCode);
-      if (event && event.wasReleased)
-        result = true;
-    }
-
-    return result;
-  }
-}
-
-const keyboard = new Keyboard();
-
-window.addEventListener(
-  "keydown", (event) => {
-    if (!keyboard.keyStates.get(event.code)) {
-      keyboard.keyStates.set(event.code, event);
-      keyboard.events.call('pressed', event.code, event);
-      keyboard.events.call('pressed_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-window.addEventListener(
-  "keyup", (event) => {
-    event = keyboard.keyStates.get(event.code);
-    if (event) {
-      //keyboard.keyStates.set(event.code, event);
-      event.wasReleased = true;
-      keyboard.events.call('released', event.code, event);
-      keyboard.events.call('released_' + event.code, event.code, event);
-    }
-  }, false
-);
-
-/*keyboard.events.on('pressed', null, (keyCode, event) => {
-  console.log('dd', keyCode);
-});*/
-/*
-setInterval(() => {
-  console.log(keyboard.isKeyReleased('KeyA'));
-  keyboard.update();
-}, 0);*/
-
-module.exports = keyboard;
 
 
 /***/ }),
@@ -41284,7 +41284,7 @@ earcut.flatten = function (data) {
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const Events = __webpack_require__(22);
+const Events = __webpack_require__(24);
 
 module.exports = Events;
 
@@ -41636,7 +41636,7 @@ Promise.reject = function(reason){
 
 })(typeof window != 'undefined' ? window : typeof global != 'undefined' ? global : typeof self != 'undefined' ? self : this);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(12).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(14).setImmediate))
 
 /***/ }),
 /* 11 */
@@ -41737,6 +41737,18 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 /***/ }),
 /* 12 */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"mapName\":\"Japan\",\"players\":{\"Sk00g\":{\"avatar\":\"bard\",\"nationColor\":\"GREEN\"},\"JKase\":{\"avatar\":\"knight\",\"nationColor\":\"BLUE\"}},\"dateStarted\":\"2021-01-02T16:01:00\",\"turnHistory\":[],\"regionData\":{\"SJ-1\":{\"ownedBy\":\"Sk00g\",\"armySize\":2},\"SJ-2\":{\"ownedBy\":\"Sk00g\",\"armySize\":3},\"SEJ-1\":{\"ownedBy\":\"JKase\",\"armySize\":3},\"SEJ-2\":{\"ownedBy\":\"JKase\",\"armySize\":2}}}");
+
+/***/ }),
+/* 13 */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"name\":\"Japan\",\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[25,19],\"tileSize\":[16,16],\"connectedEmpireReinforceIncrement\":3,\"generalRegionReinforceIncrement\":3,\"defaultReinforce\":3,\"continents\":[{\"name\":\"South Japan\",\"regions\":[\"SJ-1\",\"SJ-2\"],\"color\":\"#ff4030\",\"ownershipValue\":2},{\"name\":\"Southeast Japan\",\"regions\":[\"SEJ-1\",\"SEJ-2\"],\"color\":\"#30ff40\",\"ownershipValue\":2}],\"regions\":[{\"name\":\"SJ-1\",\"borderTiles\":[[2,2],[3,2],[4,2],[5,2],[5,3],[5,4],[5,5],[4,5],[3,5],[2,5],[2,4],[2,3]],\"unitPoint\":[124,124],\"borderRegions\":[\"SEJ-1\",\"SJ-2\"]},{\"name\":\"SEJ-2\",\"borderTiles\":[[6,6],[7,6],[8,6],[9,6],[9,7],[9,8],[9,9],[8,9],[7,9],[6,9],[6,8],[6,7]],\"unitPoint\":[250,250],\"borderRegions\":[\"SEJ-1\",\"SJ-2\"]},{\"name\":\"SJ-2\",\"borderTiles\":[[2,6],[3,6],[4,6],[5,6],[5,7],[5,8],[5,9],[4,9],[3,9],[2,9],[2,8],[2,7]],\"unitPoint\":[124,250],\"borderRegions\":[\"SEJ-2\",\"SJ-1\"]},{\"name\":\"SEJ-1\",\"borderTiles\":[[6,2],[7,2],[8,2],[9,2],[9,3],[9,4],[9,5],[8,5],[7,5],[6,5],[6,4],[6,3]],\"unitPoint\":[250,124],\"borderRegions\":[\"SEJ-2\",\"SJ-1\"]}]}");
+
+/***/ }),
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -41792,7 +41804,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(13);
+__webpack_require__(15);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -41803,10 +41815,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5)))
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -41996,10 +42008,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(16)))
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -42189,7 +42201,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -42712,10 +42724,10 @@ process.umask = function() { return 0; };
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(16)(module), __webpack_require__(17)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(18)(module), __webpack_require__(19)))
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -42743,7 +42755,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports) {
 
 var g;
@@ -42769,7 +42781,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42792,18 +42804,18 @@ module.exports = {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(20);
-exports.encode = exports.stringify = __webpack_require__(21);
+exports.decode = exports.parse = __webpack_require__(22);
+exports.encode = exports.stringify = __webpack_require__(23);
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42894,7 +42906,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42986,11 +42998,11 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //const format = require("string-format");
-const Resolver = __webpack_require__(23);
+const Resolver = __webpack_require__(25);
 
 class EventElement {
 	constructor(subEventName, isAsync, funct) {
@@ -43227,7 +43239,7 @@ module.exports = Events;
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports) {
 
 class Resolver {
@@ -43319,13 +43331,7 @@ class Resolver {
 module.exports = Resolver;
 
 /***/ }),
-/* 24 */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"name\":\"Japan\",\"maxPlayers\":4,\"tilesetPath\":\"graphics/tilesets/grassBiome/overworld_tileset_grass.png\",\"tileMapSize\":[25,19],\"tileSize\":[16,16],\"connectedEmpireReinforceIncrement\":3,\"defaultReinforce\":\"3\",\"continents\":[{\"name\":\"South Japan\",\"regions\":[\"SJ-1\",\"SJ-2\"],\"color\":\"#ff4030\",\"ownershipValue\":2},{\"name\":\"Southeast Japan\",\"regions\":[\"SEJ-1\",\"SEJ-2\"],\"color\":\"#30ff40\",\"ownershipValue\":2}],\"regions\":[{\"name\":\"SJ-1\",\"borderTiles\":[[2,2],[3,2],[4,2],[5,2],[5,3],[5,4],[5,5],[4,5],[3,5],[2,5],[2,4],[2,3]],\"unitPoint\":[124,124],\"borderRegions\":[\"SEJ-1\",\"SJ-2\"]},{\"name\":\"SEJ-2\",\"borderTiles\":[[6,6],[7,6],[8,6],[9,6],[9,7],[9,8],[9,9],[8,9],[7,9],[6,9],[6,8],[6,7]],\"unitPoint\":[250,250],\"borderRegions\":[\"SEJ-1\",\"SJ-2\"]},{\"name\":\"SJ-2\",\"borderTiles\":[[2,6],[3,6],[4,6],[5,6],[5,7],[5,8],[5,9],[4,9],[3,9],[2,9],[2,8],[2,7]],\"unitPoint\":[124,250],\"borderRegions\":[\"SEJ-2\",\"SJ-1\"]},{\"name\":\"SEJ-1\",\"borderTiles\":[[6,2],[7,2],[8,2],[9,2],[9,3],[9,4],[9,5],[8,5],[7,5],[6,5],[6,4],[6,3]],\"unitPoint\":[250,124],\"borderRegions\":[\"SEJ-2\",\"SJ-1\"]}]}");
-
-/***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43334,6 +43340,411 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/pixi.js/lib/pixi.es.js + 37 modules
 var pixi_es = __webpack_require__(0);
+
+// CONCATENATED MODULE: ./public/src/sengine/suie/core.js
+const SOURCE_PATH = "graphics/ui/source/source.png";
+const ICON_PATH_BROWN = "graphics/ui/source/Set1.png";
+const ICON_PATH_BLUE = "graphics/ui/source/Set2.png";
+const RESOLUTION_SCALE = 1.0;
+let UID = 100;
+
+const PanelColor = Object.freeze({
+    BLUE: "blue",
+    ORANGE: "orange",
+});
+
+const PanelSize = Object.freeze({
+    LARGE: "large",
+    SMALL: "small",
+});
+
+const IconType = Object.freeze({
+    BLANK: 0,
+    ARROW_RIGHT: 4,
+    ARROW_LEFT: 5,
+    ARROW_DOWN: 6,
+    ARROW_UP: 7,
+    RESET: 9,
+    MAX: 12,
+    PLUS: 23,
+    MINUS: 24,
+    CHECK: 27,
+    DELETE: 28,
+});
+
+// CONCATENATED MODULE: ./public/src/sengine/suie/panel.js
+
+
+
+const BORDER_FRAMES = {
+    [PanelSize.LARGE]: {
+        [PanelColor.BLUE]: {
+            tl: [384, 96, 16, 16],
+            t: [407, 96, 16, 16],
+            tr: [432, 96, 16, 16],
+            r: [432, 121, 16, 16],
+            br: [432, 160, 16, 16],
+            b: [407, 160, 16, 16],
+            bl: [384, 160, 16, 16],
+            l: [384, 121, 16, 16],
+        },
+        [PanelColor.ORANGE]: {
+            tl: [320, 96, 16, 16],
+            t: [339, 96, 16, 16],
+            tr: [368, 96, 16, 16],
+            r: [368, 136, 16, 16],
+            br: [368, 160, 16, 16],
+            b: [353, 160, 16, 16],
+            bl: [320, 160, 16, 16],
+            l: [320, 127, 16, 16],
+        },
+    },
+    [PanelSize.SMALL]: {
+        [PanelColor.BLUE]: {
+            l: [368, 32, 8, 16],
+            m: [381, 32, 8, 16],
+            r: [392, 32, 8, 16],
+        },
+        [PanelColor.ORANGE]: {
+            l: [240, 32, 8, 16],
+            m: [252, 32, 8, 16],
+            r: [264, 32, 8, 16],
+        },
+    },
+};
+const BACKGROUND_COLOR = {
+    [PanelColor.BLUE]: 0x417291,
+    [PanelColor.ORANGE]: 0xd36b41,
+};
+const RAW_BORDER_WIDTH = {
+    [PanelSize.LARGE]: 16,
+    [PanelSize.SMALL]: 8,
+};
+const RAW_BORDER_HEIGHT = {
+    [PanelSize.LARGE]: 16,
+    [PanelSize.SMALL]: 8,
+};
+
+class panel_Panel extends pixi_es["Container"] {
+    constructor(rect, panelSize = PanelSize.LARGE, panelColor = PanelColor.BLUE) {
+        super();
+
+        this.position.set(rect.x, rect.y);
+        this._size = [rect.width, rect.height];
+        this._borderScale = 1.0;
+        this._color = panelColor;
+        this._panelSize = panelSize;
+        this._panelChildren = [];
+
+        this._assemble();
+    }
+
+    addMember(child) {
+        this._panelChildren.push(child);
+        this._assemble();
+    }
+
+    _getBorderSprite(border) {
+        let texture = new pixi_es["Texture"](
+            pixi_es["BaseTexture"].from(SOURCE_PATH),
+            new pixi_es["Rectangle"](...BORDER_FRAMES[this._panelSize][this._color][border])
+        );
+        let sprite = new pixi_es["Sprite"](texture);
+        sprite.scale.set(this._borderScale, this._borderScale);
+        return sprite;
+    }
+
+    _assemble() {
+        let w = this._size[0];
+        let h = this._size[1];
+        let bw = Math.floor(RAW_BORDER_WIDTH[this._panelSize] * this._borderScale);
+        let bh = Math.floor(RAW_BORDER_HEIGHT[this._panelSize] * this._borderScale);
+
+        this.removeChildren();
+
+        let bckgr = new pixi_es["Graphics"]();
+        bckgr.beginFill(BACKGROUND_COLOR[this._color]);
+        bckgr.drawRect(Math.floor(bw / 2), Math.floor(bh / 2), w - bw, h - bh);
+        bckgr.endFill();
+        this.addChild(bckgr);
+
+        // Corner borders
+        let borders = {};
+        for (let border of ["tl", "tr", "br", "bl"]) {
+            borders[border] = this._getBorderSprite(border);
+        }
+        borders.tr.x = w - bw;
+        borders.br.position.set(w - bw, h - bh);
+        borders.bl.y = h - bh;
+        this.addChild(borders.tl, borders.tr, borders.br, borders.bl);
+
+        // Horizontal edges
+        let curx = bw;
+        while (curx < w - bw * 2) {
+            let top = this._getBorderSprite("t");
+            let bot = this._getBorderSprite("b");
+            top.x = curx;
+            bot.position.set(curx, h - bh);
+
+            this.addChild(top, bot);
+            curx += bw;
+        }
+        let topFill = this._getBorderSprite("t");
+        topFill.x = w - bw * 2;
+        let botFill = this._getBorderSprite("b");
+        botFill.position.set(w - bw * 2, h - bh);
+        this.addChild(topFill, botFill);
+
+        // Vertical edges
+        let cury = bh;
+        while (cury < h - bh * 2) {
+            let left = this._getBorderSprite("l");
+            let right = this._getBorderSprite("r");
+            left.y = cury;
+            right.position.set(w - bw, cury);
+
+            this.addChild(left, right);
+            cury += bh;
+        }
+        let leftFill = this._getBorderSprite("l");
+        leftFill.y = h - bh * 2;
+        let rightFill = this._getBorderSprite("r");
+        rightFill.position.set(w - bw, h - bh * 2);
+        this.addChild(leftFill, rightFill);
+
+        if (this._panelChildren.length > 0) this.addChild(...this._panelChildren);
+    }
+}
+
+/* harmony default export */ var panel = (panel_Panel);
+
+// CONCATENATED MODULE: ./public/src/sengine/suie/label.js
+
+
+class label_Label extends pixi_es["Text"] {
+    constructor(text, position, fontSize = 6, fontColor = "#dddddd") {
+        super(text, { fontFamily: "emulogic", fontSize: fontSize, fill: fontColor });
+
+        this.position.set(...position);
+    }
+}
+
+/* harmony default export */ var label = (label_Label);
+
+// EXTERNAL MODULE: ./node_modules/pixi.js-mouse/index.js
+var pixi_js_mouse = __webpack_require__(1);
+var pixi_js_mouse_default = /*#__PURE__*/__webpack_require__.n(pixi_js_mouse);
+
+// CONCATENATED MODULE: ./public/src/sengine/suie/textButton.js
+
+
+
+
+
+const textButton_BORDER_FRAMES = {
+    [PanelColor.BLUE]: {
+        l: [368, 32, 8, 16],
+        m: [381, 32, 8, 16],
+        r: [392, 32, 8, 16],
+    },
+    [PanelColor.ORANGE]: {
+        l: [240, 32, 8, 16],
+        m: [252, 32, 8, 16],
+        r: [264, 32, 8, 16],
+    },
+};
+const BORDER_WIDTH = 8;
+
+class textButton_TextButton extends pixi_es["Container"] {
+    constructor(text, position, action, color = PanelColor.BLUE) {
+        super();
+
+        this._uid = UID++;
+        this._text = text;
+        this._color = color;
+        this._suieChildren = [];
+        this._isPressed = false;
+        this._length = 20 + this._text.length * 6;
+        this._action = action;
+        this.position.set(...position);
+
+        this._highlight = new pixi_es["Graphics"]();
+        this._highlight.beginFill(0xffffff, 0.15);
+        this._highlight.drawRect(2, 2, this._length - 4, 12);
+        this._highlight.endFill();
+        this._highlight.visible = false;
+        this._suieChildren.push(this._highlight);
+
+        this._label = new label(text, [10, 4]);
+        this._suieChildren.push(this._label);
+
+        pixi_js_mouse_default.a.events.on("pressed", this._uid, (code, event) => this._mouseDown(code, event));
+        pixi_js_mouse_default.a.events.on("released", this._uid, (code, event) => this._mouseUp(code, event));
+
+        this._assemble();
+    }
+
+    _isPointWithin(x, y) {
+        let thisX = this.getGlobalPosition().x;
+        let thisY = this.getGlobalPosition().y;
+        return x < thisX + this._length && x > thisX && y > thisY && y < thisY + 16;
+    }
+
+    _mouseDown(code, event) {
+        let x = Math.floor(event.offsetX / RESOLUTION_SCALE);
+        let y = Math.floor(event.offsetY / RESOLUTION_SCALE);
+        if (this._isPointWithin(x, y)) {
+            this._isPressed = true;
+            this._highlight.visible = true;
+            this._label.x += 1;
+            this._label.y += 1;
+        }
+    }
+
+    _mouseUp(code, event) {
+        if (this._isPressed) {
+            let x = Math.floor(event.offsetX / RESOLUTION_SCALE);
+            let y = Math.floor(event.offsetY / RESOLUTION_SCALE);
+
+            this._isPressed = false;
+            this._highlight.visible = false;
+            this._label.x -= 1;
+            this._label.y -= 1;
+            if (this._isPointWithin(x, y) && this._action) this._action();
+        }
+    }
+
+    _getBorderSprite(border) {
+        let texture = new pixi_es["Texture"](
+            pixi_es["BaseTexture"].from(SOURCE_PATH),
+            new pixi_es["Rectangle"](...textButton_BORDER_FRAMES[this._color][border])
+        );
+        let sprite = new pixi_es["Sprite"](texture);
+        return sprite;
+    }
+
+    _assemble() {
+        this.removeChildren();
+
+        let w = this._length;
+
+        this.addChild(this._getBorderSprite("l"));
+        let right = this._getBorderSprite("r");
+        right.x = w - BORDER_WIDTH;
+        this.addChild(right);
+
+        let curx = BORDER_WIDTH;
+        while (curx < w - BORDER_WIDTH * 2) {
+            let mid = this._getBorderSprite("m");
+            mid.x = curx;
+            curx += BORDER_WIDTH;
+            this.addChild(mid);
+        }
+        let fill = this._getBorderSprite("m");
+        fill.x = w - BORDER_WIDTH * 2;
+        this.addChild(fill);
+
+        if (this._suieChildren.length > 0) this.addChild(...this._suieChildren);
+    }
+
+    destroy() {
+        pixi_js_mouse_default.a.events.remove("pressed", this._uid);
+        pixi_js_mouse_default.a.events.remove("released", this._uid);
+    }
+}
+
+/* harmony default export */ var textButton = (textButton_TextButton);
+
+// CONCATENATED MODULE: ./public/src/sengine/suie/iconButton.js
+
+
+
+
+class iconButton_IconButton extends pixi_es["Container"] {
+    constructor(iconType, position, action, color = PanelColor.BLUE, scale = 1.75) {
+        super();
+
+        this._uid = UID++;
+        this._iconType = iconType;
+        this._scale = scale;
+        this._color = color;
+        this._isPressed = false;
+        this._action = action;
+        this.position.set(...position);
+
+        this._icon = new pixi_es["Sprite"](
+            new pixi_es["Texture"](
+                pixi_es["BaseTexture"].from(
+                    color === PanelColor.BLUE ? ICON_PATH_BLUE : ICON_PATH_BROWN
+                ),
+                new pixi_es["Rectangle"](iconType * 16, 0, 16, 16)
+            )
+        );
+        this._icon.scale.set(scale, scale);
+        this.addChild(this._icon);
+
+        this._highlight = new pixi_es["Graphics"]();
+        this._highlight.beginFill(0xffffff, 0.15);
+        this._highlight.drawRect(2, 2, Math.floor(16 * scale) - 4, Math.floor(16 * scale));
+        this._highlight.endFill();
+        this._highlight.visible = false;
+        this.addChild(this._highlight);
+
+        pixi_js_mouse_default.a.events.on("pressed", this._uid, (code, event) => this._mouseDown(code, event));
+        pixi_js_mouse_default.a.events.on("released", this._uid, (code, event) => this._mouseUp(code, event));
+    }
+
+    _isPointWithin(x, y) {
+        let thisX = this.getGlobalPosition().x;
+        let thisY = this.getGlobalPosition().y;
+        return x < thisX + this.width && x > thisX && y > thisY && y < thisY + this.height;
+    }
+
+    _mouseDown(code, event) {
+        let x = Math.floor(event.offsetX / RESOLUTION_SCALE);
+        let y = Math.floor(event.offsetY / RESOLUTION_SCALE);
+        if (this._isPointWithin(x, y)) {
+            this._isPressed = true;
+            this._highlight.visible = true;
+        }
+    }
+
+    _mouseUp(code, event) {
+        if (this._isPressed) {
+            let x = Math.floor(event.offsetX / RESOLUTION_SCALE);
+            let y = Math.floor(event.offsetY / RESOLUTION_SCALE);
+
+            this._isPressed = false;
+            this._highlight.visible = false;
+            if (this._isPointWithin(x, y) && this._action) this._action();
+        }
+    }
+
+    destroy() {
+        pixi_js_mouse_default.a.events.remove("pressed", this._uid);
+        pixi_js_mouse_default.a.events.remove("released", this._uid);
+        super.destroy();
+    }
+}
+
+/* harmony default export */ var iconButton = (iconButton_IconButton);
+
+// CONCATENATED MODULE: ./public/src/sengine/suie/suie.js
+
+
+
+
+
+
+/* harmony default export */ var suie = ({
+    Panel: panel,
+    IconType: IconType,
+    PanelColor: PanelColor,
+    PanelSize: PanelSize,
+    Label: label,
+    TextButton: textButton,
+    IconButton: iconButton,
+});
 
 // CONCATENATED MODULE: ./public/src/logService.js
 const LogLevel = Object.freeze({
@@ -43385,6 +43796,8 @@ function logService(level, message, source = "APP", production = false) {
         button_frame_brown: "graphics/ui/source/16x16/Set1/Set1-1.png",
         button_frame_blue: "graphics/ui/source/16x16/Set2/Set2-1.png",
         button_frame_white: "graphics/ui/source/16x16/Set3/Set3-1.png",
+        icons_brown: "graphics/ui/source/Set1.png",
+        icons_blue: "graphics/ui/source/Set2.png",
         arrow_green: "graphics/ui/arrow-green.png",
         arrow_gray: "graphics/ui/arrow-gray.png",
         blip_white: "graphics/ui/blip-white.png",
@@ -43445,12 +43858,8 @@ function logService(level, message, source = "APP", production = false) {
 });
 
 // EXTERNAL MODULE: ./node_modules/pixi.js-keyboard/index.js
-var pixi_js_keyboard = __webpack_require__(6);
+var pixi_js_keyboard = __webpack_require__(2);
 var pixi_js_keyboard_default = /*#__PURE__*/__webpack_require__.n(pixi_js_keyboard);
-
-// EXTERNAL MODULE: ./node_modules/pixi.js-mouse/index.js
-var pixi_js_mouse = __webpack_require__(2);
-var pixi_js_mouse_default = /*#__PURE__*/__webpack_require__.n(pixi_js_mouse);
 
 // CONCATENATED MODULE: ./public/src/vector.js
 function subtract(vecA, vecB) {
@@ -43495,11 +43904,12 @@ function isPointWithinPolygon(point, vertices) {
 
 
 
+
 const DEFAULT_REGION_COLOR = 0xffffff;
 const DEFAULT_REGION_ALPHA = 0.1;
 const BLIP_SCALE = 1.25;
 
-class regionLayer_Region {
+class regionLayer_RegionVisual {
     constructor(mapData, data, stage, tileScale) {
         this._stage = stage;
         this._tileScale = tileScale;
@@ -43538,7 +43948,10 @@ class regionLayer_Region {
     }
 
     getHitPath() {
-        return this._blipSprites.map((sprite) => [sprite.position.x, sprite.position.y]);
+        return this._blipSprites.map((sprite) => [
+            sprite.position.x + sprite.width / 2,
+            sprite.position.y + sprite.height / 2,
+        ]);
     }
 
     resetStyle() {
@@ -43584,7 +43997,7 @@ class regionLayer_RegionLayer {
         this._regions = {};
 
         for (let data of mapData.regions) {
-            this._regions[data.name] = new regionLayer_Region(mapData, data, stage, tileScale);
+            this._regions[data.name] = new regionLayer_RegionVisual(mapData, data, stage, tileScale);
         }
 
         // Set the continent colors for each region
@@ -43601,14 +44014,70 @@ class regionLayer_RegionLayer {
 
         this.clearAllStyles();
 
+        this._eventHandlerUID = 100;
+        this._handlerRegistry = {};
+        this._objectKeyRegistry = {};
+        // All handlers are passed the region that fired the event
         this._eventHandlers = {
-            mouseEnter: [], // handlers are passed the region that fired the event
-            mouseExit: [], // handlers are passed the region that fired the event
+            mouseEnter: [],
+            mouseExit: [],
+            leftClick: [],
+            rightClick: [],
         };
+
+        // Setup click handler
+        this._setupClickHandler();
     }
 
-    on(eventType, func) {
+    _setupClickHandler() {
+        pixi_js_mouse_default.a.events.on("released", (code, event, x, y) => {
+            for (let key in this._regions) {
+                let region = this._regions[key];
+                if (isPointWithinPolygon([x, y], region.getHitPath())) {
+                    let eventType = code === 0 ? "leftClick" : "rightClick";
+                    for (let handler of this._eventHandlers[eventType]) handler(region);
+                }
+            }
+        });
+    }
+
+    on(eventType, func, objectKey = null) {
         this._eventHandlers[eventType].push(func);
+
+        // Use simple UID registry for optional unsubscribing
+        this._eventHandlerUID++;
+        this._handlerRegistry[this._eventHandlerUID] = func;
+
+        // ObjectKey based registry for simple mass unsubscribing
+        if (objectKey) {
+            if (!(objectKey in this._objectKeyRegistry)) this._objectKeyRegistry[objectKey] = [];
+            this._objectKeyRegistry[objectKey].push([eventType, func]);
+        }
+
+        return this._eventHandlerUID;
+    }
+
+    removeHandler(eventType, uid) {
+        if (!(eventType in this._eventHandlers) || !(uid in this._handlerRegistry))
+            throw new Exception(`Specified handler ${eventType} (${uid}) doesn't exist`);
+
+        this._eventHandlers[eventType].splice(
+            this._eventHandlers[eventType].indexOf(this._handlerRegistry[uid]),
+            1
+        );
+    }
+
+    unsubscribeAll(objectKey) {
+        if (!(objectKey in this._objectKeyRegistry))
+            throw new Error("objectKey not in event registry");
+
+        for (let entry of this._objectKeyRegistry[objectKey]) {
+            this._eventHandlers[entry[0]].splice(
+                this._eventHandlers[entry[0]].indexOf(entry[1]),
+                1
+            );
+        }
+        delete this._objectKeyRegistry[objectKey];
     }
 
     get(name) {
@@ -43664,19 +44133,6 @@ const NationColor = Object.freeze({
     BLUE: 0x4050ff,
 });
 
-// CONCATENATED MODULE: ./public/src/sengine/suie/label.js
-
-
-class label_Label extends pixi_es["Text"] {
-    constructor(text, position, fontSize = 6, fontColor = "#dddddd") {
-        super(text, { fontFamily: "emulogic", fontSize: fontSize, fill: fontColor });
-
-        this.position.set(...position);
-    }
-}
-
-/* harmony default export */ var label = (label_Label);
-
 // CONCATENATED MODULE: ./public/src/sengine/unitAvatar.js
 
 
@@ -43690,7 +44146,7 @@ const ATTACK_ANIM_INTERVAL = 20;
 const SCALE = 1.5;
 const COUNTER_SCALE = 1.75;
 const MIN_MOVE_DISTANCE = 2;
-const WALK_SPEED = 1;
+const WALK_SPEED = 2;
 const SHAKE_INCREMENT_MAX = 3;
 
 /*
@@ -43804,6 +44260,17 @@ class unitAvatar_UnitAvatar {
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
         stage.addChild(this._counterLabel);
+    }
+
+    destroy() {
+        this._stage.removeChild(this.sprite);
+        this._stage.removeChild(this._counterSprite);
+        this._stage.removeChild(this._counterLabel);
+    }
+
+    setCounterVisibility(flag) {
+        this._counterSprite.visible = flag;
+        this._counterLabel.visible = flag;
     }
 
     getCounter() {
@@ -44142,6 +44609,7 @@ class tilemap_TileMap {
             this._tileSprites[x] = [];
             for (let y = 0; y < size[1]; y++) {
                 let texture = new pixi_es["Texture"](pixi_es["BaseTexture"].from(path));
+                texture.baseTexture.scaleMode = pixi_es["SCALE_MODES"].NEAREST;
                 let sprite = new pixi_es["Sprite"](texture);
 
                 sprite.position.set(x * this._tileSize[0] * scale, y * this._tileSize[1] * scale);
@@ -44167,12 +44635,6 @@ class tilemap_TileMap {
             this._tileSize[1]
         );
     }
-
-    exportToDataFile(fileName) {
-        // collect all internal variables into a single data object
-        // convert said object into text (let text = JSON.stringify(data))
-        // download said text to the browser-user's computer
-    }
 }
 
 /* harmony default export */ var tilemap = (tilemap_TileMap);
@@ -44196,10 +44658,10 @@ class stateManagerBase_StateManagerBase {
     }
 
     // Remove all states from the stack and reset to only the given state
-    resetState(stateType) {
+    resetState(stateType, initData = null) {
         while (this.getActiveState()) this.popState();
 
-        this.pushState(stateType);
+        this.pushState(stateType, initData);
     }
 
     // Pop off the top state from current stack
@@ -44217,11 +44679,11 @@ class stateManagerBase_StateManagerBase {
     }
 
     // Push a new state on top of the current stack
-    pushState(stateType) {
+    pushState(stateType, initData = null) {
         let currentState = this.getActiveState();
         if (currentState && currentState.deactivate) currentState.deactivate();
 
-        let newState = this._generateState(stateType);
+        let newState = this._generateState(stateType, initData);
         newState.stateType = stateType;
         if (newState.activate) newState.activate();
         logService(LogLevel.DEBUG, `adding new state ${stateType} to stack`, "STATE");
@@ -44229,7 +44691,19 @@ class stateManagerBase_StateManagerBase {
     }
 }
 
+// CONCATENATED MODULE: ./public/src/appContext.js
+/* harmony default export */ var appContext = ({
+    stage: null,
+    playerName: "UNKNOWN",
+});
+
 // CONCATENATED MODULE: ./public/src/gameStates/gameplayStates/deployState.js
+
+
+
+
+
+
 
 
 const DeployStateType = Object.freeze({
@@ -44238,74 +44712,315 @@ const DeployStateType = Object.freeze({
     CONFIRM: "CONFIRM",
 });
 
+const HOVER_FILL = 0x3030f0;
+
 // Will remove these from this file if they get too big
-class RegionSelectState {
-    constructor(gameData) {
-        this._gameData = gameData;
-        this.regionLayer = this._gameData.regionVisuals;
+class deployState_RegionSelectState {
+    constructor(parentState, gameData) {
+        this.parentState = parentState;
+        this.game = gameData;
     }
 
     activate() {
-        this._gameData.regionVisuals.on("mouseEnter", (region) => {
-            this.regionLayer.clearAllStyles();
-            region.setStyle({ fillAlpha: 0.25 });
+        this.game.regionVisualLayer.on(
+            "mouseEnter",
+            (regionVisual) => {
+                this.game.regionVisualLayer.clearAllStyles();
+                let region = this.game.getRegion(regionVisual.name);
+                if (region.owner.name === appContext.playerName) {
+                    region.avatar.playWalkAnimation();
+                    regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
+                }
+            },
+            this
+        );
+
+        this.game.regionVisualLayer.on(
+            "mouseExit",
+            (regionVisual) => {
+                this.game.regionVisualLayer.clearAllStyles();
+                let region = this.game.getRegion(regionVisual.name);
+                if (region.owner.name === appContext.playerName) region.avatar.stopAnimation();
+            },
+            this
+        );
+
+        this.game.regionVisualLayer.on(
+            "leftClick",
+            (regionVisual) => {
+                let region = this.game.getRegion(regionVisual.name);
+                if (region.owner.name === appContext.playerName)
+                    this.parentState.pushState(DeployStateType.EDIT_AMOUNT, {
+                        selectedRegion: region,
+                    });
+            },
+            this
+        );
+
+        pixi_js_keyboard_default.a.events.on("released", "deployState", (keyCode) => {
+            if (keyCode === "Enter") this.parentState.pushState(DeployStateType.CONFIRM);
         });
-
-        this._gameData.regionVisuals.on("mouseExit", (region) => {
-            this.regionLayer.clearAllStyles();
-        });
     }
 
-    update() {}
-}
-class EditAmountState {
-    constructor(gameData) {
-        console.log("creating edit amount state");
-    }
-}
-class ConfirmState {
-    constructor(gameData) {
-        console.log("creating confirm state");
+    deactivate() {
+        this.game.regionVisualLayer.unsubscribeAll(this);
+        pixi_js_keyboard_default.a.events.remove("released", "deployState");
     }
 }
 
-class deployState_DeployState extends stateManagerBase_StateManagerBase {
-    constructor(gameData) {
-        super();
+class deployState_EditAmountState {
+    constructor(parentState, gameData, initData) {
+        this.parentState = parentState;
+        this.game = gameData;
+        this.selectedRegion = initData.selectedRegion;
 
-        this._gameData = gameData;
-
-        // Setup HUD according to deployment state
-
-        this.resetState(DeployStateType.REGION_SELECT);
+        this._deployAvatar = null;
+        this._editPanel = null;
     }
 
-    _generateState(type) {
-        switch (type) {
-            case DeployStateType.REGION_SELECT:
-                return new RegionSelectState(this._gameData);
-            case DeployStateType.EDIT_AMOUNT:
-                return new EditAmountState(this._gameData);
-            case DeployStateType.CONFIRM:
-                return new ConfirmState(this._gameData);
+    animateEntry() {
+        let unitCenter = this.selectedRegion.visual.getUnitCenter();
+
+        this._deployAvatar = new unitAvatar(
+            appContext.stage,
+            graphics.avatar[this.selectedRegion.owner.avatarType],
+            0x99999c
+        );
+        this._deployAvatar.sprite.alpha = 0;
+        this._deployAvatar.sprite.scale.set(1.2, 1.2);
+        this._deployAvatar.setPosition([unitCenter[0] - 80, unitCenter[1] + 8]);
+        this._deployAvatar.setCounter(1);
+
+        this._deployAvatar.walk([unitCenter[0] - 25, unitCenter[1] + 8]);
+        this._deployAvatar.fade(0.75, 0.04);
+    }
+
+    _handleButton(button) {
+        switch (button) {
+            case "delete":
+                this.parentState.popState();
+                break;
+            case "minus":
+                this._deployAvatar.setCounter(Math.max(1, this._deployAvatar.getCounter() - 1));
+                break;
+            case "plus":
+                this._deployAvatar.setCounter(
+                    Math.min(this.parentState.availableArmies, this._deployAvatar.getCounter() + 1)
+                );
+                break;
+            case "max":
+                this._deployAvatar.setCounter(this.parentState.availableArmies);
+                break;
+            case "check":
+                this.parentState.registerDeployment(
+                    this.selectedRegion,
+                    this._deployAvatar.getCounter()
+                );
+                this.parentState.popState();
+                break;
         }
+    }
+
+    activate() {
+        this.game.regionVisualLayer.clearAllStyles();
+        this.selectedRegion.visual.setStyle({ fillColor: 0xffffff, fillAlpha: 0.2 });
+
+        // Default deploy amount is hardcoded to 1 for now... user config later?
+        this.animateEntry();
+
+        // Create interactive GUI to edit the numbers
+        let unitPoint = this.selectedRegion.visual.getUnitCenter();
+        this._editPanel = new pixi_es["Container"]();
+        this._editPanel.position.set(unitPoint[0] - 80, unitPoint[1] + 30);
+        appContext.stage.addChild(this._editPanel);
+
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.DELETE,
+                [0, 0],
+                () => this._handleButton("delete"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.MINUS,
+                // [this._editPanel.getChildAt(0).width, 0],
+                [32, 0],
+                () => this._handleButton("minus"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.PLUS,
+                [this._editPanel.getChildAt(0).width * 2, 0],
+                () => this._handleButton("plus"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.MAX,
+                [this._editPanel.getChildAt(0).width * 3, 0],
+                () => this._handleButton("max"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.CHECK,
+                [this._editPanel.getChildAt(0).width * 4, 0],
+                () => this._handleButton("check"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+    }
+
+    deactivate() {
+        if (this._deployAvatar) this._deployAvatar.destroy();
+        this.game.regionVisualLayer.clearAllStyles();
+
+        let kids = [...this._editPanel.children];
+        for (let child of kids) child.destroy();
+        this._editPanel.destroy();
+
+        this.selectedRegion.avatar.stopAnimation();
+    }
+
+    update(delta) {
+        if (pixi_js_keyboard_default.a.isKeyDown("Escape")) this.parentState.popState();
+
+        if (this._deployAvatar) this._deployAvatar.update(delta);
+    }
+}
+
+class deployState_ConfirmState {
+    constructor(parentState, gameData) {
+        this.parentState = parentState;
+
+        this._confirmPanel = new suie.Panel(new pixi_es["Rectangle"](500, 350, 200, 100));
+        this._confirmPanel.addChild(new suie.Label("Submit deployment?", [10, 30], 10));
+        this._confirmPanel.addChild(
+            new suie.TextButton("YES", [60, 60], () => this._confirmAction())
+        );
+        this._confirmPanel.addChild(
+            new suie.TextButton("NO", [100, 60], () => this.parentState.popState())
+        );
+
+        appContext.stage.addChild(this._confirmPanel);
+    }
+
+    _confirmAction() {
+        this.parentState.finalize();
     }
 
     activate() {}
 
-    deactivate() {}
+    deactivate() {
+        this._confirmPanel.destroy();
+    }
+}
 
-    dispose() {}
+class deployState_DeployState extends stateManagerBase_StateManagerBase {
+    constructor(manager, gameData, initData = null) {
+        super();
+
+        this.parentState = manager;
+        this._gameData = gameData;
+        this._registerAvatars = [];
+        this._registeredDeployments = {};
+
+        // Publicly accessible by sub-states
+        this.availableArmies = gameData.getReinforcementCount(
+            gameData.getPlayer(appContext.playerName)
+        );
+
+        // Setup HUD according to current game state
+        this._hudInfo = new pixi_es["Container"]();
+        this._hudInfo.position.set(1000, 20);
+        this._reinforcementCounter = new suie.Label(this.availableArmies, [0, 0], 12);
+        this._hudInfo.addChild(this._reinforcementCounter);
+
+        appContext.stage.addChild(this._hudInfo);
+
+        this.resetState(DeployStateType.REGION_SELECT);
+    }
+
+    _generateState(type, initData = null) {
+        switch (type) {
+            case DeployStateType.REGION_SELECT:
+                return new deployState_RegionSelectState(this, this._gameData, initData);
+            case DeployStateType.EDIT_AMOUNT:
+                return new deployState_EditAmountState(this, this._gameData, initData);
+            case DeployStateType.CONFIRM:
+                return new deployState_ConfirmState(this, this._gameData, initData);
+        }
+    }
+
+    unregisterDeployment() {}
+
+    registerDeployment(region, amount) {
+        this.availableArmies -= amount;
+        this._registeredDeployments[region.name] = amount;
+        this._reinforcementCounter.text = this.availableArmies;
+
+        let unitCenter = region.visual.getUnitCenter();
+        let avatar = new unitAvatar(
+            appContext.stage,
+            graphics.avatar[region.owner.avatarType],
+            0x99999c
+        );
+        avatar.sprite.alpha = 0.75;
+        avatar.sprite.scale.set(1.2, 1.2);
+        avatar.setPosition([unitCenter[0] - 25, unitCenter[1] + 8]);
+        avatar.setCounter(amount);
+        avatar.playWalkAnimation(true);
+
+        this._registerAvatars.push(avatar);
+    }
+
+    activate() {}
+
+    finalize() {
+        for (let avatar of this._registerAvatars) {
+            avatar.setCounterVisibility(false);
+            avatar.walk([avatar.getPosition()[0] + 25, avatar.getPosition()[1]]);
+            avatar.fade(1, 0.1);
+        }
+
+        setTimeout(() => {
+            for (let name in this._registeredDeployments)
+                this._gameData.updateArmySize(
+                    this._gameData.getRegion(name),
+                    this._registeredDeployments[name]
+                );
+            this.parentState.resetState("ORDER");
+        }, 400);
+    }
+
+    deactivate() {
+        this._hudInfo.destroy();
+        for (let avatar of this._registerAvatars) avatar.destroy();
+
+        while (this.getActiveState()) this.popState();
+    }
 
     update(delta) {
         let currentState = this.getActiveState();
         if (currentState && currentState.update) currentState.update(delta);
+        for (let avatar of this._registerAvatars) avatar.update(delta);
     }
 }
 
 // CONCATENATED MODULE: ./public/src/gameStates/gameplayStates/orderState.js
 class OrderState {
-    constructor(gameData) {}
+    constructor(manager, gameData, initData = null) {}
 
     activate() {}
 
@@ -44316,7 +45031,186 @@ class OrderState {
     update(delta) {}
 }
 
+// CONCATENATED MODULE: ./public/src/game_data/player.js
+class Player {
+    constructor(name, avatarType, nationColor) {
+        this.name = name;
+        this.avatarType = avatarType;
+        this.nationColor = nationColor;
+        this.alive = true;
+        this.regions = [];
+    }
+
+    toString() {
+        return `${this.name} [${this.avatarType} | ${this.nationColor}] (${this.regions.length})`;
+    }
+}
+
+// CONCATENATED MODULE: ./public/src/game_data/region.js
+
+
+
+
+
+class region_Region {
+    constructor() {
+        this.name = null;
+        this.owner = null;
+        this.armySize = 1;
+        this.continent = null;
+        this.avatar = null;
+        this.visual = null;
+    }
+
+    toString() {
+        return `${this.name} [${this.armySize} | ${this.owner.name}] (${this.continent.name})`;
+    }
+
+    renderAvatar() {
+        if (this.avatar) appContext.stage.removeChild(this.avatar);
+
+        this.avatar = new unitAvatar(
+            appContext.stage,
+            graphics.avatar[this.owner.avatarType],
+            NationColor[this.owner.nationColor]
+        );
+        this.avatar.setPosition(this.visual.getUnitCenter());
+        this.avatar.setCounter(this.armySize);
+        this.avatar.setDirection("down");
+    }
+}
+
+// CONCATENATED MODULE: ./public/src/game_data/gameData.js
+/*
+IN MEMORY class / object to represent the current game state and provide helper functions for 
+accessing the units / regions / tiles etc. as the game progresses. This object is generally 
+initialized by interpreting the gameState.json data retrieved from the server
+*/
+
+
+
+
+
+
+const LOG_TAG = "GAME";
+
+class gameData_GameData {
+    constructor(mapData, gameState, regionVisuals) {
+        this._originalState = gameState;
+
+        this.regionVisualLayer = regionVisuals;
+        this.mapData = mapData;
+
+        // Shaping the state data into updateable and easily accessible objects
+        this.allPlayers = Object.keys(gameState.players).map(
+            (playerName) =>
+                new Player(
+                    playerName,
+                    gameState.players[playerName].avatar,
+                    gameState.players[playerName].nationColor
+                )
+        );
+        this.allRegions = Object.keys(gameState.regionData).map((regionName) => {
+            let newRegion = new region_Region();
+            newRegion.name = regionName;
+
+            // Circular relationship where players have regions, and each region has owner
+            newRegion.owner = this.allPlayers.find(
+                (player) => player.name === gameState.regionData[regionName].ownedBy
+            );
+
+            // Special way of adding ownership, use in constructor only
+            newRegion.owner.regions.push(newRegion);
+
+            // Directly from gameState data
+            newRegion.armySize = gameState.regionData[regionName].armySize;
+
+            // Use mapData to store a raw data object with continent details
+            newRegion.continent = mapData.continents.find((cont) =>
+                cont.regions.includes(regionName)
+            );
+
+            // All things graphical or interactive are handled by this 'visual' (RegionLayer)
+            newRegion.visual = regionVisuals.get(regionName);
+
+            // Render the first avatar now that we have a populated region class
+            newRegion.renderAvatar();
+
+            return newRegion;
+        });
+
+        // ----- DEBUG TOOLS -----
+        pixi_js_keyboard_default.a.events.on("released", (keyCode, event) => {
+            let alt = pixi_js_keyboard_default.a.isKeyDown("AltLeft") || pixi_js_keyboard_default.a.isKeyDown("AltRight");
+            let shift = pixi_js_keyboard_default.a.isKeyDown("ShiftLeft") || pixi_js_keyboard_default.a.isKeyDown("ShiftRight");
+
+            switch (keyCode) {
+                case "KeyR":
+                    if (alt && shift) this.allRegions.forEach((region) => console.log(`${region}`));
+                    break;
+                case "KeyP":
+                    if (alt && shift) this.allPlayers.forEach((player) => console.log(`${player}`));
+                    break;
+            }
+        });
+        // -----------------------
+    }
+
+    updateArmySize(region, amount) {
+        region.armySize += amount;
+
+        // TODO - different colors for increase vs decrease?
+
+        region.avatar.morphNumber(1.5, 0.1);
+        region.avatar.blendNumberColor("#ffd700", 10);
+
+        setTimeout(() => region.avatar.setCounter(region.armySize), 300);
+
+        setTimeout(() => {
+            region.avatar.morphNumber(1.0, 0.2);
+            region.avatar.blendNumberColor("#ffffff", 15);
+        }, 1300);
+    }
+
+    getReinforcementCount(player) {
+        let count = this.mapData.defaultReinforce;
+        count += Math.floor(player.regions.length / this.mapData.generalRegionReinforceIncrement);
+
+        // Continent bonuses
+        for (let cont of this.mapData.continents) {
+            let hasAllRegions = true;
+            for (let name of cont.regions) {
+                let region = this.getRegion(name);
+                if (region.owner !== player) {
+                    hasAllRegions = false;
+                    break;
+                }
+            }
+            if (hasAllRegions) count += cont.ownershipValue;
+        }
+
+        // Connected empire bonuses
+        logService(LogLevel.DEBUG, `Player ${player.name} receives ${count} armies`, LOG_TAG);
+
+        return count;
+    }
+
+    getRegion(name) {
+        return this.allRegions.find((reg) => reg.name === name);
+    }
+
+    getPlayer(name) {
+        return this.allPlayers.find((player) => player.name === name);
+    }
+
+    update(delta) {
+        this.allRegions.forEach((region) => region.avatar.update(delta));
+    }
+}
+
 // CONCATENATED MODULE: ./public/src/gameStates/gameplayState.js
+
+
 
 
 
@@ -44350,50 +45244,25 @@ The current game data will be passed into each state on construction, this can b
 build the initial graphics and reactions upon entering a new state
 
  */
-const LOG_TAG = "GAMEPLAY";
+const gameplayState_LOG_TAG = "GAMEPLAY";
 
 class gameplayState_GameplayState extends stateManagerBase_StateManagerBase {
-    constructor(stage, mapData, gameState) {
+    constructor(mapData, gameState) {
         super();
 
         // Since this constructor is the entry point for all front-end game display, we need to
         // begin by instantiating all of the graphics objects for gameplay. Only include
         // graphics / objects that will be used all the time or by all sub-states. State-specific
         // graphics should be handled internally by the sub-state itself
-        logService(LogLevel.DEBUG, "generating tile and region visuals", LOG_TAG);
-        this._stage = stage;
-        this._tileMap = new tilemap(stage, mapData, 2.0);
-        this._regionVisuals = new regionLayer(stage, mapData, 2.0);
-        this._gameState = { ...gameState };
+        logService(LogLevel.DEBUG, "generating tile and region visuals", gameplayState_LOG_TAG);
+        this._tileMap = new tilemap(appContext.stage, mapData, 2.0);
+        this._regionVisuals = new regionLayer(appContext.stage, mapData, 2.0);
 
-        this._regionAvatars = [];
-        logService(LogLevel.DEBUG, "generating unit avatars", LOG_TAG);
-        for (let regionName in this._gameState.regionData) {
-            let rdata = this._gameState.regionData[regionName];
-            let ownerInfo = this._gameState.players[rdata.ownedBy];
-            let rvisual = this._regionVisuals.get(regionName);
+        // This object is passed to all sub-states, contains all necessary game state data
+        // and many helper functions to simplify interaction with the game board / map
+        this._gameData = new gameData_GameData(mapData, gameState, this._regionVisuals);
 
-            let avatar = new unitAvatar(
-                stage,
-                graphics.avatar[ownerInfo.avatar],
-                NationColor[ownerInfo.nationColor]
-            );
-            avatar.setPosition(rvisual.getUnitCenter());
-            avatar.setCounter(rdata.armySize);
-            avatar.setDirection("down");
-            avatar.playWalkAnimation(true);
-
-            this._regionAvatars.push(avatar);
-        }
-
-        this._gameData = {
-            stage: stage,
-            tileMap: this._tileMap,
-            regionVisuals: this._regionVisuals,
-            avatars: this._regionAvatars,
-        };
-
-        logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
+        logService(LogLevel.DEBUG, "settings initial state to DEPLOY", gameplayState_LOG_TAG);
         // Initial state of GAMEPLAY will normally be view only
         // this.resetState(GameplayStateType.VIEW_ONLY, this._gameData);
 
@@ -44402,31 +45271,33 @@ class gameplayState_GameplayState extends stateManagerBase_StateManagerBase {
     }
 
     // Factory pattern for generating new gameplay state objects
-    _generateState(type) {
+    _generateState(type, initData = null) {
         switch (type) {
             case GameplayStateType.DEPLOY:
-                return new deployState_DeployState(this._gameData);
+                return new deployState_DeployState(this, this._gameData, initData);
             case GameplayStateType.ORDER:
-                return new OrderState(this._gameData);
+                return new OrderState(this, this._gameData, initData);
         }
     }
 
     update(delta) {
         // Before calling child classes, update necessary game graphics
-        for (let i = 0; i < this._regionAvatars.length; i++) this._regionAvatars[i].update(delta);
         this._regionVisuals.update(delta, [pixi_js_mouse_default.a.posLocalX, pixi_js_mouse_default.a.posLocalY]);
+        this._gameData.update(delta);
 
         if (this._stateStack) this.getActiveState().update(delta);
     }
 }
 
 // EXTERNAL MODULE: ./public/src/game_data/gameStateTEST.json
-var gameStateTEST = __webpack_require__(26);
+var gameStateTEST = __webpack_require__(12);
 
 // EXTERNAL MODULE: ./public/dist/maps/japan_tconfig.json
-var japan_tconfig = __webpack_require__(24);
+var japan_tconfig = __webpack_require__(13);
 
 // CONCATENATED MODULE: ./public/src/index.js
+
+
 
 
 
@@ -44439,17 +45310,24 @@ var japan_tconfig = __webpack_require__(24);
 
 
 
+// Universally get rid of default right-click behaviour
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+
 const src_loader = pixi_es["Loader"].shared;
 
 pixi_es["utils"].sayHello("WebGL");
 pixi_es["settings"].RESOLUTION = 1.0;
 
 // Initialization
-let app = new pixi_es["Application"]({ width: 800, height: 608, backgroundColor: 0x000000 });
+let app = new pixi_es["Application"]({ width: 1200, height: 800, backgroundColor: 0x000000 });
 document.body.appendChild(app.view);
 
 // Load all assets from game_data/* files
 assetLoader.initialize(src_loader, main);
+
+// Provide app-wide context accessible from anywhere else, be careful...
+appContext.playerName = "Sk00g";
+appContext.stage = app.stage;
 
 function main() {
     logService(LogLevel.INFO, "initializing application");
@@ -44457,7 +45335,10 @@ function main() {
     // For production, this will be another level above for managing overall game state
     // For testing we will jump straight into gameplay with fake data imported above
     logService(LogLevel.WARNING, "running in DEV mode");
-    let testState = new gameplayState_GameplayState(app.stage, japan_tconfig, gameStateTEST);
+    let testState = new gameplayState_GameplayState(japan_tconfig, gameStateTEST);
+
+    // ----- DEBUG CODE -----
+    // ----------------------
 
     app.ticker.add((delta) => {
         pixi_js_keyboard_default.a.update();
@@ -44467,12 +45348,6 @@ function main() {
     });
 }
 
-
-/***/ }),
-/* 26 */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"mapName\":\"Japan\",\"players\":{\"Sk00g\":{\"avatar\":\"bard\",\"nationColor\":\"GREEN\"},\"JKase\":{\"avatar\":\"knight\",\"nationColor\":\"BLUE\"}},\"dateStarted\":\"2021-01-02T16:01:00\",\"turnHistory\":[],\"regionData\":{\"SJ-1\":{\"ownedBy\":\"Sk00g\",\"armySize\":2},\"SJ-2\":{\"ownedBy\":\"Sk00g\",\"armySize\":3},\"SEJ-1\":{\"ownedBy\":\"JKase\",\"armySize\":3},\"SEJ-2\":{\"ownedBy\":\"JKase\",\"armySize\":2}}}");
 
 /***/ })
 /******/ ]);

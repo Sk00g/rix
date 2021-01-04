@@ -10,7 +10,7 @@ const ATTACK_ANIM_INTERVAL = 20;
 const SCALE = 1.5;
 const COUNTER_SCALE = 1.75;
 const MIN_MOVE_DISTANCE = 2;
-const WALK_SPEED = 1;
+const WALK_SPEED = 2;
 const SHAKE_INCREMENT_MAX = 3;
 
 /*
@@ -124,6 +124,17 @@ class UnitAvatar {
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
         stage.addChild(this._counterLabel);
+    }
+
+    destroy() {
+        this._stage.removeChild(this.sprite);
+        this._stage.removeChild(this._counterSprite);
+        this._stage.removeChild(this._counterLabel);
+    }
+
+    setCounterVisibility(flag) {
+        this._counterSprite.visible = flag;
+        this._counterLabel.visible = flag;
     }
 
     getCounter() {

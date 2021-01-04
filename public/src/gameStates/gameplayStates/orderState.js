@@ -1,5 +1,5 @@
 export default class OrderState {
-    constructor(gameData) {}
+    constructor(manager, gameData, initData = null) {}
 
     activate() {}
 

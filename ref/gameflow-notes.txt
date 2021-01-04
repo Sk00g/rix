@@ -55,8 +55,8 @@ DEPLOY STATES:
         * faded counter beside actual counter with current value
         * deselect by other region or explicit ENTER or check ([Y])
             -> on deselect, do the walk-in fade thing animation, stay 75%
-        * buttons graying out when you can't
-        * HUD includes side bar with little army dudes that disappear as you deploy
+        * buttons graying out when you can't*
+        * HUD includes side bar with little army dudes that disappear as you deploy*
     -> CONFIRM 
         * optional confirmation, very obvious message section bottom / right
         * exits deploy into ORDER state

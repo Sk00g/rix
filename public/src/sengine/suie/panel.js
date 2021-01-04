@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import core from "./core";
+import * as core from "./core";
 
 const BORDER_FRAMES = {
     [core.PanelSize.LARGE]: {
@@ -138,8 +138,6 @@ class Panel extends PIXI.Container {
         this.addChild(leftFill, rightFill);
 
         if (this._panelChildren.length > 0) this.addChild(...this._panelChildren);
-
-        console.log("finished render");
     }
 }
 
