@@ -1,25 +1,10 @@
 :JAN 2021-01-01:
 
-FOR EACH GAME STATE:
-- initialization()
-- transitions()
-- end()
-- update()
-- render()
-
-stateManager.pop()
-
-ORIGIN_SELECTION -> TARGET_SELECTION
-
-
-
 OVERARCHING APP STATES:
 
 LOGIN -> LOBBY -> GAMEPLAY 
             -> STATSVIEW
             -> CREATE GAME
-
-
 
 GAMEPLAY STATES:
 
@@ -46,21 +31,6 @@ ORDER STATES:
         * obvious message section bottom / right
         * throughout state, all orders are laid out somewhere in HUD for review (also in actual map)
         * units march out of owned region into middle ground on arrow (or occurs during ORDER_EDIT?)
-
-DEPLOY STATES:
-    -> REGION_SELECTION (hover action on region)
-        * in this state, can end deployment with a button / hotkey -> CONFIRM
-    -> EDIT_AMOUNT 
-        * select graphics on region, edit numbers UI [X][M] -1 +1 +5 [Y]
-        * faded counter beside actual counter with current value
-        * deselect by other region or explicit ENTER or check ([Y])
-            -> on deselect, do the walk-in fade thing animation, stay 75%
-        * buttons graying out when you can't*
-        * HUD includes side bar with little army dudes that disappear as you deploy*
-    -> CONFIRM 
-        * optional confirmation, very obvious message section bottom / right
-        * exits deploy into ORDER state
-        * run final animation with opaqueness, number glow, etc.
 
 General Notes:
     - player own units are bright and others dimmed in DEPLOY or ORDER states

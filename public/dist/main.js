@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -819,8 +819,8 @@ var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
 var earcut = __webpack_require__(8);
 var earcut_default = /*#__PURE__*/__webpack_require__.n(earcut);
 
-// EXTERNAL MODULE: D:/Dev/games/Rix/node_modules/url/url.js
-var url_url = __webpack_require__(4);
+// EXTERNAL MODULE: ./node_modules/url/url.js
+var url_url = __webpack_require__(5);
 var url_default = /*#__PURE__*/__webpack_require__.n(url_url);
 
 // CONCATENATED MODULE: ./node_modules/@pixi/constants/lib/constants.es.js
@@ -39432,6 +39432,32 @@ module.exports = exports['default'];
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39459,7 +39485,7 @@ module.exports = exports['default'];
 
 
 var punycode = __webpack_require__(17);
-var util = __webpack_require__(20);
+var util = __webpack_require__(19);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -39534,7 +39560,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(21);
+    querystring = __webpack_require__(20);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -40167,32 +40193,6 @@ Url.prototype.parseHost = function() {
   }
   if (host) this.hostname = host;
 };
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
 
 
 /***/ }),
@@ -41284,7 +41284,7 @@ earcut.flatten = function (data) {
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const Events = __webpack_require__(24);
+const Events = __webpack_require__(23);
 
 module.exports = Events;
 
@@ -41636,7 +41636,7 @@ Promise.reject = function(reason){
 
 })(typeof window != 'undefined' ? window : typeof global != 'undefined' ? global : typeof self != 'undefined' ? self : this);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(14).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(14).setImmediate))
 
 /***/ }),
 /* 11 */
@@ -41739,7 +41739,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 /* 12 */
 /***/ (function(module) {
 
-module.exports = JSON.parse("{\"mapName\":\"Japan\",\"players\":{\"Sk00g\":{\"avatar\":\"bard\",\"nationColor\":\"GREEN\"},\"JKase\":{\"avatar\":\"knight\",\"nationColor\":\"BLUE\"}},\"dateStarted\":\"2021-01-02T16:01:00\",\"turnHistory\":[],\"regionData\":{\"SJ-1\":{\"ownedBy\":\"Sk00g\",\"armySize\":2},\"SJ-2\":{\"ownedBy\":\"Sk00g\",\"armySize\":3},\"SEJ-1\":{\"ownedBy\":\"JKase\",\"armySize\":3},\"SEJ-2\":{\"ownedBy\":\"JKase\",\"armySize\":2}}}");
+module.exports = JSON.parse("{\"mapName\":\"Japan\",\"players\":{\"Sk00g\":{\"avatar\":\"bard\",\"nationColor\":\"GREEN\"},\"JKase\":{\"avatar\":\"knight\",\"nationColor\":\"BLUE\"}},\"dateStarted\":\"2021-01-02T16:01:00\",\"turnHistory\":[],\"regionData\":{\"SJ-1\":{\"ownedBy\":\"Sk00g\",\"armySize\":5},\"SJ-2\":{\"ownedBy\":\"Sk00g\",\"armySize\":4},\"SEJ-1\":{\"ownedBy\":\"JKase\",\"armySize\":6},\"SEJ-2\":{\"ownedBy\":\"JKase\",\"armySize\":3}}}");
 
 /***/ }),
 /* 13 */
@@ -41815,7 +41815,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4)))
 
 /***/ }),
 /* 15 */
@@ -42008,7 +42008,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5), __webpack_require__(16)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(16)))
 
 /***/ }),
 /* 16 */
@@ -42724,7 +42724,7 @@ process.umask = function() { return 0; };
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(18)(module), __webpack_require__(19)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(18)(module), __webpack_require__(4)))
 
 /***/ }),
 /* 18 */
@@ -42756,32 +42756,6 @@ module.exports = function(module) {
 
 /***/ }),
 /* 19 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
-} catch (e) {
-	// This works if the window reference is available
-	if (typeof window === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42804,18 +42778,18 @@ module.exports = {
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(22);
-exports.encode = exports.stringify = __webpack_require__(23);
+exports.decode = exports.parse = __webpack_require__(21);
+exports.encode = exports.stringify = __webpack_require__(22);
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42906,7 +42880,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42998,11 +42972,11 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //const format = require("string-format");
-const Resolver = __webpack_require__(25);
+const Resolver = __webpack_require__(24);
 
 class EventElement {
 	constructor(subEventName, isAsync, funct) {
@@ -43239,7 +43213,7 @@ module.exports = Events;
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports) {
 
 class Resolver {
@@ -43331,7 +43305,7 @@ class Resolver {
 module.exports = Resolver;
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44068,8 +44042,11 @@ class regionLayer_RegionLayer {
     }
 
     unsubscribeAll(objectKey) {
-        if (!(objectKey in this._objectKeyRegistry))
-            throw new Error("objectKey not in event registry");
+        if (!(objectKey in this._objectKeyRegistry)) {
+            // throw new Error(`objectKey ${objectKey} not in event registry`);
+            console.warn(`objectKey ${objectKey} is not in registry`);
+            return;
+        }
 
         for (let entry of this._objectKeyRegistry[objectKey]) {
             this._eventHandlers[entry[0]].splice(
@@ -44778,7 +44755,7 @@ class deployState_EditAmountState {
         this._editPanel = null;
     }
 
-    animateEntry() {
+    animateEntry(amount) {
         let unitCenter = this.selectedRegion.visual.getUnitCenter();
 
         this._deployAvatar = new unitAvatar(
@@ -44789,7 +44766,7 @@ class deployState_EditAmountState {
         this._deployAvatar.sprite.alpha = 0;
         this._deployAvatar.sprite.scale.set(1.2, 1.2);
         this._deployAvatar.setPosition([unitCenter[0] - 80, unitCenter[1] + 8]);
-        this._deployAvatar.setCounter(1);
+        this._deployAvatar.setCounter(amount);
 
         this._deployAvatar.walk([unitCenter[0] - 25, unitCenter[1] + 8]);
         this._deployAvatar.fade(0.75, 0.04);
@@ -44825,8 +44802,13 @@ class deployState_EditAmountState {
         this.game.regionVisualLayer.clearAllStyles();
         this.selectedRegion.visual.setStyle({ fillColor: 0xffffff, fillAlpha: 0.2 });
 
-        // Default deploy amount is hardcoded to 1 for now... user config later?
-        this.animateEntry();
+        let currentAmount = this.parentState.getRegistration(this.selectedRegion);
+        if (!currentAmount) {
+            this.animateEntry(1);
+        } else {
+            this.animateEntry(currentAmount);
+            this.parentState.unregisterDeployment(this.selectedRegion);
+        }
 
         // Create interactive GUI to edit the numbers
         let unitPoint = this.selectedRegion.visual.getUnitCenter();
@@ -44846,7 +44828,6 @@ class deployState_EditAmountState {
         this._editPanel.addChild(
             new suie.IconButton(
                 suie.IconType.MINUS,
-                // [this._editPanel.getChildAt(0).width, 0],
                 [32, 0],
                 () => this._handleButton("minus"),
                 suie.PanelColor.ORANGE,
@@ -44920,9 +44901,14 @@ class deployState_ConfirmState {
         this.parentState.finalize();
     }
 
-    activate() {}
+    activate() {
+        pixi_js_keyboard_default.a.events.on("released", "deployState", (keyCode) => {
+            if (keyCode === "Enter") this._confirmAction();
+        });
+    }
 
     deactivate() {
+        pixi_js_keyboard_default.a.events.remove("released", "deployState");
         this._confirmPanel.destroy();
     }
 }
@@ -44933,7 +44919,7 @@ class deployState_DeployState extends stateManagerBase_StateManagerBase {
 
         this.parentState = manager;
         this._gameData = gameData;
-        this._registerAvatars = [];
+        this._registerAvatars = {};
         this._registeredDeployments = {};
 
         // Publicly accessible by sub-states
@@ -44963,7 +44949,22 @@ class deployState_DeployState extends stateManagerBase_StateManagerBase {
         }
     }
 
-    unregisterDeployment() {}
+    // Return { amount: #, avatar: UnitAvatar } or null
+    getRegistration(region) {
+        return region.name in this._registeredDeployments
+            ? this._registeredDeployments[region.name]
+            : null;
+    }
+
+    unregisterDeployment(region) {
+        if (region.name in this._registeredDeployments) {
+            this.availableArmies += this._registeredDeployments[region.name];
+            this._reinforcementCounter.text = this.availableArmies;
+            delete this._registeredDeployments[region.name];
+            this._registerAvatars[region.name].destroy();
+            delete this._registerAvatars[region.name];
+        }
+    }
 
     registerDeployment(region, amount) {
         this.availableArmies -= amount;
@@ -44982,13 +44983,14 @@ class deployState_DeployState extends stateManagerBase_StateManagerBase {
         avatar.setCounter(amount);
         avatar.playWalkAnimation(true);
 
-        this._registerAvatars.push(avatar);
+        this._registerAvatars[region.name] = avatar;
     }
 
     activate() {}
 
     finalize() {
-        for (let avatar of this._registerAvatars) {
+        for (let key in this._registerAvatars) {
+            let avatar = this._registerAvatars[key];
             avatar.setCounterVisibility(false);
             avatar.walk([avatar.getPosition()[0] + 25, avatar.getPosition()[1]]);
             avatar.fade(1, 0.1);
@@ -45005,30 +45007,653 @@ class deployState_DeployState extends stateManagerBase_StateManagerBase {
     }
 
     deactivate() {
-        this._hudInfo.destroy();
-        for (let avatar of this._registerAvatars) avatar.destroy();
+        for (let key in this._registerAvatars) this._registerAvatars[key].destroy();
 
         while (this.getActiveState()) this.popState();
+    }
+
+    dispose() {
+        this._hudInfo.destroy();
     }
 
     update(delta) {
         let currentState = this.getActiveState();
         if (currentState && currentState.update) currentState.update(delta);
-        for (let avatar of this._registerAvatars) avatar.update(delta);
+        for (let key in this._registerAvatars) this._registerAvatars[key].update(delta);
+    }
+}
+
+// CONCATENATED MODULE: ./public/src/sengine/regionPathMarker.js
+/*
+Concerned only with the visual representation of a path between regions
+*/
+
+
+
+
+
+const ARROW_INCREMENT = 28;
+const ARROW_SCALE_X = 0.7;
+const ARROW_SCALE_Y = 1;
+const ORIGIN_OFFSET = [0, 0];
+
+class regionPathMarker_RegionPathMarker {
+    constructor(stage, origin, destination, arrowColor = 0x00ff00) {
+        this._stage = stage;
+        this._arrowContainer = new pixi_es["Container"]();
+        this._hitPath = [];
+        this._isHovering = false;
+        this._texture = assetLoader.loadTexture(graphics.interface.arrow_gray);
+
+        // Publicly accessible properties
+        this.origin = origin;
+        this.destination = destination;
+        this.arrowColor = arrowColor;
+
+        stage.addChild(this._arrowContainer);
+        this._render();
+    }
+
+    destroy() {
+        this._arrowContainer.destroy();
+    }
+
+    setAlpha(newAlpha) {
+        this._arrowContainer.alpha = newAlpha;
+    }
+
+    _render() {
+        this._arrowContainer.removeChildren();
+
+        let difference = subtract(this.destination.getUnitCenter(), this.origin.getUnitCenter());
+        let distance = norm(difference);
+        let direction = normalize(difference);
+
+        let distanceRemaining = distance;
+        let count = 1;
+        let origin = add(this.origin.getUnitCenter(), ORIGIN_OFFSET);
+        while (distanceRemaining > ARROW_INCREMENT * 2) {
+            let arrow = new pixi_es["Sprite"](this._texture);
+            arrow.tint = this.arrowColor;
+            arrow.scale.set(ARROW_SCALE_X, ARROW_SCALE_Y);
+            arrow.anchor.set(0.5, 0.5);
+            arrow.rotation = Math.atan2(direction[1], direction[0]);
+
+            let shadow = new pixi_es["Sprite"](this._texture);
+            shadow.tint = 0x000000;
+            shadow.anchor.set(0.5, 0.5);
+            shadow.alpha = 0.5;
+            shadow.scale.set(ARROW_SCALE_X - 0.1, ARROW_SCALE_Y - 0.1);
+            shadow.rotation = Math.atan2(direction[1], direction[0]);
+
+            let pos = add(origin, multiply(direction, ARROW_INCREMENT * count++));
+            arrow.position.set(pos[0], pos[1]);
+            shadow.position.set(pos[0] + 2, pos[1] + 3);
+
+            this._arrowContainer.addChild(shadow);
+            this._arrowContainer.addChild(arrow);
+
+            distanceRemaining -= ARROW_INCREMENT;
+        }
     }
 }
 
 // CONCATENATED MODULE: ./public/src/gameStates/gameplayStates/orderState.js
-class OrderState {
-    constructor(manager, gameData, initData = null) {}
 
-    activate() {}
 
-    deactivate() {}
 
-    dispose() {}
 
-    update(delta) {}
+
+
+
+
+
+
+
+const orderState_HOVER_FILL = 0x3030f0;
+const OUTLINE_COLOR = 0xa0c0ff;
+const ATTACK_ARROW_COLOR = 0xff6060;
+const MOVE_ARROW_COLOR = 0x60ff60;
+
+class orderState_OrderEdit {
+    constructor(parentState, gameData, initData) {
+        this.parentState = parentState;
+        this.game = gameData;
+        this.origin = initData.origin;
+        this.target = initData.target;
+        this.orderCount = initData.count || this.origin.avatar.getCounter() - 1;
+
+        this._orderAvatar = null;
+        this._orderMarker = null;
+        this._editPanel = null;
+
+        // This is set to true when we pass the graphics to the parent state to keep displaying
+        // This is just a convenience thing to avoid re-creating the avatar and path in parent state
+        // when the order is placed, it prevents the this.dispose() method from killing them
+        this._preserveGraphics = false;
+    }
+
+    _handleButton(type) {
+        switch (type) {
+            case "delete":
+                this.parentState.popState();
+                return;
+            case "minus":
+                this.orderCount = Math.max(1, this.orderCount - 1);
+                break;
+            case "plus":
+                this.orderCount = Math.min(
+                    this.parentState.getRegionDisplayCounter(this.origin) - 1,
+                    this.orderCount + 1
+                );
+                break;
+            case "max":
+                this.orderCount = this.parentState.getRegionDisplayCounter(this.origin) - 1;
+                break;
+            case "check":
+                this._preserveGraphics = true;
+                this.parentState.registerOrder(
+                    this.origin,
+                    this.target,
+                    this._orderAvatar.getCounter(),
+                    this._orderAvatar,
+                    this._orderMarker
+                );
+                this.parentState.resetState("PRE_SELECT");
+                return;
+        }
+        this._orderAvatar.setCounter(this.orderCount);
+        this.origin.avatar.setCounter(
+            this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount
+        );
+    }
+
+    _createEditPanel() {
+        // HUD position is dependent on direction of movement
+        let hudPos = this._orderAvatar.getPosition();
+        let originCenter = this.origin.visual.getUnitCenter();
+        let targetCenter = this.target.visual.getUnitCenter();
+        let diff = subtract(originCenter, targetCenter);
+        if (Math.abs(diff[0]) > Math.abs(diff[1])) {
+            hudPos[0] -= 60;
+            hudPos[1] += 20;
+        } else {
+            hudPos[0] += 20;
+            hudPos[1] -= 20;
+        }
+
+        // Create interactive GUI to edit the numbers
+        this._editPanel = new pixi_es["Container"]();
+        this._editPanel.position.set(hudPos[0], hudPos[1]);
+        appContext.stage.addChild(this._editPanel);
+
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.DELETE,
+                [0, 0],
+                () => this._handleButton("delete"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.MINUS,
+                [32, 0],
+                () => this._handleButton("minus"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.PLUS,
+                [this._editPanel.getChildAt(0).width * 2, 0],
+                () => this._handleButton("plus"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.MAX,
+                [this._editPanel.getChildAt(0).width * 3, 0],
+                () => this._handleButton("max"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+        this._editPanel.addChild(
+            new suie.IconButton(
+                suie.IconType.CHECK,
+                [this._editPanel.getChildAt(0).width * 4, 0],
+                () => this._handleButton("check"),
+                suie.PanelColor.ORANGE,
+                2.0
+            )
+        );
+    }
+
+    activate() {
+        this.game.regionVisualLayer.clearAllStyles();
+        this.origin.avatar.setCounter(
+            this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount
+        );
+        this.origin.visual.setStyle({ fillColor: orderState_HOVER_FILL, fillAlpha: 0.2 });
+        this.target.visual.setStyle({ fillColor: orderState_HOVER_FILL, fillAlpha: 0.2 });
+
+        // Create marker path between regions
+        let pathColor =
+            this.origin.owner === this.target.owner ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
+        this._orderMarker = new regionPathMarker_RegionPathMarker(
+            appContext.stage,
+            this.origin.visual,
+            this.target.visual,
+            pathColor
+        );
+        this._orderMarker.setAlpha(0.75);
+
+        // Create avatar to represent 'moving troops'
+        this._orderAvatar = new unitAvatar(
+            appContext.stage,
+            graphics.avatar[this.origin.owner.avatarType],
+            0x99999c
+        );
+        this._orderAvatar.sprite.alpha = 0.75;
+        this._orderAvatar.sprite.scale.set(1.2, 1.2);
+        this._orderAvatar.setCounter(this.orderCount);
+        this._orderAvatar.playWalkAnimation(true);
+
+        // Place avatar at halfway point between two regions
+        let originCenter = this.origin.visual.getUnitCenter();
+        let targetCenter = this.target.visual.getUnitCenter();
+        let difference = subtract(targetCenter, originCenter);
+        let direction = normalize(difference);
+        let newPos = add(originCenter, multiply(direction, norm(difference) / 2));
+        this._orderAvatar.setPosition([newPos[0], newPos[1]]);
+        this._orderAvatar.facePoint(this.target.visual.getUnitCenter());
+
+        // Create panel to edit amount of troops moved
+        this._createEditPanel();
+    }
+
+    deactivate() {
+        this.game.regionVisualLayer.clearAllStyles();
+        if (!this._preserveGraphics) {
+            if (this._orderAvatar) this._orderAvatar.destroy();
+            if (this._orderMarker) this._orderMarker.destroy();
+        }
+
+        let kids = [...this._editPanel.children];
+        for (let child of kids) child.destroy();
+        this._editPanel.destroy();
+    }
+
+    update(delta) {
+        if (this._orderAvatar) this._orderAvatar.update(delta);
+    }
+}
+
+class orderState_TargetSelect {
+    constructor(parentState, gameData, initData) {
+        this.parentState = parentState;
+        this.game = gameData;
+        this.selectedRegion = initData.selectedRegion;
+
+        this._pathMarker = null;
+        this._hoveredRegion = null;
+
+        // Constants unique to this state
+        this.FILL_ALPHA = 0.4;
+        this.OUTLINE_ALPHA = 0;
+    }
+
+    _handleRegionClick(regionVisual) {
+        let region = this.game.getRegion(regionVisual.name);
+
+        if (region === this.selectedRegion) this.parentState.popState();
+        else if (region.owner === this.selectedRegion.owner) {
+            this.parentState.pushState("ORDER_EDIT", {
+                origin: this.selectedRegion,
+                target: region,
+            });
+        } else if (region.owner !== this.selectedRegion.owner) {
+            this.parentState.pushState("ORDER_EDIT", {
+                origin: this.selectedRegion,
+                target: region,
+            });
+        }
+    }
+
+    _handleRegionEnter(regionVisual) {
+        let region = this.game.getRegion(regionVisual.name);
+
+        if (!this.game.isRegionBorder(this.selectedRegion, region)) return;
+
+        this._hoveredRegion = region;
+
+        if (this._pathMarker) this._pathMarker.destroy();
+
+        let pathColor =
+            region.owner.name === appContext.playerName ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
+        this._pathMarker = new regionPathMarker_RegionPathMarker(
+            appContext.stage,
+            this.selectedRegion.visual,
+            regionVisual,
+            pathColor
+        );
+        region.avatar.playWalkAnimation();
+        regionVisual.setStyle({ fillAlpha: 0.2, fillColor: orderState_HOVER_FILL });
+    }
+
+    _handleRegionExit(regionVisual) {
+        this._hoveredRegion = null;
+        if (this._pathMarker) this._pathMarker.destroy();
+        let region = this.game.getRegion(regionVisual.name);
+        if (region !== this.selectedRegion) {
+            region.avatar.stopAnimation();
+            regionVisual.resetStyle();
+        }
+    }
+
+    activate() {
+        this.selectedRegion.visual.setStyle({
+            outlineAlpha: this.OUTLINE_ALPHA,
+            fillAlpha: this.FILL_ALPHA,
+        });
+        this.selectedRegion.avatar.morph(1.6, 0.04);
+        this.selectedRegion.avatar.playWalkAnimation(true);
+
+        this.game.regionVisualLayer.on("mouseEnter", (r) => this._handleRegionEnter(r), this);
+        this.game.regionVisualLayer.on("mouseExit", (r) => this._handleRegionExit(r), this);
+        this.game.regionVisualLayer.on("leftClick", (r) => this._handleRegionClick(r), this);
+    }
+
+    deactivate() {
+        if (this._pathMarker) this._pathMarker.destroy();
+        if (this._hoveredRegion) this._hoveredRegion.avatar.stopAnimation();
+        this.selectedRegion.visual.resetStyle();
+        this.selectedRegion.avatar.stopAnimation();
+        this.selectedRegion.avatar.morph(1.5, 0.04);
+        this.game.regionVisualLayer.unsubscribeAll(this);
+    }
+
+    update() {}
+}
+
+class orderState_PreSelectState {
+    constructor(parentState, gameData, initData) {
+        this.parentState = parentState;
+        this.game = gameData;
+    }
+
+    _isRegionValid(region) {
+        return region.owner.name === appContext.playerName && region.avatar.getCounter() > 1;
+    }
+
+    activate() {
+        this.game.regionVisualLayer.on(
+            "mouseEnter",
+            (regionVisual) => {
+                this.game.regionVisualLayer.clearAllStyles();
+                let region = this.game.getRegion(regionVisual.name);
+                if (this._isRegionValid(region)) {
+                    region.avatar.playWalkAnimation();
+                    regionVisual.setStyle({ fillAlpha: 0.2, fillColor: orderState_HOVER_FILL });
+                }
+            },
+            this
+        );
+
+        this.game.regionVisualLayer.on(
+            "mouseExit",
+            (regionVisual) => {
+                this.game.regionVisualLayer.clearAllStyles();
+                let region = this.game.getRegion(regionVisual.name);
+                if (this._isRegionValid(region)) region.avatar.stopAnimation();
+            },
+            this
+        );
+
+        this.game.regionVisualLayer.on(
+            "leftClick",
+            (regionVisual) => {
+                let region = this.game.getRegion(regionVisual.name);
+                if (this._isRegionValid(region)) {
+                    regionVisual.resetStyle();
+                    this.parentState.pushState("TARGET_SELECT", {
+                        selectedRegion: region,
+                    });
+                }
+            },
+            this
+        );
+
+        pixi_js_keyboard_default.a.events.on("released", "orderPreSelectState", (keyCode) => {
+            if (keyCode === "Enter") this.parentState.pushState("CONFIRM");
+        });
+    }
+
+    deactivate() {
+        this.game.regionVisualLayer.unsubscribeAll(this);
+        pixi_js_keyboard_default.a.events.remove("released", "orderPreSelectState");
+    }
+
+    update() {}
+}
+
+class orderState_ConfirmState {
+    constructor(parentState, gameData) {
+        this.parentState = parentState;
+
+        this._confirmPanel = new suie.Panel(new pixi_es["Rectangle"](500, 350, 200, 100));
+        this._confirmPanel.addChild(new suie.Label("Submit orders?", [10, 30], 10));
+        this._confirmPanel.addChild(
+            new suie.TextButton("YES", [60, 60], () => this._confirmAction())
+        );
+        this._confirmPanel.addChild(
+            new suie.TextButton("NO", [100, 60], () => this.parentState.popState())
+        );
+
+        appContext.stage.addChild(this._confirmPanel);
+    }
+
+    _confirmAction() {
+        this.parentState.finalize();
+    }
+
+    activate() {
+        pixi_js_keyboard_default.a.events.on("released", "orderConfirmState", (keyCode) => {
+            if (keyCode === "Enter") this._confirmAction();
+        });
+    }
+
+    deactivate() {
+        pixi_js_keyboard_default.a.events.remove("released", "orderConfirmState");
+        this._confirmPanel.destroy();
+    }
+}
+
+class orderState_OrderState extends stateManagerBase_StateManagerBase {
+    constructor(manager, gameData, initData = null) {
+        super();
+
+        // CONSTANTS
+        this.DEFAULT_AVATAR_ALPHA = 0.75;
+        this.DEFAULT_MARKER_ALPHA = 0.75;
+        this.HOVER_AVATAR_ALPHA = 1.0;
+        this.HOVER_MARKER_ALPHA = 1.0;
+
+        this.parentState = manager;
+        this._gameData = gameData;
+        this._initData = initData;
+        this._registeredOrders = {};
+
+        // Graphical flag to avoid twitching numbers during finalize
+        this._finalReset = false;
+
+        this.resetState("PRE_SELECT");
+
+        this._hud = new pixi_es["Container"]();
+        this._hud.position.set(1000, 20);
+        this._regionText = new suie.Label("placeholder", [0, 0], 10);
+        this._hud.addChild(this._regionText);
+        appContext.stage.addChild(this._hud);
+
+        // Subscribe to hover events for HUD update
+        gameData.regionVisualLayer.on(
+            "mouseEnter",
+            (region) => {
+                this._regionText.text = region.name;
+            },
+            this
+        );
+    }
+
+    // Calculate the correct display counter for a region, based on army size and registered orders
+    getRegionDisplayCounter(region) {
+        let count = region.armySize;
+        if (region.name in this._registeredOrders) {
+            for (let order of this._registeredOrders[region.name]) count -= order.amount;
+        }
+        return count;
+    }
+
+    unregisterOrder(key, order) {
+        order.origin.avatar.setCounter(this.getRegionDisplayCounter(order.origin));
+        order.avatar.destroy();
+        order.marker.destroy();
+        this._registeredOrders[key].splice(this._registeredOrders[key].indexOf(order), 1);
+    }
+
+    registerOrder(origin, target, amount, avatar, marker) {
+        // Hit box for selecting and edit / delete
+        let center = avatar.getPosition();
+        let hitbox = [
+            add(center, [-20, -20]),
+            add(center, [20, -20]),
+            add(center, [20, 20]),
+            add(center, [-20, 20]),
+        ];
+
+        if (!(origin.name in this._registeredOrders)) this._registeredOrders[origin.name] = [];
+        this._registeredOrders[origin.name].push({
+            hitbox: hitbox,
+            origin: origin,
+            target: target,
+            avatar: avatar,
+            amount: amount,
+            marker: marker,
+        });
+
+        origin.avatar.setCounter(this.getRegionDisplayCounter(origin));
+    }
+
+    finalize() {
+        for (let key in this._registeredOrders) {
+            for (let order of this._registeredOrders[key]) {
+                order.marker.destroy();
+                order.avatar.sprite.alpha = 1.0;
+                order.avatar.setCounterVisibility(false);
+                order.avatar.morph(1.5, 0.01);
+                order.avatar.fade(0, 0.01);
+                order.avatar.walk(order.target.visual.getUnitCenter());
+            }
+        }
+
+        setTimeout(() => {
+            for (let key in this._registeredOrders) {
+                for (let order of this._registeredOrders[key])
+                    this._gameData.registerOrder(order.origin, order.target, order.amount);
+            }
+            this._gameData.finishTurn();
+            this._finalReset = true;
+            this.parentState.resetState("DEPLOY");
+        }, 500);
+    }
+
+    popState() {
+        super.popState();
+
+        // On every state switch, ensure all avatar counters are displaying correctly
+        if (!this._finalReset) {
+            for (let region of this._gameData.allRegions)
+                region.avatar.setCounter(this.getRegionDisplayCounter(region));
+        }
+    }
+
+    _generateState(type, initData = null) {
+        switch (type) {
+            case "PRE_SELECT":
+                return new orderState_PreSelectState(this, this._gameData, initData);
+            case "TARGET_SELECT":
+                return new orderState_TargetSelect(this, this._gameData, initData);
+            case "ORDER_EDIT":
+                return new orderState_OrderEdit(this, this._gameData, initData);
+            case "CONFIRM":
+                return new orderState_ConfirmState(this, this._gameData, initData);
+        }
+    }
+
+    activate() {
+        pixi_js_mouse_default.a.events.on("released", "orderState", (code) => {
+            if (code === 2 && this._stateStack.length > 1) this.popState();
+
+            for (let key in this._registeredOrders) {
+                for (let order of this._registeredOrders[key]) {
+                    if (isPointWithinPolygon([pixi_js_mouse_default.a.posLocalX, pixi_js_mouse_default.a.posLocalY], order.hitbox)) {
+                        this.unregisterOrder(key, order);
+                        this.pushState("ORDER_EDIT", {
+                            origin: order.origin,
+                            target: order.target,
+                            count: order.avatar.getCounter(),
+                        });
+                    }
+                }
+            }
+        });
+        pixi_js_keyboard_default.a.events.on("released", "orderState", (keyCode) => {
+            if (keyCode === "Escape" && this._stateStack.length > 1) this.popState();
+        });
+    }
+
+    deactivate() {
+        pixi_js_mouse_default.a.events.remove("released", "orderState");
+        pixi_js_keyboard_default.a.events.remove("released", "orderState");
+
+        for (let key in this._registeredOrders)
+            this._registeredOrders[key].forEach((order) => {
+                order.avatar.destroy();
+                order.marker.destroy();
+            });
+
+        while (this.getActiveState()) this.popState();
+    }
+
+    dispose() {
+        this._gameData.regionVisualLayer.unsubscribeAll(this);
+        this._hud.destroy();
+    }
+
+    update(delta) {
+        for (let key in this._registeredOrders) {
+            for (let order of this._registeredOrders[key]) {
+                if (isPointWithinPolygon([pixi_js_mouse_default.a.posLocalX, pixi_js_mouse_default.a.posLocalY], order.hitbox)) {
+                    order.avatar.sprite.alpha = this.HOVER_AVATAR_ALPHA;
+                    order.marker.setAlpha(this.HOVER_MARKER_ALPHA);
+                } else {
+                    order.avatar.sprite.alpha = this.DEFAULT_AVATAR_ALPHA;
+                    order.marker.setAlpha(this.DEFAULT_MARKER_ALPHA);
+                }
+            }
+        }
+
+        let currentState = this.getActiveState();
+        if (currentState && currentState.update) currentState.update(delta);
+        for (let key in this._registeredOrders) {
+            for (let order of this._registeredOrders[key]) order.avatar.update(delta);
+        }
+    }
 }
 
 // CONCATENATED MODULE: ./public/src/game_data/player.js
@@ -45101,6 +45726,9 @@ class gameData_GameData {
         this.regionVisualLayer = regionVisuals;
         this.mapData = mapData;
 
+        // Store orders from each player until turn execution occurs
+        this.pendingOrders = [];
+
         // Shaping the state data into updateable and easily accessible objects
         this.allPlayers = Object.keys(gameState.players).map(
             (playerName) =>
@@ -45156,6 +45784,17 @@ class gameData_GameData {
         // -----------------------
     }
 
+    // DEBUG HACKS!!! KILL ME LATER!!
+    finishTurn() {
+        if (appContext.playerName === "Sk00g") appContext.playerName = "JKase";
+        else if (appContext.playerName === "JKase") appContext.playerName = "Sk00g";
+    }
+
+    registerOrder(origin, target, amount) {
+        this.pendingOrders.push({ origin, target, amount });
+        this.updateArmySize(origin, -amount);
+    }
+
     updateArmySize(region, amount) {
         region.armySize += amount;
 
@@ -45193,6 +45832,13 @@ class gameData_GameData {
         logService(LogLevel.DEBUG, `Player ${player.name} receives ${count} armies`, LOG_TAG);
 
         return count;
+    }
+
+    // Important to remember borderness is not always mutual
+    isRegionBorder(origin, target) {
+        if (origin === target) return false;
+        let regionData = this.mapData.regions.find((r) => r.name === origin.name);
+        return regionData.borderRegions.includes(target.name);
     }
 
     getRegion(name) {
@@ -45266,8 +45912,9 @@ class gameplayState_GameplayState extends stateManagerBase_StateManagerBase {
         // Initial state of GAMEPLAY will normally be view only
         // this.resetState(GameplayStateType.VIEW_ONLY, this._gameData);
 
-        // For testing will go straight to deployment phase
-        this.resetState(GameplayStateType.DEPLOY, this._gameData);
+        // For testing will go straight to other phase
+        // this.resetState(GameplayStateType.DEPLOY, this._gameData);
+        this.resetState(GameplayStateType.ORDER, this._gameData);
     }
 
     // Factory pattern for generating new gameplay state objects
@@ -45276,7 +45923,7 @@ class gameplayState_GameplayState extends stateManagerBase_StateManagerBase {
             case GameplayStateType.DEPLOY:
                 return new deployState_DeployState(this, this._gameData, initData);
             case GameplayStateType.ORDER:
-                return new OrderState(this, this._gameData, initData);
+                return new orderState_OrderState(this, this._gameData, initData);
         }
     }
 
@@ -45285,7 +45932,7 @@ class gameplayState_GameplayState extends stateManagerBase_StateManagerBase {
         this._regionVisuals.update(delta, [pixi_js_mouse_default.a.posLocalX, pixi_js_mouse_default.a.posLocalY]);
         this._gameData.update(delta);
 
-        if (this._stateStack) this.getActiveState().update(delta);
+        if (this._stateStack.length > 0) this.getActiveState().update(delta);
     }
 }
 
@@ -45326,7 +45973,7 @@ document.body.appendChild(app.view);
 assetLoader.initialize(src_loader, main);
 
 // Provide app-wide context accessible from anywhere else, be careful...
-appContext.playerName = "Sk00g";
+appContext.playerName = "JKase";
 appContext.stage = app.stage;
 
 function main() {

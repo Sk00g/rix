@@ -28,7 +28,7 @@ document.body.appendChild(app.view);
 assetLoader.initialize(loader, main);
 
 // Provide app-wide context accessible from anywhere else, be careful...
-AppContext.playerName = "Sk00g";
+AppContext.playerName = "JKase";
 AppContext.stage = app.stage;
 
 function main() {

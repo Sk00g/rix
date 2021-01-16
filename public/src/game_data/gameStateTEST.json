@@ -13,9 +13,9 @@
     "dateStarted": "2021-01-02T16:01:00",
     "turnHistory": [],
     "regionData": {
-        "SJ-1": { "ownedBy": "Sk00g", "armySize": 2 },
-        "SJ-2": { "ownedBy": "Sk00g", "armySize": 3 },
-        "SEJ-1": { "ownedBy": "JKase", "armySize": 3 },
-        "SEJ-2": { "ownedBy": "JKase", "armySize": 2 }
+        "SJ-1": { "ownedBy": "Sk00g", "armySize": 5 },
+        "SJ-2": { "ownedBy": "Sk00g", "armySize": 4 },
+        "SEJ-1": { "ownedBy": "JKase", "armySize": 6 },
+        "SEJ-2": { "ownedBy": "JKase", "armySize": 3 }
     }
 }

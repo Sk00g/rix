@@ -55,8 +55,9 @@ export class GameplayState extends StateManagerBase {
         // Initial state of GAMEPLAY will normally be view only
         // this.resetState(GameplayStateType.VIEW_ONLY, this._gameData);
 
-        // For testing will go straight to deployment phase
-        this.resetState(GameplayStateType.DEPLOY, this._gameData);
+        // For testing will go straight to other phase
+        // this.resetState(GameplayStateType.DEPLOY, this._gameData);
+        this.resetState(GameplayStateType.ORDER, this._gameData);
     }
 
     // Factory pattern for generating new gameplay state objects
@@ -74,6 +75,6 @@ export class GameplayState extends StateManagerBase {
         this._regionVisuals.update(delta, [Mouse.posLocalX, Mouse.posLocalY]);
         this._gameData.update(delta);
 
-        if (this._stateStack) this.getActiveState().update(delta);
+        if (this._stateStack.length > 0) this.getActiveState().update(delta);
     }
 }

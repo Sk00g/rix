@@ -167,8 +167,11 @@ class RegionLayer {
     }
 
     unsubscribeAll(objectKey) {
-        if (!(objectKey in this._objectKeyRegistry))
-            throw new Error("objectKey not in event registry");
+        if (!(objectKey in this._objectKeyRegistry)) {
+            // throw new Error(`objectKey ${objectKey} not in event registry`);
+            console.warn(`objectKey ${objectKey} is not in registry`);
+            return;
+        }
 
         for (let entry of this._objectKeyRegistry[objectKey]) {
             this._eventHandlers[entry[0]].splice(

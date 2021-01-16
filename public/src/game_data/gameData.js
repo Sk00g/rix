@@ -18,6 +18,9 @@ export default class GameData {
         this.regionVisualLayer = regionVisuals;
         this.mapData = mapData;
 
+        // Store orders from each player until turn execution occurs
+        this.pendingOrders = [];
+
         // Shaping the state data into updateable and easily accessible objects
         this.allPlayers = Object.keys(gameState.players).map(
             (playerName) =>
@@ -73,6 +76,17 @@ export default class GameData {
         // -----------------------
     }
 
+    // DEBUG HACKS!!! KILL ME LATER!!
+    finishTurn() {
+        if (AppContext.playerName === "Sk00g") AppContext.playerName = "JKase";
+        else if (AppContext.playerName === "JKase") AppContext.playerName = "Sk00g";
+    }
+
+    registerOrder(origin, target, amount) {
+        this.pendingOrders.push({ origin, target, amount });
+        this.updateArmySize(origin, -amount);
+    }
+
     updateArmySize(region, amount) {
         region.armySize += amount;
 
@@ -110,6 +124,13 @@ export default class GameData {
         logService(LogLevel.DEBUG, `Player ${player.name} receives ${count} armies`, LOG_TAG);
 
         return count;
+    }
+
+    // Important to remember borderness is not always mutual
+    isRegionBorder(origin, target) {
+        if (origin === target) return false;
+        let regionData = this.mapData.regions.find((r) => r.name === origin.name);
+        return regionData.borderRegions.includes(target.name);
     }
 
     getRegion(name) {

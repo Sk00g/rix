@@ -78,7 +78,7 @@ class EditAmountState {
         this._editPanel = null;
     }
 
-    animateEntry() {
+    animateEntry(amount) {
         let unitCenter = this.selectedRegion.visual.getUnitCenter();
 
         this._deployAvatar = new UnitAvatar(
@@ -89,7 +89,7 @@ class EditAmountState {
         this._deployAvatar.sprite.alpha = 0;
         this._deployAvatar.sprite.scale.set(1.2, 1.2);
         this._deployAvatar.setPosition([unitCenter[0] - 80, unitCenter[1] + 8]);
-        this._deployAvatar.setCounter(1);
+        this._deployAvatar.setCounter(amount);
 
         this._deployAvatar.walk([unitCenter[0] - 25, unitCenter[1] + 8]);
         this._deployAvatar.fade(0.75, 0.04);
@@ -125,8 +125,13 @@ class EditAmountState {
         this.game.regionVisualLayer.clearAllStyles();
         this.selectedRegion.visual.setStyle({ fillColor: 0xffffff, fillAlpha: 0.2 });
 
-        // Default deploy amount is hardcoded to 1 for now... user config later?
-        this.animateEntry();
+        let currentAmount = this.parentState.getRegistration(this.selectedRegion);
+        if (!currentAmount) {
+            this.animateEntry(1);
+        } else {
+            this.animateEntry(currentAmount);
+            this.parentState.unregisterDeployment(this.selectedRegion);
+        }
 
         // Create interactive GUI to edit the numbers
         let unitPoint = this.selectedRegion.visual.getUnitCenter();
@@ -146,7 +151,6 @@ class EditAmountState {
         this._editPanel.addChild(
             new SUIE.IconButton(
                 SUIE.IconType.MINUS,
-                // [this._editPanel.getChildAt(0).width, 0],
                 [32, 0],
                 () => this._handleButton("minus"),
                 SUIE.PanelColor.ORANGE,
@@ -220,9 +224,14 @@ class ConfirmState {
         this.parentState.finalize();
     }
 
-    activate() {}
+    activate() {
+        Keyboard.events.on("released", "deployState", (keyCode) => {
+            if (keyCode === "Enter") this._confirmAction();
+        });
+    }
 
     deactivate() {
+        Keyboard.events.remove("released", "deployState");
         this._confirmPanel.destroy();
     }
 }
@@ -233,7 +242,7 @@ export default class DeployState extends StateManagerBase {
 
         this.parentState = manager;
         this._gameData = gameData;
-        this._registerAvatars = [];
+        this._registerAvatars = {};
         this._registeredDeployments = {};
 
         // Publicly accessible by sub-states
@@ -263,7 +272,22 @@ export default class DeployState extends StateManagerBase {
         }
     }
 
-    unregisterDeployment() {}
+    // Return { amount: #, avatar: UnitAvatar } or null
+    getRegistration(region) {
+        return region.name in this._registeredDeployments
+            ? this._registeredDeployments[region.name]
+            : null;
+    }
+
+    unregisterDeployment(region) {
+        if (region.name in this._registeredDeployments) {
+            this.availableArmies += this._registeredDeployments[region.name];
+            this._reinforcementCounter.text = this.availableArmies;
+            delete this._registeredDeployments[region.name];
+            this._registerAvatars[region.name].destroy();
+            delete this._registerAvatars[region.name];
+        }
+    }
 
     registerDeployment(region, amount) {
         this.availableArmies -= amount;
@@ -282,13 +306,14 @@ export default class DeployState extends StateManagerBase {
         avatar.setCounter(amount);
         avatar.playWalkAnimation(true);
 
-        this._registerAvatars.push(avatar);
+        this._registerAvatars[region.name] = avatar;
     }
 
     activate() {}
 
     finalize() {
-        for (let avatar of this._registerAvatars) {
+        for (let key in this._registerAvatars) {
+            let avatar = this._registerAvatars[key];
             avatar.setCounterVisibility(false);
             avatar.walk([avatar.getPosition()[0] + 25, avatar.getPosition()[1]]);
             avatar.fade(1, 0.1);
@@ -305,15 +330,18 @@ export default class DeployState extends StateManagerBase {
     }
 
     deactivate() {
-        this._hudInfo.destroy();
-        for (let avatar of this._registerAvatars) avatar.destroy();
+        for (let key in this._registerAvatars) this._registerAvatars[key].destroy();
 
         while (this.getActiveState()) this.popState();
+    }
+
+    dispose() {
+        this._hudInfo.destroy();
     }
 
     update(delta) {
         let currentState = this.getActiveState();
         if (currentState && currentState.update) currentState.update(delta);
-        for (let avatar of this._registerAvatars) avatar.update(delta);
+        for (let key in this._registerAvatars) this._registerAvatars[key].update(delta);
     }
 }
