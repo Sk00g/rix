@@ -50,7 +50,7 @@
                 [3, 3],
                 [2, 2]
             ],
-            "unitPoint": [96, 96],
+            "unitPoint": [144, 144],
             "borderRegions": []
         },
         {
@@ -87,7 +87,7 @@
                 [11, 12],
                 [11, 11]
             ],
-            "unitPoint": [112, 240],
+            "unitPoint": [168, 360],
             "borderRegions": []
         },
         {
@@ -133,7 +133,7 @@
                 [9, 19],
                 [10, 18]
             ],
-            "unitPoint": [176, 384],
+            "unitPoint": [264, 576],
             "borderRegions": []
         },
         {
@@ -166,7 +166,7 @@
                 [6, 31],
                 [6, 30]
             ],
-            "unitPoint": [160, 496],
+            "unitPoint": [240, 744],
             "borderRegions": []
         },
         {
@@ -198,7 +198,7 @@
                 [16, 29],
                 [16, 28]
             ],
-            "unitPoint": [304, 480],
+            "unitPoint": [456, 720],
             "borderRegions": []
         }
     ],

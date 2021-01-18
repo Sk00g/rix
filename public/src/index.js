@@ -21,7 +21,7 @@ PIXI.utils.sayHello("WebGL");
 PIXI.settings.RESOLUTION = 1.0;
 
 // Initialization
-let app = new PIXI.Application({ width: 1200, height: 800, backgroundColor: 0x000000 });
+let app = new PIXI.Application({ width: 1400, height: 900, backgroundColor: 0x000000 });
 document.body.appendChild(app.view);
 
 // Load all assets from game_data/* files

@@ -28,7 +28,12 @@ class TileMap {
 
                 this._tileSprites[x][y] = sprite;
 
-                this.updateTileIndex(x, y, Math.floor(Math.random() * 3), 0);
+                this.updateTileIndex(
+                    x,
+                    y,
+                    mapData.tileIndices[x][y][0],
+                    mapData.tileIndices[x][y][1]
+                );
 
                 this._spriteContainer.addChild(sprite);
             }
@@ -40,10 +45,10 @@ class TileMap {
     updateTileIndex(tileX, tileY, indexX, indexY) {
         this._tileIndices[tileX][tileY] = [indexX, indexY];
         this._tileSprites[tileX][tileY].texture.frame = new PIXI.Rectangle(
-            indexX * this._tileSize[0] * this._scale,
-            indexY * this._tileSize[1] * this._scale,
-            this._tileSize[0] * this._scale,
-            this._tileSize[1] * this._scale
+            indexX * this._tileSize[0],
+            indexY * this._tileSize[1],
+            this._tileSize[0],
+            this._tileSize[1]
         );
     }
 }
