@@ -8,29 +8,7 @@ LOGIN -> LOBBY -> GAMEPLAY
 
 GAMEPLAY STATES:
 
-VIEW_ONLY -> REPLAY_TURN -> DEPLOY -> ORDER
-
-ORDER STATES:
-    -> PRE_SELECT 
-        * hover action on region if has more than one unit
-        * can select a region for a new order, or an existing order
-    -> ORDER_EDIT (can't end order phase from this state)
-        * on init -> highlight the order so it's clear it's selected
-        * arrows from gray to green
-        * put up amount GUI [X][M] -1 +1 +5 [Y]
-        * while in this state, can select a new region to target
-        * state can be easily cancelled by clicks / hotkeys
-        * place holder for an order is pathway of gray areas, 50% faded / smaller? avatar with num?
-    -> TARGET_SELECT
-        * when you select a valid region
-        * strong fading on all regions that are no longer clickable
-        * fairly strong highlighting of selected region, walking unit, grow 0.25
-        * highlight viable targets with slightly different hover based on ally / enemy
-        * when region is selected -> ORDER_EDIT
-    -> CONFIRM
-        * obvious message section bottom / right
-        * throughout state, all orders are laid out somewhere in HUD for review (also in actual map)
-        * units march out of owned region into middle ground on arrow (or occurs during ORDER_EDIT?)
+VIEW -> PLAYBACK -> DEPLOY -> ORDER
 
 General Notes:
     - player own units are bright and others dimmed in DEPLOY or ORDER states
@@ -38,5 +16,3 @@ General Notes:
 
 #TODO
 * make conductor class to handle animation sequences
-* make core game object class Region (switch current Region to RegionVisual)????
-* make class for order, ORDER game state creates a list of these

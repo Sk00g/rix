@@ -44,8 +44,8 @@ export class GameplayState extends StateManagerBase {
         // graphics / objects that will be used all the time or by all sub-states. State-specific
         // graphics should be handled internally by the sub-state itself
         logService(LogLevel.DEBUG, "generating tile and region visuals", LOG_TAG);
-        this._tileMap = new TileMap(AppContext.stage, mapData, 2.0);
-        this._regionVisuals = new RegionLayer(AppContext.stage, mapData, 2.0);
+        this._tileMap = new TileMap(AppContext.stage, mapData);
+        this._regionVisuals = new RegionLayer(AppContext.stage, mapData);
 
         // This object is passed to all sub-states, contains all necessary game state data
         // and many helper functions to simplify interaction with the game board / map
@@ -56,8 +56,8 @@ export class GameplayState extends StateManagerBase {
         // this.resetState(GameplayStateType.VIEW_ONLY, this._gameData);
 
         // For testing will go straight to other phase
-        // this.resetState(GameplayStateType.DEPLOY, this._gameData);
-        this.resetState(GameplayStateType.ORDER, this._gameData);
+        this.resetState(GameplayStateType.DEPLOY, this._gameData);
+        // this.resetState(GameplayStateType.ORDER, this._gameData);
     }
 
     // Factory pattern for generating new gameplay state objects

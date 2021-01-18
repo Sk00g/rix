@@ -10,7 +10,7 @@ import AppContext from "./appContext.js";
 // In the future, map data and game state data should be pulled from the server, for testing
 // we will use hard-coded JSON test data instead
 import testGameState from "./game_data/gameStateTEST.json";
-import japanMap from "../../public/dist/maps/japan_tconfig.json";
+import protomap from "../../public/dist/maps/Protomap.json";
 
 // Universally get rid of default right-click behaviour
 document.addEventListener("contextmenu", (event) => event.preventDefault());
@@ -37,7 +37,7 @@ function main() {
     // For production, this will be another level above for managing overall game state
     // For testing we will jump straight into gameplay with fake data imported above
     logService(LogLevel.WARNING, "running in DEV mode");
-    let testState = new GameplayState(japanMap, testGameState);
+    let testState = new GameplayState(protomap, testGameState);
 
     // ----- DEBUG CODE -----
     // ----------------------

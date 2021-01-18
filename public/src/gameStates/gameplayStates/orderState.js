@@ -409,6 +409,11 @@ export default class OrderState extends StateManagerBase {
         );
     }
 
+    // Sends order and deploy information to server for processing
+    transmitTurn() {
+        // websocket info
+    }
+
     // Calculate the correct display counter for a region, based on army size and registered orders
     getRegionDisplayCounter(region) {
         let count = region.armySize;
@@ -465,6 +470,7 @@ export default class OrderState extends StateManagerBase {
                 for (let order of this._registeredOrders[key])
                     this._gameData.registerOrder(order.origin, order.target, order.amount);
             }
+            // This will actually send the data to the server
             this._gameData.finishTurn();
             this._finalReset = true;
             this.parentState.resetState("DEPLOY");

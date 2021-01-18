@@ -18,7 +18,7 @@ export default class GameData {
         this.regionVisualLayer = regionVisuals;
         this.mapData = mapData;
 
-        // Store orders from each player until turn execution occurs
+        // Store orders from each player until turn execution occurs (TEMP)
         this.pendingOrders = [];
 
         // Shaping the state data into updateable and easily accessible objects

@@ -9,9 +9,9 @@ const DEFAULT_REGION_ALPHA = 0.1;
 const BLIP_SCALE = 1.25;
 
 class RegionVisual {
-    constructor(mapData, data, stage, tileScale) {
+    constructor(mapData, data, stage) {
         this._stage = stage;
-        this._tileScale = tileScale;
+        this._tileScale = mapData.scale;
         this._spriteContainer = new PIXI.Container();
 
         // Data from the actual map file is considered 'static' because it can't change after init
@@ -26,8 +26,8 @@ class RegionVisual {
             let tile = data.borderTiles[i];
             let blip = new PIXI.Sprite(assetLoader.loadTexture(graphics.interface.blip_white));
             blip.scale.set(BLIP_SCALE, BLIP_SCALE);
-            let blipX = mapData.tileSize[0] * tileScale * tile[0];
-            let blipY = mapData.tileSize[1] * tileScale * tile[1];
+            let blipX = mapData.tileSize[0] * this._tileScale * tile[0];
+            let blipY = mapData.tileSize[1] * this._tileScale * tile[1];
             this._shadePath.push(
                 blipX + (mapData.tileSize[0] * BLIP_SCALE) / 2,
                 blipY + (mapData.tileSize[0] * BLIP_SCALE) / 2

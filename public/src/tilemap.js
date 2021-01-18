@@ -2,13 +2,14 @@ import * as PIXI from "pixi.js";
 
 // Class used for displaying tilemap
 class TileMap {
-    constructor(stage, mapData, scale) {
+    constructor(stage, mapData) {
         const path = mapData.tilesetPath;
         const size = mapData.tileMapSize;
 
         this._tileSize = mapData.tileSize;
         this._tileIndices = [];
         this._tileSprites = [];
+        this._scale = mapData.scale;
         this._spriteContainer = new PIXI.Container();
 
         for (let x = 0; x < size[0]; x++) {
@@ -19,8 +20,11 @@ class TileMap {
                 texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
                 let sprite = new PIXI.Sprite(texture);
 
-                sprite.position.set(x * this._tileSize[0] * scale, y * this._tileSize[1] * scale);
-                sprite.scale.set(scale, scale);
+                sprite.position.set(
+                    x * this._tileSize[0] * this._scale,
+                    y * this._tileSize[1] * this._scale
+                );
+                sprite.scale.set(this._scale, this._scale);
 
                 this._tileSprites[x][y] = sprite;
 
@@ -36,10 +40,10 @@ class TileMap {
     updateTileIndex(tileX, tileY, indexX, indexY) {
         this._tileIndices[tileX][tileY] = [indexX, indexY];
         this._tileSprites[tileX][tileY].texture.frame = new PIXI.Rectangle(
-            indexX * this._tileSize[0],
-            indexY * this._tileSize[1],
-            this._tileSize[0],
-            this._tileSize[1]
+            indexX * this._tileSize[0] * this._scale,
+            indexY * this._tileSize[1] * this._scale,
+            this._tileSize[0] * this._scale,
+            this._tileSize[1] * this._scale
         );
     }
 }
