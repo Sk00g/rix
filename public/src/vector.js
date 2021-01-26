@@ -19,17 +19,39 @@ export function multiply(vector, value) {
     return [vector[0] * value, vector[1] * value];
 }
 
-export function isPointWithinPolygon(point, vertices) {
-    let minX = 999999;
-    let maxX = -1;
-    let minY = 999999;
-    let maxY = -1;
-    for (let vert of vertices) {
-        if (vert[0] < minX) minX = vert[0];
-        else if (vert[0] > maxX) maxX = vert[0];
-        if (vert[1] < minY) minY = vert[1];
-        else if (vert[1] > maxY) maxY = vert[1];
+export function divide(vector, value) {
+    return [vector[0] / value, vector[1] / value];
+}
+
+export function dotProduct(vecA, vecB) {
+    return vecA[0] * vecB[0] + vecA[1] * vecB[1];
+}
+
+export function crossProduct(vecA, vecB) {
+    return vecB[0] * vecA[0] - vecA[1] * vecB[1];
+}
+
+export function distanceBetween(vecA, vecB) {
+    return Math.abs(norm(subtract(vecA, vecB)));
+}
+
+export function isPointWithinPolygon(point, vs) {
+    // ray-casting algorithm based on
+    // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
+
+    var x = point[0],
+        y = point[1];
+
+    var inside = false;
+    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        var xi = vs[i][0],
+            yi = vs[i][1];
+        var xj = vs[j][0],
+            yj = vs[j][1];
+
+        var intersect = yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+        if (intersect) inside = !inside;
     }
 
-    return point[0] < maxX && point[0] > minX && point[1] < maxY && point[1] > minY;
+    return inside;
 }

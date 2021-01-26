@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import * as V from "./vector.js";
 import SUIE from "./sengine/suie/suie.js";
 import assetLoader from "./assetLoader.js";
 import Keyboard from "pixi.js-keyboard";

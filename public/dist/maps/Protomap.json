@@ -6,7 +6,8 @@
     "tileSize": [16, 16],
     "scale": 1.5,
     "connectedEmpireReinforceIncrement": 3,
-    "defaultReinforce": "3",
+    "generalRegionReinforceIncrement": 3,
+    "defaultReinforce": 3,
     "continents": [
         {
             "name": "Angmar",

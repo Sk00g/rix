@@ -198,7 +198,6 @@ class RegionLayer {
             if (V.isPointWithinPolygon(mousePos, region.getHitPath())) {
                 if (!region.isHovering)
                     for (let handler of this._eventHandlers.mouseEnter) handler(region);
-
                 region.isHovering = true;
             } else {
                 if (region.isHovering)
