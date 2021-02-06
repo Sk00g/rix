@@ -6,7 +6,7 @@ class IconButton extends PIXI.Container {
     constructor(iconType, position, action, color = core.PanelColor.BLUE, scale = 1.75) {
         super();
 
-        this._uid = core.UID++;
+        this._uid = core.generateUID();
         this._iconType = iconType;
         this._scale = scale;
         this._color = color;

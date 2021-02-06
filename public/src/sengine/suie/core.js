@@ -2,7 +2,11 @@ export const SOURCE_PATH = "graphics/ui/source/source.png";
 export const ICON_PATH_BROWN = "graphics/ui/source/Set1.png";
 export const ICON_PATH_BLUE = "graphics/ui/source/Set2.png";
 export const RESOLUTION_SCALE = 1.0;
-export let UID = 100;
+
+let _UID = 100;
+export function generateUID() {
+    return _UID++;
+}
 
 export const PanelColor = Object.freeze({
     BLUE: "blue",

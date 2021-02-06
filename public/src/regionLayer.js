@@ -104,7 +104,7 @@ class RegionLayer {
             for (let name of cont.regions) {
                 this._regions[name]._defaultStyle = {
                     outlineColor: parseInt(cont.color.substr(1), 16),
-                    outlineAlpha: 1.0,
+                    outlineAlpha: 0.5,
                     fillColor: parseInt(cont.color.substr(1), 16),
                     fillAlpha: DEFAULT_REGION_ALPHA,
                 };

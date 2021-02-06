@@ -21,7 +21,7 @@ class TextButton extends PIXI.Container {
     constructor(text, position, action, color = core.PanelColor.BLUE) {
         super();
 
-        this._uid = core.UID++;
+        this._uid = core.generateUID();
         this._text = text;
         this._color = color;
         this._suieChildren = [];

@@ -19,6 +19,6 @@ export default {
         ghost: "graphics/characters/ghost1.png",
     },
     environment: {
-        tileset_grass: "graphics/tilesets/grassBiome/overworld_tileset_grass.png",
+        tileset_grass: "graphics/tilesets/overworld_tileset_grass.png",
     },
 };
