@@ -31,7 +31,7 @@ class App extends Component {
                             <LoginPage />
                         </Route>
                         <Route path="/home">
-                            <HomePage />
+                            <HomePage startGame={this.startGame} />
                         </Route>
                         <Route path="/gameJoin"></Route>
                         <Route path="/lobby/:gameid">
@@ -40,7 +40,7 @@ class App extends Component {
                         <Route path="/creator">
                             <CreatorPage />
                         </Route>
-                        <Redirect path="/" to="/creator" />
+                        <Redirect path="/" to="/home" />
                         {/* <Redirect path="/" to="/login" /> */}
                     </Switch>
                 </Router>

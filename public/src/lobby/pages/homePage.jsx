@@ -39,6 +39,7 @@ const HomePage = (props) => {
                 <DivButton>
                     <FatButton title="Create New Game" onClick={() => history.push("/creator")} />
                     <FatButton title="Join Game" onClick={() => console.log("join existing")} />
+                    <FatButton title="Play Game" onClick={() => props.startGame()} />
                 </DivButton>
                 <PTitle>Active Games</PTitle>
                 <DivButton></DivButton>

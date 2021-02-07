@@ -7,7 +7,7 @@
     "scale": 1.5,
     "connectedEmpireReinforceIncrement": 3,
     "generalRegionReinforceIncrement": 3,
-    "defaultReinforce": "3",
+    "defaultReinforce": 3,
     "continents": [
         {
             "name": "CONTINENT_1",
@@ -71,7 +71,7 @@
                 "REGION_26",
                 "REGION_27"
             ],
-            "color": "#FF4030",
+            "color": "#DDDDDD",
             "ownershipValue": 4
         }
     ],

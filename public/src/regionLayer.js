@@ -5,7 +5,9 @@ import graphics from "./game_data/graphics.js";
 import assetLoader from "./assetLoader.js";
 
 const DEFAULT_REGION_COLOR = 0xffffff;
-const DEFAULT_REGION_ALPHA = 0.1;
+const DEFAULT_REGION_ALPHA = 0.3;
+const DEFAULT_OUTLINE_ALPHA = 1.0;
+const DEFAULT_OUTLINE_WIDTH = 2;
 const BLIP_SCALE = 1.25;
 
 class RegionVisual {
@@ -33,12 +35,15 @@ class RegionVisual {
                 blipY + (mapData.tileSize[0] * BLIP_SCALE) / 2
             );
             blip.position.set(blipX, blipY);
+            blip.alpha = 0;
             this._spriteContainer.addChild(blip);
             this._blipSprites.push(blip);
         }
 
         this._fillColor = DEFAULT_REGION_COLOR;
         this._fillAlpha = DEFAULT_REGION_ALPHA;
+        this._outlineWidth = DEFAULT_OUTLINE_WIDTH;
+        this._outlineColor = DEFAULT_REGION_COLOR;
         this._shape = null;
 
         stage.addChild(this._spriteContainer);
@@ -58,12 +63,16 @@ class RegionVisual {
     }
 
     setStyle(style) {
-        if ("fillColor" in style) this._fillColor = style.fillColor;
+        if ("fillColor" in style) {
+            this._fillColor = style.fillColor;
+            this._outlineColor = style.fillColor;
+        }
         if ("fillAlpha" in style) this._fillAlpha = style.fillAlpha;
 
         // All blips are the same, so only compare to the first
         if ("outlineAlpha" in style && this._blipSprites[0].alpha !== style.outlineAlpha)
-            for (let blip of this._blipSprites) blip.alpha = style.outlineAlpha;
+            for (let blip of this._blipSprites) blip.alpha = 0;
+        // for (let blip of this._blipSprites) blip.alpha = style.outlineAlpha;
         if ("outlineColor" in style && this._blipSprites[0].tint !== style.outlineColor)
             for (let blip of this._blipSprites) blip.tint = style.outlineColor;
 
@@ -104,7 +113,7 @@ class RegionLayer {
             for (let name of cont.regions) {
                 this._regions[name]._defaultStyle = {
                     outlineColor: parseInt(cont.color.substr(1), 16),
-                    outlineAlpha: 0.5,
+                    outlineAlpha: DEFAULT_OUTLINE_ALPHA,
                     fillColor: parseInt(cont.color.substr(1), 16),
                     fillAlpha: DEFAULT_REGION_ALPHA,
                 };

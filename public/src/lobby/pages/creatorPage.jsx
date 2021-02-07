@@ -67,14 +67,20 @@ const CreatorPage = (props) => {
                     validation function, it should just check the entire settings object and return
                     the first error it hits. Then, add reset logic to go back to defaults. Finally, 
                     we can allow game creation. */}
-                    {settings.map((set) => (
-                        <LabelSelect
-                            key={set.key}
-                            label={set.key}
-                            options={Array.isArray(set.options) ? set.options : []}
-                            value={set.default}
-                        />
-                    ))}
+                    {settings.map((set) => {
+                        if (Array.isArray(set.options)) {
+                            return (
+                                <LabelSelect
+                                    key={set.key}
+                                    label={set.key}
+                                    options={Array.isArray(set.options) ? set.options : []}
+                                    value={set.default}
+                                />
+                            );
+                        } else if (set.options.includes("-")) {
+                        } else if (set.options.includes("<") || set.options.includes(">")) {
+                        }
+                    })}
                 </DivSettings>
             </div>
         </DivRoot>

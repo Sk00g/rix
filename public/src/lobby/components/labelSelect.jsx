@@ -46,20 +46,9 @@ const DivParent = styled.div`
 
 const Select = styled.select`
     padding: 3px 8px 2px 4px;
-    font-family: ${theme.font};
-    font-size: 16px;
     width: 100%;
     border: 1px solid #00000000;
     outline: none;
-    box-shadow: ${theme.boxshadowSmall};
-
-    &:hover {
-        border: 1px solid ${theme.colors.primaryLight};
-    }
-
-    &:focus {
-        border: 1px solid ${theme.colors.primaryLight};
-    }
 `;
 
 //#endregion

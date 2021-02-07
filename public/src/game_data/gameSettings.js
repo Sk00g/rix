@@ -3,7 +3,7 @@ Exhaustive list of all game settings and their options
 */
 
 const settings = [
-    { key: "maxPlayers", options: "custom", default: 4 },
+    { key: "maxPlayers", options: "2-10", default: 4 },
     { key: "minPlayers", options: ">2", default: null },
     { key: "victoryCondition", options: ["Death Match"], default: "Death Match" },
     { key: "initialDeploymentType", options: ["Random"], default: "Random" },
