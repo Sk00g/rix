@@ -19,10 +19,9 @@ const LabelSelect = (props) => {
             <Select
                 value={props.value || ""}
                 readOnly={props.handleChange ? false : true}
-                onChange={props.handleChange}
+                onChange={(e) => props.handleChange(e.target.value)}
             >
-                {props.options &&
-                    props.options.map((option) => <option key={option}>{option}</option>)}
+                {props.options && props.options.map((option) => <option key={option}>{option}</option>)}
             </Select>
         </DivParent>
     );
@@ -32,7 +31,7 @@ const LabelSelect = (props) => {
 
 const P = styled.p`
     white-space: nowrap;
-    font-size: ${theme.fontSizeSmall};
+    font-size: ${theme.fontSizeTiny};
     color: ${theme.colors.fontWhite};
     margin-right: 1em;
     user-select: none;
@@ -41,12 +40,11 @@ const P = styled.p`
 const DivParent = styled.div`
     display: flex;
     align-items: center;
-    margin: 0 0.5em;
+    margin: 0.3em 0.5em;
 `;
 
 const Select = styled.select`
     padding: 3px 8px 2px 4px;
-    width: 100%;
     border: 1px solid #00000000;
     outline: none;
 `;

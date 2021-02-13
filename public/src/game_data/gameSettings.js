@@ -4,7 +4,7 @@ Exhaustive list of all game settings and their options
 
 const settings = [
     { key: "maxPlayers", options: "2-10", default: 4 },
-    { key: "minPlayers", options: ">2", default: null },
+    { key: "minPlayers", options: "2-20", default: 2 },
     { key: "victoryCondition", options: ["Death Match"], default: "Death Match" },
     { key: "initialDeploymentType", options: ["Random"], default: "Random" },
     {
@@ -25,11 +25,11 @@ const settings = [
     {
         key: "initialDeployAmount",
         options: "0-999",
-        default: null,
+        default: 20,
         description: "How many armies are given to deploy on the first round",
     },
-    { key: "publicChatEnabled", options: [true], default: true },
-    { key: "privateChatEnabled", options: [false], default: false },
+    { key: "publicChatEnabled", options: ['true'], default: 'true' },
+    { key: "privateChatEnabled", options: ['false'], default: 'false' },
     {
         key: "roundLimit",
         options: "0-999",
@@ -58,20 +58,20 @@ const settings = [
         description: "Base amount of reinforcements given to each player at the start of each turn",
     },
     {
-        key: "regionReinforcementFactor",
+        key: "regionReinforceFactor",
         options: "1-999",
         default: "map",
         description: "One reinforcement is given to players for each group of this many regions",
     },
     {
-        key: "connectedRegionReinforcementFactor",
+        key: "connectedRegionReinforceFactor",
         options: "1-99",
         default: "map",
         description:
             "One reinforcement is given to players for their connected regions divided by this factor",
     },
     {
-        key: "connectedRegionReinforcementThreshold",
+        key: "connectedRegionReinforceThreshold",
         options: "1-99",
         default: "map",
         description: "Connected region networks below this amount do not give any bonus",
@@ -90,11 +90,11 @@ const settings = [
         description:
             "Controls the reward given for eliminating another player (other than the obvious fame and glory...)",
     },
-    { key: "firstRoundAttackEnabled", options: [true, false], default: false },
+    { key: "firstRoundAttackEnabled", options: ['true', 'false'], default: 'false' },
     {
         key: "preventMismatchKills",
-        options: [true, false],
-        default: true,
+        options: ['true', 'false'],
+        default: 'true',
         description:
             "When enabled, prevents an army from killing more than its amount duration multi-invasions",
     },

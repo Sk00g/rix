@@ -1,1 +1,6 @@
-{}
+{
+    "baseReinforcements": 3,
+    "regionReinforceFactor": 3,
+    "connectedRegionReinforceFactor": 3,
+    "connectedRegionReinforceThreshold": 5
+}

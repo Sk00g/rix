@@ -5,37 +5,72 @@ import apiService from "../apiService.js";
 import FatButton from "../components/fatButton.jsx";
 import IconButton, { BUTTON_TYPES } from "../components/iconButton.jsx";
 import LabelSelect from "../components/labelSelect.jsx";
+import LabelNumberInput from "../components/labelNumberInput.jsx";
 import settings from "../../game_data/gameSettings";
 import theme from "../theme";
 
+/*
+Work still needed for this section:
+- question mark icon beside each game setting which pops up a modal with the description
+- validation for the entire game settings object, make sure there are no conflicting settings, etc.
+- confirmation on 'back' button press that you will be leaving any changed settings
+*/
+
 const CreatorPage = (props) => {
-    let [lobbyData, setLobbyData] = useState([]);
     let [mapList, setMapList] = useState(["Protomap"]);
     let [selectedMap, setSelectedMap] = useState("Protomap");
+    let [selectedSettings, setSelectedSettings] = useState([]);
+
     const history = useHistory();
 
-    useEffect(() => {
-        apiService.getLobbyData(true).then((data) => setLobbyData(data));
-        apiService.getMapList().then((list) => setMapList(list));
-    }, []);
-
-    const _handleLobbyClick = (lobby) => {
-        console.log("clicked on", lobby);
+    const _resetSettings = async (mapName) => {
+        const mapSettings = await import(`../../../dist/maps/${mapName}/defaultSettings.json`);
+        let newSettings = settings.map((setting) => {
+            if (setting.default === "map") setting.default = mapSettings[setting.key];
+            return { ...setting, value: setting.default };
+        });
+        setSelectedSettings(newSettings);
     };
+
+    useEffect(async () => {
+        try {
+            let mapList = await apiService.getMapList();
+            setMapList(mapList);
+            _resetSettings(mapList[0]);
+        } catch (err) {
+            console.log(`Failed gathering API data: ${err}`);
+        }
+    }, []);
 
     const _handleMapSelect = (map) => {
         setSelectedMap(map);
+        _resetSettings(map);
+    };
+
+    const _handleGameCreate = () => {
+        let settings = {};
+        for (let set of selectedSettings) settings[set.key] = set.value;
+
+        apiService.createLobby({
+            // createdById: playerContext.active._id,
+            // playerIds: [],
+            gameSettings: settings,
+            // mapName: selectedMap,
+        });
+    };
+
+    const _updateSettingValue = (key, value) => {
+        let newSettings = [...selectedSettings];
+        newSettings.find((set) => set.key === key).value = value;
+        setSelectedSettings(newSettings);
     };
 
     return (
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton
-                        type={BUTTON_TYPES.arrowLeft}
-                        onClick={() => history.push("/home")}
-                    />
-                    <IconButton type={BUTTON_TYPES.reset} onClick={() => console.log("reset?")} />
+                    <IconButton type={BUTTON_TYPES.arrowLeft} onClick={() => history.push("/home")} />
+                    <IconButton type={BUTTON_TYPES.reset} onClick={() => _resetSettings(mapList[0])} />
                 </div>
                 <PTitle>{`Create New Game`}</PTitle>
             </DivTitlebar>
@@ -51,34 +86,37 @@ const CreatorPage = (props) => {
                         <img
                             src={`./maps/${selectedMap}/thumbnail.png`}
                             alt="mapImage"
-                            width="150px"
-                            height="150px"
+                            width="250px"
+                            height="250px"
                             style={{ marginTop: "1em" }}
                         />
                     </div>
-                    <FatButton title="Create Game" onClick={() => console.log("create new game")} />
+                    <FatButton title="Create Game" onClick={_handleGameCreate} />
                 </DivColumn>
                 <DivSettings>
                     <PTitle>Settings</PTitle>
-                    {/* Left off here!!! --- need to add more components for each type of setting, 
-                    then switch based on that type to create the right controls, need function. Next
-                    should add a question mark help button beside each, which pops up the 
-                    description, which will require a modal component. Next we need a settings
-                    validation function, it should just check the entire settings object and return
-                    the first error it hits. Then, add reset logic to go back to defaults. Finally, 
-                    we can allow game creation. */}
-                    {settings.map((set) => {
+                    {selectedSettings.map((set) => {
                         if (Array.isArray(set.options)) {
                             return (
                                 <LabelSelect
                                     key={set.key}
                                     label={set.key}
                                     options={Array.isArray(set.options) ? set.options : []}
-                                    value={set.default}
+                                    value={set.value}
+                                    handleChange={(val) => _updateSettingValue(set.key, val)}
                                 />
                             );
                         } else if (set.options.includes("-")) {
-                        } else if (set.options.includes("<") || set.options.includes(">")) {
+                            return (
+                                <LabelNumberInput
+                                    key={set.key}
+                                    label={set.key}
+                                    value={set.value}
+                                    min={set.options.split("-")[0]}
+                                    max={set.options.split("-")[1]}
+                                    handleChange={(val) => _updateSettingValue(set.key, val)}
+                                />
+                            );
                         }
                     })}
                 </DivSettings>

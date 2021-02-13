@@ -40,7 +40,7 @@ class App extends Component {
                         <Route path="/creator">
                             <CreatorPage />
                         </Route>
-                        <Redirect path="/" to="/home" />
+                        <Redirect path="/" to="/creator" />
                         {/* <Redirect path="/" to="/login" /> */}
                     </Switch>
                 </Router>
