@@ -1,5 +1,5 @@
-const express = require("express");
-const ObjectId = require("mongodb").ObjectID;
+import express from "express";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
@@ -9,14 +9,20 @@ router.get("/", async (req, res) => {
     res.json(accounts);
 });
 
+router.get("/byUsername", async (req, res) => {
+    let db = req.app.get("db");
+    let accounts = await db.collection("accounts").find({ username: req.query.username }).toArray();
+    res.json(accounts[0] || null);
+});
+
 router.get("/:id", async (req, res) => {
     let db = req.app.get("db");
-    console.log(req.params.id);
+
     let accounts = await db
         .collection("accounts")
         .find({ _id: ObjectId(req.params.id) })
         .toArray();
-    res.json(accounts[0] || []);
+    res.json(accounts[0] || null);
 });
 
 router.post("/", async (req, res) => {
@@ -39,4 +45,4 @@ router.post("/", async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -5,6 +5,7 @@ import styled from "styled-components";
  * Managed Input component for use in a form
  *
  * @param {HANDLER} handleChange - Function to respond to user input, should update 'value' prop
+ * @param {HANDLER} handleEnter - Enter key press
  * @param {STRING} value - Text content
  * @param {CSS} [OPTIONAL]width - Width of the input's parent div, defaults to 100%
  */
@@ -18,6 +19,9 @@ class TextInput extends Component {
                 onChange={this.props.handleChange}
                 value={this.props.value || ""}
                 width={this.props.width || "160px"}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" && this.props.handleEnter) this.props.handleEnter();
+                }}
             />
         );
     }
@@ -29,9 +33,9 @@ const InputStyle = styled.input`
     height: 20px;
     padding: 4px 8px 4px 8px;
     font-size: 10px;
-    font-family: 'emulogic';
+    font-family: "emulogic";
     background-color: ${(props) => (props.readOnly ? "#888" : "#eee")};
-    font-color: ${(props) => (props.readOnly ? "#888" : "#000")};
+    color: ${(props) => (props.readOnly ? "#888" : "#000")};
     border: 1px solid #00000000;
     text-align: center;
     outline: none;
@@ -45,7 +49,7 @@ const InputStyle = styled.input`
     }
 
     &::selection {
-        background: #ffe4c0};
+        background: #ffe4c0;
     }
 `;
 

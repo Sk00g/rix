@@ -5,7 +5,6 @@ import TileMap from "../tilemap.js";
 import Keyboard from "pixi.js-keyboard";
 import Mouse from "pixi.js-mouse";
 import graphics from "../game_data/graphics.js";
-import { NationColor } from "../sengine/utils.js";
 import StateManagerBase from "./stateManagerBase.js";
 import DeployState from "./gameplayStates/deployState.js";
 import OrderState from "./gameplayStates/orderState.js";

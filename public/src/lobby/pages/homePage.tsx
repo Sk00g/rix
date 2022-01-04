@@ -1,34 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import apiService from "../apiService.js";
+import apiService from "../apiService";
 import FatButton from "../components/fatButton.jsx";
 import IconButton, { BUTTON_TYPES } from "../components/iconButton.jsx";
-import LabelValue from "../components/labelValue.jsx";
+import LabelValue from "../components/labelValue";
 import LobbyFatButton from "../components/lobbyFatButton.jsx";
+import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
 
 const HomePage = (props) => {
+    let [activeLobbies, setActiveLobbies] = useState([]);
     let history = useHistory();
+
+    let activeAccount = useContext(AccountContext);
+
+    useEffect(() => {
+        apiService.getLobbyData(true, null).then((allLobbies) => {
+            setActiveLobbies(allLobbies.filter((lob) => lob.players.find((p) => p._id === activeAccount._id)));
+        });
+    }, []);
 
     return (
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton
-                        type={BUTTON_TYPES.arrowLeft}
-                        onClick={() => history.push("/login")}
-                    />
-                    <IconButton
-                        type={BUTTON_TYPES.reset}
-                        onClick={() => console.log("refresh connected games?")}
-                    />
+                    <IconButton type={BUTTON_TYPES.arrowLeft} onClick={() => history.push("/login")} />
+                    <IconButton type={BUTTON_TYPES.reset} onClick={() => console.log("refresh connected games?")} />
                 </div>
-                <PTitle>{`Welcome ${props.username || "Scott"}`}</PTitle>
+                <PTitle>{`Welcome ${activeAccount.username || "Scott"}`}</PTitle>
             </DivTitlebar>
             <DivPlayerStats>
                 <PTitle>Player Stats:</PTitle>
-                <hr width="80%" />
+                <hr />
                 <LabelValue label="ELO:" value={1} />
                 <LabelValue label="Games Played:" value={2} />
                 <LabelValue label="Games Won:" value={3} />
@@ -38,8 +42,19 @@ const HomePage = (props) => {
             <DivActions>
                 <DivButton>
                     <FatButton title="Create New Game" onClick={() => history.push("/creator")} />
-                    <FatButton title="Join Game" onClick={() => console.log("join existing")} />
+                    <FatButton title="Join Game" onClick={() => history.push("/gameJoin")} />
                     <FatButton title="Play Game" onClick={() => props.startGame()} />
+                </DivButton>
+                <PTitle>Active Lobbies</PTitle>
+                <DivButton>
+                    {activeLobbies.length > 0 &&
+                        activeLobbies.map((lobby) => (
+                            <LobbyFatButton
+                                key={lobby._id}
+                                lobby={lobby}
+                                onClick={() => history.push(`/lobby/${lobby._id}`)}
+                            />
+                        ))}
                 </DivButton>
                 <PTitle>Active Games</PTitle>
                 <DivButton></DivButton>
@@ -52,8 +67,8 @@ const DivRoot = styled.div`
     display: grid;
     grid-template-rows: min-content auto;
     grid-template-columns: auto min-content;
-    width: 1000px;
-    height: 600px;
+    width: 1200px;
+    height: 700px;
     background-color: ${theme.colors.dark1};
 `;
 
@@ -96,6 +111,7 @@ const PTitle = styled.p`
     font-size: ${theme.fontSizeMedium};
     align-self: center;
     user-select: none;
+    margin-top: 2em;
 `;
 
 export default HomePage;

@@ -1,4 +1,4 @@
-import * as utils from "../sengine/utils.js";
+import * as utils from "../sengine/utils";
 import AppContext from "../appContext.js";
 import graphics from "./graphics.js";
 import UnitAvatar from "../sengine/unitAvatar";

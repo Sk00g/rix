@@ -2,7 +2,13 @@ import React from "react";
 import styled from "styled-components";
 import theme from "../theme";
 
-const LabelValue = ({ label, value, color }) => {
+interface LabelValueProps {
+    label: string;
+    value: string | number;
+    color?: string;
+}
+
+const LabelValue: React.FC<LabelValueProps> = ({ label, value, color }) => {
     return (
         <Div>
             <PLabel color={color}>{label}</PLabel>
@@ -20,13 +26,13 @@ const Div = styled.div`
 
 const PLabel = styled.p`
     color: ${theme.colors.fontMain};
-    font-size: ${theme.fontSizeSmall};
+    font-size: ${theme.fontSizeTiny};
     user-select: none;
 `;
 
 const PValue = styled.p`
-    color: ${(props) => props.color || theme.colors.fontWhite};
-    font-size: ${theme.fontSizeSmall};
+    color: ${(props) => props.color ?? theme.colors.fontWhite};
+    font-size: ${theme.fontSizeTiny};
     user-select: none;
 `;
 

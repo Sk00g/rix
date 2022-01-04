@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
 import SUIE from "./sengine/suie/suie.js";
-import utils from "./sengine/utils.js";
 import UnitAvatar from "./sengine/unitAvatar.js";
 import Keyboard from "pixi.js-keyboard";
 import Mouse from "pixi.js-mouse";
@@ -28,17 +27,10 @@ loader.add(imagePaths).load(() => {
     unit = new UnitAvatar("graphics/characters/knights_1x.png");
     unit.sprite.position.set(200, 200);
 
-    enemy = new UnitAvatar(
-        "graphics/characters/knights_1x.png",
-        new PIXI.Rectangle(156, 2, 26, 36)
-    );
+    enemy = new UnitAvatar("graphics/characters/knights_1x.png", new PIXI.Rectangle(156, 2, 26, 36));
     enemy.sprite.position.set(100, 200);
 
-    panel = new SUIE.Panel(
-        new PIXI.Rectangle(500, 50, 100, 100),
-        SUIE.PanelSize.LARGE,
-        SUIE.PanelColor.ORANGE
-    );
+    panel = new SUIE.Panel(new PIXI.Rectangle(500, 50, 100, 100), SUIE.PanelSize.LARGE, SUIE.PanelColor.ORANGE);
     panel.addMember(new SUIE.Label("Hello scott", [15, 10]));
     panel.addMember(new SUIE.TextButton("log", [20, 20], () => console.warn("booyah!")));
     panel.addMember(new SUIE.TextButton("logi", [20, 40]));

@@ -10,7 +10,23 @@ const DEFAULT_OUTLINE_ALPHA = 1.0;
 const DEFAULT_OUTLINE_WIDTH = 2;
 const BLIP_SCALE = 1.25;
 
-class RegionVisual {
+export class RegionVisual {
+    _stage: any;
+    _tileScale: any;
+    _spriteContainer: any;
+    _static: any;
+    _blipSprites: any;
+    _shadePath: any;
+    _fillColor: any;
+    _fillAlpha: any;
+    _outlineWidth: any;
+    _outlineColor: any;
+    _outlineAlpha: any;
+    _shape: any;
+    _defaultStyle: any;
+
+    public name: string;
+
     constructor(mapData, data, stage) {
         this._stage = stage;
         this._tileScale = mapData.scale;
@@ -98,14 +114,22 @@ class RegionVisual {
     }
 }
 
-class RegionLayer {
+export class RegionLayer {
+    _staticData: any;
+    _stage: any;
+    _regions: any;
+    _eventHandlerUID;
+    _handlerRegistry;
+    _objectKeyRegistry;
+    _eventHandlers;
+
     constructor(stage, mapData, tileScale) {
         this._staticData = { ...mapData };
         this._stage = stage;
         this._regions = {};
 
         for (let data of mapData.regions) {
-            this._regions[data.name] = new RegionVisual(mapData, data, stage, tileScale);
+            this._regions[data.name] = new RegionVisual(mapData, data, stage);
         }
 
         // Set the continent colors for each region
@@ -167,12 +191,9 @@ class RegionLayer {
 
     removeHandler(eventType, uid) {
         if (!(eventType in this._eventHandlers) || !(uid in this._handlerRegistry))
-            throw new Exception(`Specified handler ${eventType} (${uid}) doesn't exist`);
+            throw new Error(`Specified handler ${eventType} (${uid}) doesn't exist`);
 
-        this._eventHandlers[eventType].splice(
-            this._eventHandlers[eventType].indexOf(this._handlerRegistry[uid]),
-            1
-        );
+        this._eventHandlers[eventType].splice(this._eventHandlers[eventType].indexOf(this._handlerRegistry[uid]), 1);
     }
 
     unsubscribeAll(objectKey) {
@@ -183,10 +204,7 @@ class RegionLayer {
         }
 
         for (let entry of this._objectKeyRegistry[objectKey]) {
-            this._eventHandlers[entry[0]].splice(
-                this._eventHandlers[entry[0]].indexOf(entry[1]),
-                1
-            );
+            this._eventHandlers[entry[0]].splice(this._eventHandlers[entry[0]].indexOf(entry[1]), 1);
         }
         delete this._objectKeyRegistry[objectKey];
     }
@@ -205,16 +223,12 @@ class RegionLayer {
         for (let key in this._regions) {
             let region = this._regions[key];
             if (V.isPointWithinPolygon(mousePos, region.getHitPath())) {
-                if (!region.isHovering)
-                    for (let handler of this._eventHandlers.mouseEnter) handler(region);
+                if (!region.isHovering) for (let handler of this._eventHandlers.mouseEnter) handler(region);
                 region.isHovering = true;
             } else {
-                if (region.isHovering)
-                    for (let handler of this._eventHandlers.mouseExit) handler(region);
+                if (region.isHovering) for (let handler of this._eventHandlers.mouseExit) handler(region);
                 region.isHovering = false;
             }
         }
     }
 }
-
-export default RegionLayer;

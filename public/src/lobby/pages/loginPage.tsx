@@ -4,18 +4,30 @@ import TextInput from "../components/textInput.jsx";
 import TextButton from "../components/textButton.jsx";
 import styled from "styled-components";
 import { toast } from "react-toastify";
-import theme from "../theme.js";
+import theme from "../theme";
+import apiService from "../apiService";
 
 const LoginPage = (props) => {
-    let [username, setUsername] = useState(null);
-    let [redirect, setRedirect] = useState(false);
+    let [username, setUsername] = useState<string>();
+    let [redirect, setRedirect] = useState<boolean>(false);
 
     const _handleClick = () => {
         if (!username || username.length < 3) {
             toast.warn("Username must be at least 3 characters long");
             return;
         }
-        setRedirect(true);
+
+        apiService
+            .getAccountByUsername(username)
+            .then((user) => {
+                if (user) {
+                    props.updateAccount(user);
+                    setRedirect(true);
+                }
+            })
+            .catch((err) => {
+                console.log("login request failed", err);
+            });
     };
 
     return redirect ? (
@@ -24,7 +36,11 @@ const LoginPage = (props) => {
         <DivForm>
             <PTitle>WELCOME TO PERILOUS</PTitle>
             <P>USERNAME</P>
-            <TextInput value={username} handleChange={(val) => setUsername(val.target.value)} />
+            <TextInput
+                value={username}
+                handleChange={(val) => setUsername(val.target.value)}
+                handleEnter={_handleClick}
+            />
             <div style={{ margin: "1em" }}></div>
             <TextButton handleClick={_handleClick} text="LOGIN" />
         </DivForm>

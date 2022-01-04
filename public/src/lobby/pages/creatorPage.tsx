@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import apiService from "../apiService.js";
+import apiService from "../apiService";
 import FatButton from "../components/fatButton.jsx";
 import IconButton, { BUTTON_TYPES } from "../components/iconButton.jsx";
 import LabelSelect from "../components/labelSelect.jsx";
 import LabelNumberInput from "../components/labelNumberInput.jsx";
 import settings from "../../game_data/gameSettings";
 import theme from "../theme";
+import AccountContext from "../contexts/accountContext";
+import { NationColor, PlayerStatus } from "../../../../model/enums";
+import { GameData } from "../../../../model/gameplay";
 
 /*
 Work still needed for this section:
@@ -19,27 +22,32 @@ Work still needed for this section:
 const CreatorPage = (props) => {
     let [mapList, setMapList] = useState(["Protomap"]);
     let [selectedMap, setSelectedMap] = useState("Protomap");
-    let [selectedSettings, setSelectedSettings] = useState([]);
+    let [selectedSettings, setSelectedSettings] = useState<any[]>([]);
+
+    let activeAccount = useContext(AccountContext);
 
     const history = useHistory();
 
-    const _resetSettings = async (mapName) => {
+    const _resetSettings = async (mapName: string) => {
         const mapSettings = await import(`../../../dist/maps/${mapName}/defaultSettings.json`);
-        let newSettings = settings.map((setting) => {
+        let newSettings: any = settings.map((setting) => {
             if (setting.default === "map") setting.default = mapSettings[setting.key];
             return { ...setting, value: setting.default };
         });
         setSelectedSettings(newSettings);
     };
 
-    useEffect(async () => {
-        try {
-            let mapList = await apiService.getMapList();
-            setMapList(mapList);
-            _resetSettings(mapList[0]);
-        } catch (err) {
-            console.log(`Failed gathering API data: ${err}`);
+    useEffect(() => {
+        async function _action() {
+            try {
+                let mapList = await apiService.getMapList();
+                setMapList(mapList);
+                _resetSettings(mapList[0]);
+            } catch (err) {
+                console.log(`Failed gathering API data: ${err}`);
+            }
         }
+        _action();
     }, []);
 
     const _handleMapSelect = (map) => {
@@ -51,12 +59,27 @@ const CreatorPage = (props) => {
         let settings = {};
         for (let set of selectedSettings) settings[set.key] = set.value;
 
-        apiService.createLobby({
-            // createdById: playerContext.active._id,
-            // playerIds: [],
+        let gameData: GameData = {
+            _id: "",
+            createdById: activeAccount._id,
+            dateCreated: new Date(),
+            tag: "",
+            players: [
+                {
+                    _id: "",
+                    accountId: activeAccount._id,
+                    status: PlayerStatus.Waiting,
+                    avatar: "knight",
+                    color: NationColor.BLUE,
+                },
+            ],
             gameSettings: settings,
-            // mapName: selectedMap,
-        });
+            mapName: selectedMap,
+        };
+
+        apiService.createLobby(gameData);
+
+        history.push("/home");
     };
 
     const _updateSettingValue = (key, value) => {

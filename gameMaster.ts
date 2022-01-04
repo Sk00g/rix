@@ -3,10 +3,13 @@ This class holds the code that actually 'executes' the orders and resolves all t
 turn. It is the equivalent in the board game of rolling the dice and removing / moving armies 
 */
 
-BASE_DICE_MIN = 1;
-BASE_DICE_MAX = 10;
+const BASE_DICE_MIN = 1;
+const BASE_DICE_MAX = 10;
 
 class GameMaster {
+    mapData: any;
+    gameData: any;
+
     constructor(mapData, gameData) {
         this.mapData = mapData;
         this.gameData = gameData;
@@ -18,11 +21,11 @@ class GameMaster {
 
         let diceLimits = [BASE_DICE_MIN, BASE_DICE_MAX + 1];
 
-        // Upper limit is increased based on having multiple region's attacking
+        // Upper limit is increased based on having multiple regions attacking
         if (validArmies.length > 1) diceLimits[1] += validArmies.length;
 
         // Lower limit is increased based on army size (total across regions)
-        let totalArmy = validArmies.reduce(prev, (item) => prev + item.amount, 0);
+        let totalArmy = validArmies.reduce((prev: number, item: any) => prev + item.amount, 0);
         if (totalArmy < 40) diceLimits[0] += Math.floor((totalArmy - 1) / 5);
         else diceLimits[0] = 7;
 
@@ -37,12 +40,12 @@ class GameMaster {
         amount      (INT)
     }
     */
-    resolve(orders) {
+    resolve(orders: any[]) {
         // Store all roll results and overall outcomes by region name key
         let outcomes = {};
 
         // Iterate regions that are contested
-        let targets = [];
+        let targets: any[] = [];
         for (let order of orders) {
             if (!targets.includes(order.target)) targets.push(order.target);
         }
@@ -68,7 +71,7 @@ class GameMaster {
                 // Highest rolling player kills lowest rolling
                 // Adjust armies accordingly
                 let lowestRoll = 100;
-                let lowestArmies = [];
+                let lowestArmies: any[] = [];
                 for (let owner in armies) {
                     if (rolls[owner] <= lowestRoll) {
                         lowestArmies.push(armies[owner]);
@@ -76,11 +79,11 @@ class GameMaster {
                     }
                 }
 
-                // Ties take no action, lowest army loses unit from random region
-                let damagedArmy = null;
+                // Ties take no action
+                // lowest army loses unit from random region
+                let damagedArmy: any = null;
                 if (lowestArmies.length === 1) {
-                    damagedArmy =
-                        lowestArmies[0][Math.floor(Math.random() * lowestArmies[0].length)];
+                    damagedArmy = lowestArmies[0][Math.floor(Math.random() * lowestArmies[0].length)];
                     damagedArmy.amount--;
                 }
 
@@ -94,7 +97,7 @@ class GameMaster {
 
                 // Exit the 'rolling' turn loop when there is only one player with army left
                 let activeArmies = Object.keys(armies).filter(
-                    (owner) => armies[owner].reduce(prev, (item) => prev + item.amount, 0) > 0
+                    (owner) => armies[owner].reduce((prev, item) => prev + item.amount, 0) > 0
                 );
                 if (activeArmies.length === 1) break;
             }

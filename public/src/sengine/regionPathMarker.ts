@@ -1,3 +1,4 @@
+import { RegionVisual } from "./../regionLayer";
 /*
 Concerned only with the visual representation of a path between regions
 */
@@ -12,10 +13,18 @@ const ARROW_SCALE_Y = 1;
 const ORIGIN_OFFSET = [0, 0];
 
 export default class RegionPathMarker {
-    constructor(stage, origin, destination, arrowColor = 0x00ff00) {
+    _stage: PIXI.Container;
+    _arrowContainer: PIXI.Container;
+    _isHovering: boolean;
+    _texture: PIXI.Texture;
+
+    origin: RegionVisual;
+    destination: RegionVisual;
+    arrowColor: number;
+
+    constructor(stage: PIXI.Container, origin: RegionVisual, destination: RegionVisual, arrowColor: number = 0x00ff00) {
         this._stage = stage;
         this._arrowContainer = new PIXI.Container();
-        this._hitPath = [];
         this._isHovering = false;
         this._texture = assetLoader.loadTexture(graphics.interface.arrow_gray);
 

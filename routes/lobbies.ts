@@ -1,5 +1,5 @@
-const express = require("express");
-const ObjectId = require("mongodb").ObjectID;
+import express from "express";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
@@ -24,12 +24,37 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     let db = req.app.get("db");
-    console.log(req.params.id);
     let lobbies = await db
         .collection("lobbies")
         .find({ _id: ObjectId(req.params.id) })
         .toArray();
     res.json(lobbies[0] || []);
+});
+
+router.put("/:id/players", async (req, res) => {
+    let db = req.app.get("db");
+    let lobby = (
+        await db
+            .collection("lobbies")
+            .find({ _id: ObjectId(req.params.id) })
+            .toArray()
+    )[0];
+
+    let playerMatch = lobby.players.find((item) => item.id === req.body.id);
+    if (playerMatch) {
+        // Update existing player status
+        playerMatch.status = req.body.status;
+        playerMatch.avatar = req.body.avatar;
+        playerMatch.color = req.body.color;
+    } else {
+        // Add new player to the array
+        lobby.players.push(req.body);
+    }
+    let result = await db
+        .collection("lobbies")
+        .updateOne({ _id: ObjectId(req.params.id) }, { $set: { players: lobby.players } });
+
+    res.json({ updatedId: lobby._id || null });
 });
 
 router.post("/", async (req, res) => {
@@ -38,7 +63,7 @@ router.post("/", async (req, res) => {
 
     // Ensure our tag is unique
     let match = [0];
-    let tag = null;
+    let tag: string = _generateTag();
     while (match.length > 0) {
         tag = _generateTag();
         match = await db.collection("lobbies").find({ tag: tag }).toArray();
@@ -47,7 +72,7 @@ router.post("/", async (req, res) => {
     let response = await db.collection("lobbies").insertOne({
         dateCreated: new Date(),
         createdById: data.createdById,
-        playerIds: [],
+        players: data.players,
         gameSettings: data.gameSettings,
         mapName: data.mapName,
         tag: tag,
@@ -55,4 +80,4 @@ router.post("/", async (req, res) => {
     res.json({ insertedId: response.insertedId || null });
 });
 
-module.exports = router;
+export default router;

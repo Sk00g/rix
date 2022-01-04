@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import * as V from "../vector.js";
-import * as utils from "./utils.js";
+import * as utils from "./utils";
 import assetLoader from "../assetLoader.js";
 import Label from "./suie/label.js";
 import graphics from "../game_data/graphics.js";
@@ -87,23 +87,13 @@ class UnitAvatar {
             right: [
                 new PIXI.Rectangle(x, y + this.height * 2, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height * 2, this.width, this.height),
-                new PIXI.Rectangle(
-                    x + this.width * 2,
-                    y + this.height * 2,
-                    this.width,
-                    this.height
-                ),
+                new PIXI.Rectangle(x + this.width * 2, y + this.height * 2, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height * 2, this.width, this.height),
             ],
             up: [
                 new PIXI.Rectangle(x, y + this.height * 3, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height * 3, this.width, this.height),
-                new PIXI.Rectangle(
-                    x + this.width * 2,
-                    y + this.height * 3,
-                    this.width,
-                    this.height
-                ),
+                new PIXI.Rectangle(x + this.width * 2, y + this.height * 3, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height * 3, this.width, this.height),
             ],
         };
@@ -179,9 +169,7 @@ class UnitAvatar {
         // Store speeds for R / G / B values separately based on increment
         this._blendNumberSpeeds = {};
         for (let key in targetColors)
-            this._blendNumberSpeeds[key] = Math.round(
-                (targetColors[key] - currentColors[key]) / increments
-            );
+            this._blendNumberSpeeds[key] = Math.round((targetColors[key] - currentColors[key]) / increments);
     }
 
     fade(newAlpha, speed) {
@@ -314,10 +302,7 @@ class UnitAvatar {
                 this.stopAnimation();
             } else {
                 let direction = V.normalize(difference);
-                let newPosition = V.add(
-                    this.getPosition(),
-                    V.multiply(direction, delta * WALK_SPEED)
-                );
+                let newPosition = V.add(this.getPosition(), V.multiply(direction, delta * WALK_SPEED));
                 this.setPosition(newPosition);
             }
         }
@@ -333,10 +318,7 @@ class UnitAvatar {
                 this._slideTarget = null;
             } else {
                 let direction = V.normalize(difference);
-                let newPosition = V.add(
-                    this.getPosition(),
-                    V.multiply(direction, delta * this._slideSpeed)
-                );
+                let newPosition = V.add(this.getPosition(), V.multiply(direction, delta * this._slideSpeed));
                 this.setPosition(newPosition);
             }
         }
@@ -345,10 +327,7 @@ class UnitAvatar {
     _updateShake(delta) {
         if (this._shakeMagnitude) {
             let sign = this._shakeDirection === "right" ? 1 : -1;
-            let newPosition = [
-                this.getPosition()[0] + sign * this._shakeMagnitude * delta,
-                this.getPosition()[1],
-            ];
+            let newPosition = [this.getPosition()[0] + sign * this._shakeMagnitude * delta, this.getPosition()[1]];
 
             this.setPosition(newPosition);
 
@@ -369,10 +348,7 @@ class UnitAvatar {
             this._counterLabel.scale.x += sign * this._morphNumberSpeed;
             this._counterLabel.scale.y += sign * this._morphNumberSpeed;
 
-            if (
-                Math.abs(this._counterLabel.scale.x - this._morphNumberTarget) <
-                this._morphNumberSpeed
-            ) {
+            if (Math.abs(this._counterLabel.scale.x - this._morphNumberTarget) < this._morphNumberSpeed) {
                 this._counterLabel.scale.set(this._morphNumberTarget, this._morphNumberTarget);
                 this._morphNumberTarget = null;
             }
@@ -392,17 +368,12 @@ class UnitAvatar {
         if (this._blendNumberTarget) {
             let colors = utils.RGBFromString(this._counterLabel.style._fill);
             for (let key in colors)
-                colors[key] = Math.max(
-                    Math.min(255, colors[key] + this._blendNumberSpeeds[key]),
-                    0
-                );
+                colors[key] = Math.max(Math.min(255, colors[key] + this._blendNumberSpeeds[key]), 0);
             this._blendNumberIncrementsRemaining--;
 
             let style = { ...this._counterLabel.style };
             style.fill =
-                this._blendNumberIncrementsRemaining === 0
-                    ? this._blendNumberTarget
-                    : utils.StringFromRGB(colors);
+                this._blendNumberIncrementsRemaining === 0 ? this._blendNumberTarget : utils.StringFromRGB(colors);
 
             this._counterLabel.style = style;
 

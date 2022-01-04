@@ -20,7 +20,7 @@ const LobbyFatButton = ({ lobby, onClick }) => {
                     <PValue>{lobby.tag}</PValue>
                 </div>
                 <P>{new Date(lobby.dateCreated).toDateString().substr(3)}</P>
-                <P>{lobby.playerIds.length} Players</P>
+                <P>{lobby.players.length} Players</P>
             </DivSmallLabels>
             <DivLargeLabels>
                 <P>Creator: {lobby.createdBy.username}</P>

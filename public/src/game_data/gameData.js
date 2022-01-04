@@ -24,11 +24,7 @@ export default class GameData {
         // Shaping the state data into updateable and easily accessible objects
         this.allPlayers = Object.keys(gameState.players).map(
             (playerName) =>
-                new Player(
-                    playerName,
-                    gameState.players[playerName].avatar,
-                    gameState.players[playerName].nationColor
-                )
+                new Player(playerName, gameState.players[playerName].avatar, gameState.players[playerName].nationColor)
         );
         this.allRegions = Object.keys(gameState.regionData).map((regionName) => {
             let newRegion = new Region();
@@ -46,9 +42,7 @@ export default class GameData {
             newRegion.armySize = gameState.regionData[regionName].armySize;
 
             // Use mapData to store a raw data object with continent details
-            newRegion.continent = mapData.continents.find((cont) =>
-                cont.regions.includes(regionName)
-            );
+            newRegion.continent = mapData.continents.find((cont) => cont.regions.includes(regionName));
 
             // All things graphical or interactive are handled by this 'visual' (RegionLayer)
             newRegion.visual = regionVisuals.get(regionName);

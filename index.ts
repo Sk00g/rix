@@ -1,13 +1,13 @@
-const express = require("express");
-const MongoClient = require("mongodb").MongoClient;
+import express from "express";
+import cors from "cors";
+import * as mongo from "mongodb";
 
 // import routes for api endpoints
-const accountsRoute = require("./routes/accounts.js");
-const lobbiesRoute = require("./routes/lobbies.js");
-const mapsRoute = require("./routes/maps.js");
+import accountsRoute from "./routes/accounts";
+import lobbiesRoute from "./routes/lobbies";
+import mapsRoute from "./routes/maps";
 
 // create new express app and save it as "app"
-const cors = require("cors");
 const app = express();
 
 // server configuration
@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 const mongoURL = "mongodb://localhost:27017/perilous";
-MongoClient.connect(mongoURL, { useUnifiedTopology: true }, (err, client) => {
+mongo.MongoClient.connect(mongoURL, { useUnifiedTopology: true }, (err, client) => {
     if (err) {
         console.error("Mongo connection failed: ", err);
         return;
@@ -48,4 +48,4 @@ app.listen(PORT, () => {
     console.log(`Server running at: http://127.0.0.1:${PORT}/`);
 });
 
-module.exports = db;
+export default db;

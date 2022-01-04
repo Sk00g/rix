@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import theme from "../theme.js";
+import theme from "../theme";
 
 /**
  * Managed Select component for use in forms

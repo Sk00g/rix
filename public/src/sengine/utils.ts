@@ -1,4 +1,9 @@
-export function RGBFromString(hexString) {
+export function randomInt(min, max) {
+    const val = Math.floor(Math.random() * (max - min) + min);
+    return val;
+}
+
+export function RGBFromString(hexString: string) {
     if (hexString.substr(0, 1) === "#") hexString = hexString.substr(1);
     let num = parseInt(hexString, 16);
     return { r: num >> 16, g: (num >> 8) & 0xff, b: num & 0xff };
@@ -13,10 +18,4 @@ export function StringFromRGB(rgbValues) {
 export const AnimationType = Object.freeze({
     WALK: "WALK",
     STAND: "STAND",
-});
-
-export const NationColor = Object.freeze({
-    RED: 0xff0000,
-    GREEN: 0x40ff50,
-    BLUE: 0x4050ff,
 });

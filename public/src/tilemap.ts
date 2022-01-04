@@ -2,6 +2,12 @@ import * as PIXI from "pixi.js";
 
 // Class used for displaying tilemap
 class TileMap {
+    _tileSize: [number, number];
+    _tileIndices: [number, number][][];
+    _tileSprites: PIXI.Sprite[][];
+    _scale: number;
+    _spriteContainer: PIXI.Container;
+
     constructor(stage, mapData) {
         const path = mapData.tilesetPath;
         const size = mapData.tileMapSize;
@@ -20,20 +26,12 @@ class TileMap {
                 texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
                 let sprite = new PIXI.Sprite(texture);
 
-                sprite.position.set(
-                    x * this._tileSize[0] * this._scale,
-                    y * this._tileSize[1] * this._scale
-                );
+                sprite.position.set(x * this._tileSize[0] * this._scale, y * this._tileSize[1] * this._scale);
                 sprite.scale.set(this._scale, this._scale);
 
                 this._tileSprites[x][y] = sprite;
 
-                this.updateTileIndex(
-                    x,
-                    y,
-                    mapData.tileIndices[x][y][0],
-                    mapData.tileIndices[x][y][1]
-                );
+                this.updateTileIndex(x, y, mapData.tileIndices[x][y][0], mapData.tileIndices[x][y][1]);
 
                 this._spriteContainer.addChild(sprite);
             }
@@ -42,7 +40,7 @@ class TileMap {
         stage.addChild(this._spriteContainer);
     }
 
-    updateTileIndex(tileX, tileY, indexX, indexY) {
+    updateTileIndex(tileX: number, tileY: number, indexX: number, indexY: number) {
         this._tileIndices[tileX][tileY] = [indexX, indexY];
         this._tileSprites[tileX][tileY].texture.frame = new PIXI.Rectangle(
             indexX * this._tileSize[0],

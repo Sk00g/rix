@@ -1,19 +1,15 @@
-const path = require("path");
-
 module.exports = {
     mode: "development",
-    entry: "./public/src/index.tsx",
-    output: {
-        filename: "main.js",
-        path: path.resolve(__dirname, "./public/dist"),
-    },
+    entry: "./index.ts",
+    output: { filename: "server.js" },
     optimization: {
-        minimize: false,
+        minimize: true,
     },
+    target: "node",
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(js)$/,
                 exclude: [/node_modules/, /_Archive/],
                 loader: "babel-loader",
                 options: {
@@ -21,17 +17,13 @@ module.exports = {
                 },
             },
             {
-                test: /\.(ts|tsx)$/,
+                test: /\.(ts)$/,
                 loader: "ts-loader",
                 exclude: [/node_modules/, /_Archive/],
-            },
-            {
-                test: /\.css$/i,
-                use: ["style-loader", "css-loader"],
             },
         ],
     },
     resolve: {
-        extensions: ["*", ".ts", ".tsx", ".js", ".jsx"],
+        extensions: ["*", ".ts", ".js"],
     },
 };
