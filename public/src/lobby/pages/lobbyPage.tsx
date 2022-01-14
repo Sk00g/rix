@@ -3,73 +3,63 @@ import { useHistory, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Account, Player } from "../../../../model/lobby";
 import { PlayerStatus } from "../../../../model/enums";
-import { GameData } from "../../../../model/gameplay";
+import { Lobby } from "../../../../model/lobby";
 import apiService from "../apiService";
-import IconButton, { BUTTON_TYPES } from "../components/iconButton.jsx";
+import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
 import PlayerRow from "../components/playerRow";
 import TextButton from "../components/textButton";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
 
 const LobbyPage = () => {
-    const [gameData, setGameData] = useState<GameData>();
+    const [lobby, setLobby] = useState<Lobby>();
 
     const account = useContext(AccountContext);
-    const { gameId } = useParams<{ gameId: string }>();
+    const { id } = useParams<{ id: string }>();
     const history = useHistory();
 
     useEffect(() => {
-        if (gameId) {
-            apiService.getLobbyData(true, gameId).then(async (data: GameData) => {
-                const promises: Promise<Account>[] = data.players.map((p) => apiService.getAccount(p._id));
-                const accounts = await Promise.all(promises);
-                for (let account of accounts) {
-                    const match = data.players.find((p) => p._id === account._id);
-                    if (match) match.username = account?.username ?? "UNKNOWN";
-                }
-                setGameData(data);
-            });
-        }
-    }, [gameId]);
+        if (id) apiService.getLobbyData(id).then(setLobby);
+    }, [id]);
 
-    const _getPlayer = (): Player | undefined => {
-        return gameData?.players.find((p) => p._id === account._id);
+    const _getThisPlayer = (): Player | undefined => {
+        return lobby?.players.find((p) => p.accountId === account._id);
     };
 
     const _handleToggle = async () => {
-        let player = _getPlayer();
-        if (!player || !gameData?._id) return;
+        let player = _getThisPlayer();
+        if (!player || !lobby?._id) return;
         player.status = player.status === PlayerStatus.Active ? PlayerStatus.Waiting : PlayerStatus.Active;
-        await apiService.updateLobby(gameData._id, player);
-        const newGame = { ...gameData };
-        const newPlayers = [...gameData.players];
+        await apiService.updateLobby(lobby._id, player);
+        const newLobby = { ...lobby };
+        const newPlayers = [...lobby.players];
         const id = newPlayers.indexOf(player);
         newPlayers[id] = player;
-        newGame.players = newPlayers;
-        setGameData(newGame);
+        newLobby.players = newPlayers;
+        setLobby(newLobby);
     };
 
     return (
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton type={BUTTON_TYPES.arrowLeft} onClick={() => history.push("/home")} />
-                    <IconButton type={BUTTON_TYPES.reset} onClick={() => console.log("refresh lobby games?")} />
+                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/home")} />
+                    <IconButton type={ButtonTypes.reset} onClick={() => console.log("refresh lobby games?")} />
                 </div>
-                {gameData && (
-                    <PTitle>{`[${gameData.players.length} PLAYERS] ${gameData.gameSettings.victoryCondition} on ${gameData.mapName}`}</PTitle>
+                {lobby && (
+                    <PTitle>{`[${lobby.players.length} PLAYERS] ${lobby.gameSettings.victoryCondition} on ${lobby.mapName}`}</PTitle>
                 )}
             </DivTitlebar>
 
             <DivMain>
                 <div style={{ margin: "2em" }}>
                     <div>
-                        {gameData && (
+                        {lobby && (
                             <img
                                 width="200px"
                                 height="200px"
-                                alt={gameData?.mapName ?? "Map loading..."}
-                                src={`./maps/${gameData?.mapName}/thumbnail.png`}
+                                alt={lobby?.mapName ?? "Map loading..."}
+                                src={`./maps/${lobby?.mapName}/thumbnail.png`}
                                 style={{ userSelect: "none" }}
                             />
                         )}
@@ -79,8 +69,8 @@ const LobbyPage = () => {
                 </div>
 
                 <div style={{ margin: "2em" }}>
-                    {gameData?.players?.map((player) => (
-                        <PlayerRow key={player._id} player={player} />
+                    {lobby?.players?.map((player) => (
+                        <PlayerRow key={player.accountId} player={player} />
                     ))}
                 </div>
             </DivMain>
@@ -88,7 +78,7 @@ const LobbyPage = () => {
             <DivInfo>
                 Info area
                 <TextButton
-                    text={_getPlayer()?.status === PlayerStatus.Active ? "Not Ready" : "Ready"}
+                    text={_getThisPlayer()?.status === PlayerStatus.Active ? "Not Ready" : "Ready"}
                     handleClick={_handleToggle}
                 />
             </DivInfo>

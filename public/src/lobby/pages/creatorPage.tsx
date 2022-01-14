@@ -3,14 +3,14 @@ import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import apiService from "../apiService";
 import FatButton from "../components/fatButton.jsx";
-import IconButton, { BUTTON_TYPES } from "../components/iconButton.jsx";
+import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
 import LabelSelect from "../components/labelSelect.jsx";
 import LabelNumberInput from "../components/labelNumberInput.jsx";
 import settings from "../../game_data/gameSettings";
 import theme from "../theme";
 import AccountContext from "../contexts/accountContext";
 import { NationColor, PlayerStatus } from "../../../../model/enums";
-import { GameData } from "../../../../model/gameplay";
+import { Lobby } from "../../../../model/lobby";
 
 /*
 Work still needed for this section:
@@ -19,13 +19,12 @@ Work still needed for this section:
 - confirmation on 'back' button press that you will be leaving any changed settings
 */
 
-const CreatorPage = (props) => {
-    let [mapList, setMapList] = useState(["Protomap"]);
-    let [selectedMap, setSelectedMap] = useState("Protomap");
+const CreatorPage: React.FC = () => {
+    let [mapList, setMapList] = useState<string[]>(["Protomap"]);
+    let [selectedMap, setSelectedMap] = useState<string>("Protomap");
     let [selectedSettings, setSelectedSettings] = useState<any[]>([]);
 
     let activeAccount = useContext(AccountContext);
-
     const history = useHistory();
 
     const _resetSettings = async (mapName: string) => {
@@ -59,15 +58,16 @@ const CreatorPage = (props) => {
         let settings = {};
         for (let set of selectedSettings) settings[set.key] = set.value;
 
-        let gameData: GameData = {
+        let gameData: Lobby = {
             _id: "",
             createdById: activeAccount._id,
             dateCreated: new Date(),
             tag: "",
             players: [
                 {
-                    _id: "",
                     accountId: activeAccount._id,
+                    username: activeAccount.username,
+                    alive: true,
                     status: PlayerStatus.Waiting,
                     avatar: "knight",
                     color: NationColor.BLUE,
@@ -92,8 +92,8 @@ const CreatorPage = (props) => {
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton type={BUTTON_TYPES.arrowLeft} onClick={() => history.push("/home")} />
-                    <IconButton type={BUTTON_TYPES.reset} onClick={() => _resetSettings(mapList[0])} />
+                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/home")} />
+                    <IconButton type={ButtonTypes.reset} onClick={() => _resetSettings(mapList[0])} />
                 </div>
                 <PTitle>{`Create New Game`}</PTitle>
             </DivTitlebar>
@@ -102,9 +102,11 @@ const CreatorPage = (props) => {
                     <div style={{ margin: "1em", marginTop: "2.5em" }}>
                         <LabelSelect
                             label="Select Map"
-                            options={mapList}
+                            options={mapList.map((map) => {
+                                return { label: map, value: map };
+                            })}
                             value={selectedMap}
-                            onClick={_handleMapSelect}
+                            onChange={_handleMapSelect}
                         />
                         <img
                             src={`./maps/${selectedMap}/thumbnail.png`}
@@ -126,7 +128,7 @@ const CreatorPage = (props) => {
                                     label={set.key}
                                     options={Array.isArray(set.options) ? set.options : []}
                                     value={set.value}
-                                    handleChange={(val) => _updateSettingValue(set.key, val)}
+                                    onChange={(val) => _updateSettingValue(set.key, val)}
                                 />
                             );
                         } else if (set.options.includes("-")) {
@@ -137,7 +139,7 @@ const CreatorPage = (props) => {
                                     value={set.value}
                                     min={set.options.split("-")[0]}
                                     max={set.options.split("-")[1]}
-                                    handleChange={(val) => _updateSettingValue(set.key, val)}
+                                    onChange={(val) => _updateSettingValue(set.key, val)}
                                 />
                             );
                         }

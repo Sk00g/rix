@@ -6,6 +6,7 @@ import * as mongo from "mongodb";
 import accountsRoute from "./routes/accounts";
 import lobbiesRoute from "./routes/lobbies";
 import mapsRoute from "./routes/maps";
+import gameStatesRoute from "./routes/gameState";
 
 // create new express app and save it as "app"
 const app = express();
@@ -41,6 +42,7 @@ mongo.MongoClient.connect(mongoURL, { useUnifiedTopology: true }, (err, client) 
     app.use("/api/accounts", accountsRoute);
     app.use("/api/lobbies", lobbiesRoute);
     app.use("/api/maps", mapsRoute);
+    app.use("/api/gameStates", gameStatesRoute);
 });
 
 // make the server listen to requests

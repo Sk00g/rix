@@ -1,3 +1,4 @@
+import { Account, AccountValidator } from "./../model/lobby";
 import express from "express";
 import { ObjectId } from "mongodb";
 
@@ -25,8 +26,28 @@ router.get("/:id", async (req, res) => {
     res.json(accounts[0] || null);
 });
 
+router.put("/", async (req, res) => {
+    let data: Account = req.body;
+
+    // Validate the incoming account post request
+    var result = AccountValidator.validate(data);
+    if (result.error) {
+        res.status(400).send(result.error.details?.[0].message ?? "Account validation failed");
+        return;
+    }
+
+    let db = req.app.get("db");
+    let response = await db.collection("accounts").updateOne({ _id: ObjectId(data._id) }, { $set: { elo: data.elo } });
+    res.json({ updatedId: response.matchedCount ? data._id : null });
+});
+
 router.post("/", async (req, res) => {
-    let data = req.body;
+    let data: Account = req.body;
+
+    // Validate the incoming account post request
+    var result = AccountValidator.validate(data);
+    console.log(result);
+
     let db = req.app.get("db");
 
     let match = await db.collection("accounts").find({ username: data.username }).toArray();
@@ -39,7 +60,7 @@ router.post("/", async (req, res) => {
             lobbies: [],
             games: [],
             elo: 1000,
-            lastLogin: new Date(),
+            lastLogin: null,
         });
         res.json({ insertedId: response.insertedId || null });
     }

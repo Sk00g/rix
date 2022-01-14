@@ -1,57 +1,27 @@
 import axios from "axios";
-import { Player } from "../../../model/lobby";
-import { GameData } from "../../../model/gameplay";
-import { NationColor } from "../../../model/enums";
+import { GameState, GameStatePing } from "../../../model/gameplay";
+import { Account, Lobby, Player } from "../../../model/lobby";
+import { MapData } from "../../../model/mapData";
+
+type InsertResponse = { insertedId: string };
+type UpdateResponse = { updatedId: string };
 
 export default {
-    createLobby: async function createLobby(data) {
+    createLobby: async (data: Lobby): Promise<InsertResponse> => {
         let response = await axios.post("/api/lobbies", data);
         return response.data;
     },
-    getLobbyData: async function getLobbyData(populated: boolean = false, id?: string): Promise<GameData[]> {
-        if (!id) {
-            const response = await axios.get("/api/lobbies");
-            const lobbies = response.data;
-
-            if (populated) {
-                const response = await axios.get("/api/accounts");
-                let accounts = response.data;
-                for (let lobby of lobbies) {
-                    lobby.createdBy = accounts.find((acct) => acct._id === lobby.createdById);
-                }
-            }
-
-            return lobbies;
-        } else {
-            let response = await axios.get(`/api/lobbies/${id}`);
-            let lobby = response.data;
-
-            if (populated) {
-                let response = await axios.get(`/api/accounts/${lobby.createdById}`);
-                lobby.createdBy = response.data;
-            }
-
-            for (let player of lobby.players) {
-                player.color = NationColor[player.color];
-            }
-
-            return [lobby as GameData];
-        }
-    },
-    updateLobby: async function updateLobby(lobbyId: string, player: Player) {
+    getAllLobbyData: async (): Promise<Lobby[]> => (await axios.get("/api/lobbies")).data,
+    getLobbyData: async (id?: string): Promise<Lobby> => (await axios.get(`/api/lobbies/${id}`)).data,
+    updateLobby: async (lobbyId: string, player: Player): Promise<UpdateResponse> => {
         let response = await axios.put(`/api/lobbies/${lobbyId}/players`, player);
         return response.data;
     },
-    getMapList: async function getMapList() {
-        let response = await axios.get("/api/maps");
-        return response.data;
-    },
-    getAccountByUsername: async function getAccountByUsername(username: string) {
-        let response = await axios.get(`/api/accounts/byUsername?username=${username}`);
-        return response.data;
-    },
-    getAccount: async function getAccount(id) {
-        let response = await axios.get(`/api/accounts/${id}`);
-        return response.data;
-    },
+    getMapList: async (): Promise<string[]> => (await axios.get("/api/maps")).data,
+    getAccountByUsername: async (username: string): Promise<Account> =>
+        (await axios.get(`/api/accounts/byUsername?username=${username}`)).data,
+    getAccount: async (id: string): Promise<Account> => (await axios.get(`/api/accounts/${id}`)).data,
+    getGameState: async (id: string): Promise<GameState> => (await axios.get(`/api/gameStates/${id}`)).data,
+    getGameStatePing: async (id: string): Promise<GameStatePing> =>
+        (await axios.get(`/api/gameStates/${id}/ping`)).data,
 };

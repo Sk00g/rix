@@ -1,22 +1,25 @@
 import { logService, LogLevel } from "../logService.js";
+import { GameplayState, GameplayStateType } from "./gameplayState";
 
 export default class StateManagerBase {
+    _stateStack: GameplayState[];
+
     constructor() {
         this._stateStack = [];
     }
 
     // Must override as this base class is unaware of specific states
-    _generateState(type) {
+    _generateState(type: string, initData: any = null): GameplayState {
         throw new Error("Must override this function in the child class!");
     }
 
     // Gets the currently activate state (on top of stack)
-    getActiveState() {
+    getActiveState(): GameplayState {
         return this._stateStack[this._stateStack.length - 1];
     }
 
     // Remove all states from the stack and reset to only the given state
-    resetState(stateType, initData = null) {
+    resetState(stateType: GameplayStateType, initData: any = null) {
         while (this.getActiveState()) this.popState();
 
         this.pushState(stateType, initData);
@@ -28,16 +31,16 @@ export default class StateManagerBase {
         if (!this._stateStack) return;
 
         let currentState = this._stateStack.pop();
-        logService(LogLevel.DEBUG, `removing state ${currentState.stateType} from stack`);
-        if (currentState.deactivate) currentState.deactivate();
-        if (currentState.dispose) currentState.dispose();
+        logService(LogLevel.DEBUG, `removing state ${currentState?.stateType} from stack`);
+        if (currentState?.deactivate) currentState.deactivate();
+        if (currentState?.dispose) currentState.dispose();
 
         let nextState = this.getActiveState();
         if (nextState && nextState.activate) nextState.activate();
     }
 
     // Push a new state on top of the current stack
-    pushState(stateType, initData = null) {
+    pushState(stateType, initData: any = null) {
         let currentState = this.getActiveState();
         if (currentState && currentState.deactivate) currentState.deactivate();
 

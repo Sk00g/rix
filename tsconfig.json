@@ -4,11 +4,13 @@
         "esModuleInterop": true,
         "target": "es6",
         "moduleResolution": "node",
+        "resolveJsonModule": true,
         "noImplicitAny": false,
         "noImplicitThis": true,
         "strictNullChecks": true,
         "downlevelIteration": true,
         "jsx": "react",
+        "sourceMap": true,
         "preserveConstEnums": true
     }
 }

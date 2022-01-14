@@ -2,10 +2,15 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import theme from "../theme";
 
-const FatButton = ({ title, onClick }) => {
+interface FatButtonProps {
+    title: string;
+    onClick: (title: string) => void;
+}
+
+const FatButton: React.FC<FatButtonProps> = (props) => {
     return (
-        <DivRoot onClick={() => onClick(title)}>
-            {title.split(" ").map((word, index) => (
+        <DivRoot onClick={() => props.onClick(props.title)}>
+            {props.title.split(" ").map((word, index) => (
                 <P key={index}>{word}</P>
             ))}
         </DivRoot>

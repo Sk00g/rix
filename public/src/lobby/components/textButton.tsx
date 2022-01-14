@@ -1,18 +1,16 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 
-/**
- * Managed text-only button component
- *
- * @param {HANDLER} handleClick - Click handler function
- * @param {STRING} text - Displayed inside button
- * @param {BOOLEAN} disabled - Disabled click function and used for styling
- * @param {WIDTH} [OPTIONAL]width - Optional CSS width to specify button size
- */
+interface TextButtonProps {
+    handleClick: () => void;
+    text: string;
+    disabled?: boolean;
+    width?: string;
+}
 
-const TextButton = ({ text, disabled, handleClick }) => {
+const TextButton: React.FC<TextButtonProps> = ({ text, disabled, handleClick, width }) => {
     return (
-        <Button disabled={disabled} onClick={handleClick}>
+        <Button disabled={disabled} onClick={handleClick} width={width ?? "120px"}>
             {text}
         </Button>
     );
@@ -20,7 +18,7 @@ const TextButton = ({ text, disabled, handleClick }) => {
 
 //#region Styles
 
-const Button = styled.button`
+const Button = styled.button<any>`
     font-size: 10px;
     font-family: "emulogic";
     color: #ffe4c0;

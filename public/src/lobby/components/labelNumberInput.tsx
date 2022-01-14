@@ -2,26 +2,24 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import theme from "../theme";
 
-/**
- * Managed Input component for use in a form
- *
- * @param {TEXT} label - Readonly text displayed in left section of component
- * @param {HANDLER} handleChange - Function to respond to user input, should update 'value' prop
- * @param {STRING} value - Number value
- * @param {INT} min - Minimum value the input will accept
- * @param {INT} max - Max value "" ""
- */
+interface LabelNumberInputProps {
+    label: string;
+    onChange?: (newValue: string) => void;
+    value: string;
+    min: number;
+    max: number;
+}
 
-const LabelNumberInput = ({ label, handleChange, value, min, max }) => {
+const LabelNumberInput: React.FC<LabelNumberInputProps> = ({ label, onChange, value, min, max }) => {
     return (
         <DivParent>
             <P>{label}</P>
             <Input
                 type={"number"}
-                readOnly={handleChange ? false : true}
+                readOnly={onChange ? false : true}
                 onChange={(e) => {
-                    if (e.target.value === "") handleChange(e.target.value);
-                    if (e.target.valueAsNumber >= min && e.target.valueAsNumber <= max) handleChange(e.target.value);
+                    if (e.target.value === "") onChange?.(e.target.value);
+                    if (e.target.valueAsNumber >= min && e.target.valueAsNumber <= max) onChange?.(e.target.value);
                 }}
                 value={value === undefined ? "" : value}
             />

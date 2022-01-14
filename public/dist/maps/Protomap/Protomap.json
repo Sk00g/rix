@@ -11,44 +11,37 @@
     "continents": [
         {
             "name": "CONTINENT_1",
-            "regions": ["REGION_1", "REGION_2", "REGION_3", "REGION_4"],
+            "regionNames": ["REGION_1", "REGION_2", "REGION_3", "REGION_4"],
             "color": "#FF4030",
             "ownershipValue": 3
         },
         {
             "name": "CONTINENT_2",
-            "regions": ["REGION_5", "REGION_6", "REGION_7", "REGION_8", "REGION_9"],
+            "regionNames": ["REGION_5", "REGION_6", "REGION_7", "REGION_8", "REGION_9"],
             "color": "#40FF30",
             "ownershipValue": 3
         },
         {
             "name": "CONTINENT_3",
-            "regions": ["REGION_10", "REGION_11", "REGION_12", "REGION_19", "REGION_20"],
+            "regionNames": ["REGION_10", "REGION_11", "REGION_12", "REGION_19", "REGION_20"],
             "color": "#4030FF",
             "ownershipValue": 4
         },
         {
             "name": "CONTINENT_4",
-            "regions": [
-                "REGION_13",
-                "REGION_14",
-                "REGION_15",
-                "REGION_16",
-                "REGION_17",
-                "REGION_18"
-            ],
+            "regionNames": ["REGION_13", "REGION_14", "REGION_15", "REGION_16", "REGION_17", "REGION_18"],
             "color": "#DDDD30",
             "ownershipValue": 7
         },
         {
             "name": "CONTINENT_5",
-            "regions": ["REGION_21", "REGION_22", "REGION_23", "REGION_24"],
+            "regionNames": ["REGION_21", "REGION_22", "REGION_23", "REGION_24"],
             "color": "#DD30DD",
             "ownershipValue": 3
         },
         {
             "name": "CONTINENT_6",
-            "regions": [
+            "regionNames": [
                 "REGION_28",
                 "REGION_29",
                 "REGION_30",
@@ -63,14 +56,7 @@
         },
         {
             "name": "CONTINENT_7",
-            "regions": [
-                "REGION_36",
-                "REGION_37",
-                "REGION_38",
-                "REGION_25",
-                "REGION_26",
-                "REGION_27"
-            ],
+            "regionNames": ["REGION_36", "REGION_37", "REGION_38", "REGION_25", "REGION_26", "REGION_27"],
             "color": "#DDDDDD",
             "ownershipValue": 4
         }
@@ -98,7 +84,7 @@
                 [1, 0]
             ],
             "unitPoint": [72, 72],
-            "borderRegions": ["REGION_2", "REGION_3"]
+            "borderRegionNames": ["REGION_2", "REGION_3"]
         },
         {
             "name": "REGION_2",
@@ -119,7 +105,7 @@
                 [6, 2]
             ],
             "unitPoint": [168, 72],
-            "borderRegions": ["REGION_1", "REGION_3", "REGION_4", "REGION_36"]
+            "borderRegionNames": ["REGION_1", "REGION_3", "REGION_4", "REGION_36"]
         },
         {
             "name": "REGION_3",
@@ -148,7 +134,7 @@
                 [3, 7]
             ],
             "unitPoint": [120, 216],
-            "borderRegions": ["REGION_2", "REGION_1", "REGION_4", "REGION_5"]
+            "borderRegionNames": ["REGION_2", "REGION_1", "REGION_4", "REGION_5"]
         },
         {
             "name": "REGION_4",
@@ -172,7 +158,7 @@
                 [9, 6]
             ],
             "unitPoint": [240, 216],
-            "borderRegions": ["REGION_3", "REGION_2", "REGION_15", "REGION_14"]
+            "borderRegionNames": ["REGION_3", "REGION_2", "REGION_15", "REGION_14"]
         },
         {
             "name": "REGION_5",
@@ -200,7 +186,7 @@
                 [8, 13]
             ],
             "unitPoint": [144, 336],
-            "borderRegions": ["REGION_3", "REGION_6"]
+            "borderRegionNames": ["REGION_3", "REGION_6"]
         },
         {
             "name": "REGION_6",
@@ -225,7 +211,7 @@
                 [5, 16]
             ],
             "unitPoint": [192, 432],
-            "borderRegions": ["REGION_5", "REGION_7", "REGION_8"]
+            "borderRegionNames": ["REGION_5", "REGION_7", "REGION_8"]
         },
         {
             "name": "REGION_7",
@@ -247,7 +233,7 @@
                 [10, 22]
             ],
             "unitPoint": [288, 576],
-            "borderRegions": ["REGION_8", "REGION_6", "REGION_11"]
+            "borderRegionNames": ["REGION_8", "REGION_6", "REGION_11"]
         },
         {
             "name": "REGION_8",
@@ -280,7 +266,7 @@
                 [9, 22]
             ],
             "unitPoint": [168, 648],
-            "borderRegions": ["REGION_7", "REGION_11", "REGION_10", "REGION_9"]
+            "borderRegionNames": ["REGION_7", "REGION_11", "REGION_10", "REGION_9"]
         },
         {
             "name": "REGION_9",
@@ -306,7 +292,7 @@
                 [3, 25]
             ],
             "unitPoint": [72, 552],
-            "borderRegions": ["REGION_8"]
+            "borderRegionNames": ["REGION_8"]
         },
         {
             "name": "REGION_10",
@@ -340,7 +326,7 @@
                 [4, 33]
             ],
             "unitPoint": [264, 816],
-            "borderRegions": ["REGION_8", "REGION_11", "REGION_12"]
+            "borderRegionNames": ["REGION_8", "REGION_11", "REGION_12"]
         },
         {
             "name": "REGION_11",
@@ -366,14 +352,7 @@
                 [10, 30]
             ],
             "unitPoint": [336, 696],
-            "borderRegions": [
-                "REGION_12",
-                "REGION_10",
-                "REGION_8",
-                "REGION_7",
-                "REGION_13",
-                "REGION_19"
-            ]
+            "borderRegionNames": ["REGION_12", "REGION_10", "REGION_8", "REGION_7", "REGION_13", "REGION_19"]
         },
         {
             "name": "REGION_12",
@@ -400,7 +379,7 @@
                 [16, 31]
             ],
             "unitPoint": [456, 792],
-            "borderRegions": ["REGION_19", "REGION_11", "REGION_10"]
+            "borderRegionNames": ["REGION_19", "REGION_11", "REGION_10"]
         },
         {
             "name": "REGION_13",
@@ -428,7 +407,7 @@
                 [17, 25]
             ],
             "unitPoint": [432, 552],
-            "borderRegions": ["REGION_19", "REGION_11", "REGION_14", "REGION_17", "REGION_18"]
+            "borderRegionNames": ["REGION_19", "REGION_11", "REGION_14", "REGION_17", "REGION_18"]
         },
         {
             "name": "REGION_14",
@@ -456,14 +435,7 @@
                 [15, 19]
             ],
             "unitPoint": [360, 360],
-            "borderRegions": [
-                "REGION_13",
-                "REGION_16",
-                "REGION_17",
-                "REGION_15",
-                "REGION_4",
-                "REGION_6"
-            ]
+            "borderRegionNames": ["REGION_13", "REGION_16", "REGION_17", "REGION_15", "REGION_4", "REGION_6"]
         },
         {
             "name": "REGION_15",
@@ -494,7 +466,7 @@
                 [14, 11]
             ],
             "unitPoint": [408, 240],
-            "borderRegions": ["REGION_14", "REGION_16", "REGION_25", "REGION_4", "REGION_35"]
+            "borderRegionNames": ["REGION_14", "REGION_16", "REGION_25", "REGION_4", "REGION_35"]
         },
         {
             "name": "REGION_16",
@@ -521,7 +493,7 @@
                 [17, 14]
             ],
             "unitPoint": [480, 360],
-            "borderRegions": ["REGION_35", "REGION_15", "REGION_14", "REGION_17"]
+            "borderRegionNames": ["REGION_35", "REGION_15", "REGION_14", "REGION_17"]
         },
         {
             "name": "REGION_17",
@@ -553,7 +525,7 @@
                 [20, 19]
             ],
             "unitPoint": [600, 504],
-            "borderRegions": ["REGION_16", "REGION_13", "REGION_18", "REGION_24", "REGION_31"]
+            "borderRegionNames": ["REGION_16", "REGION_13", "REGION_18", "REGION_24", "REGION_31"]
         },
         {
             "name": "REGION_18",
@@ -577,7 +549,7 @@
                 [23, 25]
             ],
             "unitPoint": [600, 648],
-            "borderRegions": ["REGION_24", "REGION_17", "REGION_19", "REGION_13"]
+            "borderRegionNames": ["REGION_24", "REGION_17", "REGION_19", "REGION_13"]
         },
         {
             "name": "REGION_19",
@@ -606,14 +578,7 @@
                 [23, 29]
             ],
             "unitPoint": [552, 744],
-            "borderRegions": [
-                "REGION_18",
-                "REGION_13",
-                "REGION_12",
-                "REGION_20",
-                "REGION_11",
-                "REGION_12"
-            ]
+            "borderRegionNames": ["REGION_18", "REGION_13", "REGION_12", "REGION_20", "REGION_11", "REGION_12"]
         },
         {
             "name": "REGION_20",
@@ -642,7 +607,7 @@
                 [27, 33]
             ],
             "unitPoint": [696, 816],
-            "borderRegions": ["REGION_21", "REGION_19"]
+            "borderRegionNames": ["REGION_21", "REGION_19"]
         },
         {
             "name": "REGION_21",
@@ -672,7 +637,7 @@
                 [29, 29]
             ],
             "unitPoint": [816, 768],
-            "borderRegions": ["REGION_20", "REGION_22", "REGION_23", "REGION_24"]
+            "borderRegionNames": ["REGION_20", "REGION_22", "REGION_23", "REGION_24"]
         },
         {
             "name": "REGION_22",
@@ -702,7 +667,7 @@
                 [38, 34]
             ],
             "unitPoint": [936, 720],
-            "borderRegions": ["REGION_23", "REGION_21"]
+            "borderRegionNames": ["REGION_23", "REGION_21"]
         },
         {
             "name": "REGION_23",
@@ -724,7 +689,7 @@
                 [35, 29]
             ],
             "unitPoint": [840, 648],
-            "borderRegions": ["REGION_21", "REGION_22", "REGION_24", "REGION_28", "REGION_18"]
+            "borderRegionNames": ["REGION_21", "REGION_22", "REGION_24", "REGION_28", "REGION_18"]
         },
         {
             "name": "REGION_24",
@@ -750,7 +715,7 @@
                 [31, 27]
             ],
             "unitPoint": [744, 576],
-            "borderRegions": ["REGION_18", "REGION_17", "REGION_28", "REGION_23", "REGION_31"]
+            "borderRegionNames": ["REGION_18", "REGION_17", "REGION_28", "REGION_23", "REGION_31"]
         },
         {
             "name": "REGION_25",
@@ -778,7 +743,7 @@
                 [18, 5]
             ],
             "unitPoint": [504, 168],
-            "borderRegions": ["REGION_15", "REGION_36", "REGION_27", "REGION_26", "REGION_34"]
+            "borderRegionNames": ["REGION_15", "REGION_36", "REGION_27", "REGION_26", "REGION_34"]
         },
         {
             "name": "REGION_26",
@@ -798,7 +763,7 @@
                 [24, 5]
             ],
             "unitPoint": [648, 168],
-            "borderRegions": ["REGION_34", "REGION_37", "REGION_27", "REGION_25"]
+            "borderRegionNames": ["REGION_34", "REGION_37", "REGION_27", "REGION_25"]
         },
         {
             "name": "REGION_27",
@@ -826,7 +791,7 @@
                 [20, 4]
             ],
             "unitPoint": [552, 72],
-            "borderRegions": ["REGION_25", "REGION_36", "REGION_37", "REGION_26"]
+            "borderRegionNames": ["REGION_25", "REGION_36", "REGION_37", "REGION_26"]
         },
         {
             "name": "REGION_28",
@@ -849,7 +814,7 @@
                 [36, 23]
             ],
             "unitPoint": [888, 552],
-            "borderRegions": ["REGION_24", "REGION_29", "REGION_31"]
+            "borderRegionNames": ["REGION_24", "REGION_29", "REGION_31"]
         },
         {
             "name": "REGION_29",
@@ -879,7 +844,7 @@
                 [41, 24]
             ],
             "unitPoint": [960, 504],
-            "borderRegions": ["REGION_28", "REGION_30", "REGION_31"]
+            "borderRegionNames": ["REGION_28", "REGION_30", "REGION_31"]
         },
         {
             "name": "REGION_30",
@@ -914,7 +879,7 @@
                 [44, 13]
             ],
             "unitPoint": [984, 312],
-            "borderRegions": ["REGION_31", "REGION_29", "REGION_33"]
+            "borderRegionNames": ["REGION_31", "REGION_29", "REGION_33"]
         },
         {
             "name": "REGION_31",
@@ -939,7 +904,7 @@
                 [36, 18]
             ],
             "unitPoint": [792, 408],
-            "borderRegions": [
+            "borderRegionNames": [
                 "REGION_30",
                 "REGION_29",
                 "REGION_28",
@@ -968,7 +933,7 @@
                 [29, 17]
             ],
             "unitPoint": [672, 384],
-            "borderRegions": ["REGION_31", "REGION_17", "REGION_35", "REGION_34"]
+            "borderRegionNames": ["REGION_31", "REGION_17", "REGION_35", "REGION_34"]
         },
         {
             "name": "REGION_33",
@@ -997,7 +962,7 @@
                 [36, 13]
             ],
             "unitPoint": [888, 216],
-            "borderRegions": ["REGION_34", "REGION_31", "REGION_30", "REGION_38", "REGION_37"]
+            "borderRegionNames": ["REGION_34", "REGION_31", "REGION_30", "REGION_38", "REGION_37"]
         },
         {
             "name": "REGION_34",
@@ -1027,7 +992,7 @@
                 [33, 13]
             ],
             "unitPoint": [720, 264],
-            "borderRegions": ["REGION_31", "REGION_32", "REGION_35", "REGION_26", "REGION_33"]
+            "borderRegionNames": ["REGION_31", "REGION_32", "REGION_35", "REGION_26", "REGION_33"]
         },
         {
             "name": "REGION_35",
@@ -1047,7 +1012,7 @@
                 [23, 11]
             ],
             "unitPoint": [576, 288],
-            "borderRegions": ["REGION_34", "REGION_32", "REGION_16", "REGION_15"]
+            "borderRegionNames": ["REGION_34", "REGION_32", "REGION_16", "REGION_15"]
         },
         {
             "name": "REGION_36",
@@ -1079,7 +1044,7 @@
                 [17, 5]
             ],
             "unitPoint": [360, 72],
-            "borderRegions": ["REGION_25", "REGION_27"]
+            "borderRegionNames": ["REGION_25", "REGION_27"]
         },
         {
             "name": "REGION_37",
@@ -1117,7 +1082,7 @@
                 [28, 2]
             ],
             "unitPoint": [792, 96],
-            "borderRegions": ["REGION_27", "REGION_26", "REGION_33", "REGION_38"]
+            "borderRegionNames": ["REGION_27", "REGION_26", "REGION_33", "REGION_38"]
         },
         {
             "name": "REGION_38",
@@ -1140,7 +1105,7 @@
                 [37, 2]
             ],
             "unitPoint": [936, 72],
-            "borderRegions": ["REGION_37", "REGION_33"]
+            "borderRegionNames": ["REGION_37", "REGION_33"]
         }
     ],
     "tileIndices": [

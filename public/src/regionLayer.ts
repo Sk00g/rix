@@ -1,8 +1,10 @@
 import * as PIXI from "pixi.js";
-import * as V from "./vector.js";
+import * as V from "./vector";
+import { MapData } from "./../../model/mapData";
+import { Point } from "./sengine/model";
 import Mouse from "pixi.js-mouse";
-import graphics from "./game_data/graphics.js";
-import assetLoader from "./assetLoader.js";
+import graphics from "./game_data/graphics";
+import assetLoader from "./assetLoader";
 
 const DEFAULT_REGION_COLOR = 0xffffff;
 const DEFAULT_REGION_ALPHA = 0.3;
@@ -95,7 +97,7 @@ export class RegionVisual {
         this._render();
     }
 
-    getUnitCenter() {
+    getUnitCenter(): Point {
         return [this._static.unitPoint[0], this._static.unitPoint[1]];
     }
 
@@ -123,7 +125,7 @@ export class RegionLayer {
     _objectKeyRegistry;
     _eventHandlers;
 
-    constructor(stage, mapData, tileScale) {
+    constructor(stage: PIXI.Container, mapData: MapData, tileScale: number = 1.0) {
         this._staticData = { ...mapData };
         this._stage = stage;
         this._regions = {};
@@ -134,7 +136,7 @@ export class RegionLayer {
 
         // Set the continent colors for each region
         for (let cont of mapData.continents) {
-            for (let name of cont.regions) {
+            for (let name of cont.regionNames) {
                 this._regions[name]._defaultStyle = {
                     outlineColor: parseInt(cont.color.substr(1), 16),
                     outlineAlpha: DEFAULT_OUTLINE_ALPHA,
@@ -173,7 +175,7 @@ export class RegionLayer {
         });
     }
 
-    on(eventType, func, objectKey = null) {
+    on(eventType, func, objectKey: any = null) {
         this._eventHandlers[eventType].push(func);
 
         // Use simple UID registry for optional unsubscribing

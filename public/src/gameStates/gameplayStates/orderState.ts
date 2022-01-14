@@ -62,9 +62,7 @@ class OrderEdit {
                 return;
         }
         this._orderAvatar.setCounter(this.orderCount);
-        this.origin.avatar.setCounter(
-            this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount
-        );
+        this.origin.avatar.setCounter(this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount);
     }
 
     _createEditPanel() {
@@ -135,29 +133,17 @@ class OrderEdit {
 
     activate() {
         this.game.regionVisualLayer.clearAllStyles();
-        this.origin.avatar.setCounter(
-            this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount
-        );
+        this.origin.avatar.setCounter(this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount);
         this.origin.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
         this.target.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
 
         // Create marker path between regions
-        let pathColor =
-            this.origin.owner === this.target.owner ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
-        this._orderMarker = new RegionPathMarker(
-            AppContext.stage,
-            this.origin.visual,
-            this.target.visual,
-            pathColor
-        );
+        let pathColor = this.origin.owner === this.target.owner ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
+        this._orderMarker = new RegionPathMarker(AppContext.stage, this.origin.visual, this.target.visual, pathColor);
         this._orderMarker.setAlpha(0.75);
 
         // Create avatar to represent 'moving troops'
-        this._orderAvatar = new UnitAvatar(
-            AppContext.stage,
-            graphics.avatar[this.origin.owner.avatarType],
-            0x99999c
-        );
+        this._orderAvatar = new UnitAvatar(AppContext.stage, graphics.avatar[this.origin.owner.avatarType], 0x99999c);
         this._orderAvatar.sprite.alpha = 0.75;
         this._orderAvatar.sprite.scale.set(1.2, 1.2);
         this._orderAvatar.setCounter(this.orderCount);
@@ -233,14 +219,8 @@ class TargetSelect {
 
         if (this._pathMarker) this._pathMarker.destroy();
 
-        let pathColor =
-            region.owner.name === AppContext.playerName ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
-        this._pathMarker = new RegionPathMarker(
-            AppContext.stage,
-            this.selectedRegion.visual,
-            regionVisual,
-            pathColor
-        );
+        let pathColor = region.owner.name === AppContext.playerName ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
+        this._pathMarker = new RegionPathMarker(AppContext.stage, this.selectedRegion.visual, regionVisual, pathColor);
         region.avatar.playWalkAnimation();
         regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
     }
@@ -347,12 +327,8 @@ class ConfirmState {
 
         this._confirmPanel = new SUIE.Panel(new PIXI.Rectangle(500, 350, 200, 100));
         this._confirmPanel.addChild(new SUIE.Label("Submit orders?", [10, 30], 10));
-        this._confirmPanel.addChild(
-            new SUIE.TextButton("YES", [60, 60], () => this._confirmAction())
-        );
-        this._confirmPanel.addChild(
-            new SUIE.TextButton("NO", [100, 60], () => this.parentState.popState())
-        );
+        this._confirmPanel.addChild(new SUIE.TextButton("YES", [60, 60], () => this._confirmAction()));
+        this._confirmPanel.addChild(new SUIE.TextButton("NO", [100, 60], () => this.parentState.popState()));
 
         AppContext.stage.addChild(this._confirmPanel);
     }
@@ -416,7 +392,7 @@ export default class OrderState extends StateManagerBase {
 
     // Calculate the correct display counter for a region, based on army size and registered orders
     getRegionDisplayCounter(region) {
-        let count = region.armySize;
+        let count = region.size;
         if (region.name in this._registeredOrders) {
             for (let order of this._registeredOrders[region.name]) count -= order.amount;
         }

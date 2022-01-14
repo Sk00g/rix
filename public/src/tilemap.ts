@@ -8,7 +8,7 @@ class TileMap {
     _scale: number;
     _spriteContainer: PIXI.Container;
 
-    constructor(stage, mapData) {
+    constructor(stage: PIXI.Container, mapData: any) {
         const path = mapData.tilesetPath;
         const size = mapData.tileMapSize;
 

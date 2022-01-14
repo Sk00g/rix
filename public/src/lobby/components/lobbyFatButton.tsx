@@ -1,29 +1,35 @@
 import React from "react";
 import styled from "styled-components";
+import { Lobby } from "../../../../model/lobby";
 import theme from "../theme";
 
-const LobbyFatButton = ({ lobby, onClick }) => {
+interface LobbyFatButtonProps {
+    lobby: Lobby;
+    onClick: (lobby: Lobby) => void;
+}
+
+const LobbyFatButton: React.FC<LobbyFatButtonProps> = (props) => {
     return (
-        <DivRoot onClick={() => onClick(lobby)}>
+        <DivRoot onClick={() => props.onClick(props.lobby)}>
             <DivThumbnail>
                 <img
                     width="80px"
                     height="80px"
-                    alt={lobby.mapName}
-                    src={`./maps/${lobby.mapName}/thumbnail.png`}
+                    alt={props.lobby.mapName}
+                    src={`./maps/${props.lobby.mapName}/thumbnail.png`}
                     style={{ userSelect: "none" }}
                 />
             </DivThumbnail>
             <DivSmallLabels>
                 <div style={{ display: "flex" }}>
                     <P>Tag:</P>
-                    <PValue>{lobby.tag}</PValue>
+                    <PValue>{props.lobby.tag}</PValue>
                 </div>
-                <P>{new Date(lobby.dateCreated).toDateString().substr(3)}</P>
-                <P>{lobby.players.length} Players</P>
+                <P>{new Date(props.lobby.dateCreated).toDateString().substr(3)}</P>
+                <P>{props.lobby.players.length} Players</P>
             </DivSmallLabels>
             <DivLargeLabels>
-                <P>Creator: {lobby.createdBy.username}</P>
+                <P>Creator: {props.lobby.createdBy?.username}</P>
             </DivLargeLabels>
         </DivRoot>
     );

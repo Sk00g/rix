@@ -6,9 +6,14 @@ import styled from "styled-components";
 import { toast } from "react-toastify";
 import theme from "../theme";
 import apiService from "../apiService";
+import { Account } from "../../../../model/lobby.js";
 
-const LoginPage = (props) => {
-    let [username, setUsername] = useState<string>();
+export interface LoginPageProps {
+    updateAccount: (account: Account) => void;
+}
+
+const LoginPage: React.FC<LoginPageProps> = (props) => {
+    let [username, setUsername] = useState<string>("");
     let [redirect, setRedirect] = useState<boolean>(false);
 
     const _handleClick = () => {
@@ -20,10 +25,8 @@ const LoginPage = (props) => {
         apiService
             .getAccountByUsername(username)
             .then((user) => {
-                if (user) {
-                    props.updateAccount(user);
-                    setRedirect(true);
-                }
+                props.updateAccount(user);
+                setRedirect(true);
             })
             .catch((err) => {
                 console.log("login request failed", err);
@@ -36,11 +39,7 @@ const LoginPage = (props) => {
         <DivForm>
             <PTitle>WELCOME TO PERILOUS</PTitle>
             <P>USERNAME</P>
-            <TextInput
-                value={username}
-                handleChange={(val) => setUsername(val.target.value)}
-                handleEnter={_handleClick}
-            />
+            <TextInput value={username} handleChange={setUsername} handleEnter={_handleClick} />
             <div style={{ margin: "1em" }}></div>
             <TextButton handleClick={_handleClick} text="LOGIN" />
         </DivForm>

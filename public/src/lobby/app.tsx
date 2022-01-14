@@ -22,10 +22,11 @@ const App = () => {
         lastLogin: new Date(),
     });
     // -------------------------------------
-    let [inGame, setInGame] = useState(false);
+    let [inGame, setInGame] = useState<boolean>(false);
 
     const _startGame = () => {
         setInGame(true);
+        // Here should set up a loading screen since gameEntry is async
         gameEntry();
     };
 
@@ -50,7 +51,7 @@ const App = () => {
                         <Route path="/gameJoin">
                             <GameJoinPage />
                         </Route>
-                        <Route path="/lobby/:gameId">
+                        <Route path="/lobby/:id">
                             <LobbyPage />
                         </Route>
                         <Route path="/creator">

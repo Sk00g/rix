@@ -1,23 +1,28 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
+import { Lobby } from "../../../../model/lobby";
 import apiService from "../apiService";
 import FatButton from "../components/fatButton.jsx";
-import IconButton, { BUTTON_TYPES } from "../components/iconButton.jsx";
+import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
 import LabelValue from "../components/labelValue";
 import LobbyFatButton from "../components/lobbyFatButton.jsx";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
 
-const HomePage = (props) => {
-    let [activeLobbies, setActiveLobbies] = useState([]);
-    let history = useHistory();
+interface HomePageProps {
+    startGame: () => void;
+}
 
+const HomePage: React.FC<HomePageProps> = (props) => {
+    let [activeLobbies, setActiveLobbies] = useState<Lobby[]>([]);
+
+    let history = useHistory();
     let activeAccount = useContext(AccountContext);
 
     useEffect(() => {
-        apiService.getLobbyData(true, null).then((allLobbies) => {
-            setActiveLobbies(allLobbies.filter((lob) => lob.players.find((p) => p._id === activeAccount._id)));
+        apiService.getAllLobbyData().then((lobbies) => {
+            setActiveLobbies(lobbies.filter((lob) => lob.players.find((p) => p.accountId === activeAccount._id)));
         });
     }, []);
 
@@ -25,8 +30,8 @@ const HomePage = (props) => {
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton type={BUTTON_TYPES.arrowLeft} onClick={() => history.push("/login")} />
-                    <IconButton type={BUTTON_TYPES.reset} onClick={() => console.log("refresh connected games?")} />
+                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/login")} />
+                    <IconButton type={ButtonTypes.reset} onClick={() => console.log("refresh connected games?")} />
                 </div>
                 <PTitle>{`Welcome ${activeAccount.username || "Scott"}`}</PTitle>
             </DivTitlebar>

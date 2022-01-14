@@ -1,9 +1,11 @@
+import { Direction, Animation, Point } from "./model";
 import * as PIXI from "pixi.js";
 import * as V from "../vector.js";
 import * as utils from "./utils";
 import assetLoader from "../assetLoader.js";
 import Label from "./suie/label.js";
 import graphics from "../game_data/graphics.js";
+import { NationColor } from "../../../model/enums";
 
 const WALK_ANIM_INTERVAL = 11.5;
 const ATTACK_ANIM_INTERVAL = 20;
@@ -19,51 +21,75 @@ Go in order of down, left, right, up, with the resting or 'stand' animation in t
 */
 
 class UnitAvatar {
-    constructor(stage, path, nationColor, startRect = new PIXI.Rectangle(0, 2, 26, 36)) {
+    _stage: PIXI.Container;
+    _texture: PIXI.Texture;
+    _position: Point;
+    _frames: {
+        [Direction.Left]: PIXI.Rectangle[];
+        [Direction.Right]: PIXI.Rectangle[];
+        [Direction.Up]: PIXI.Rectangle[];
+        [Direction.Down]: PIXI.Rectangle[];
+    };
+    _counterSprite: PIXI.Sprite;
+    _counterLabel: Label;
+    _counter = 0;
+
+    // Default start frame is facing down stand
+    _direction = Direction.Down;
+    _currentFrame = 1;
+
+    // Keep track of active animation properties
+    _animation: Animation = Animation.Stand;
+    _animating = false;
+    _looping = false;
+    _animationElapsed = 0;
+
+    // Walk animation properties
+    _targetPosition?: Point;
+
+    // Slide animation properties
+    _slideTarget?: Point;
+    _slideSpeed = 1;
+
+    // Shake animation properties
+    _shakeMagnitude?: number;
+    _shakeDirection: Direction = Direction.Right;
+    _shakeOrigin?: Point;
+    _shakeIncrements = 0;
+
+    // Morph number animation properties
+    _morphNumberTarget?: number = undefined;
+    _morphNumberSpeed = 0;
+    _morphPreviousSize = [0, 0];
+
+    // Blend number animation properties
+    _blendNumberTarget?: number;
+    _blendNumberSpeeds: any = null;
+    _blendNumberIncrementsRemaining = 0;
+
+    // Fade avatar animation properties
+    _fadeTarget?: number;
+    _fadeSpeed = 0;
+
+    // Morph avatar animation properties
+    _morphTarget?: number;
+    _morphSpeed = 0;
+
+    // Public properties
+    width = 0;
+    height = 0;
+    sprite: PIXI.Sprite;
+
+    constructor(
+        stage: PIXI.Container,
+        path: string,
+        nationColor: NationColor,
+        startRect = new PIXI.Rectangle(0, 2, 26, 36)
+    ) {
         this._stage = stage;
 
         // Copy texture so we can change frame only for this unit
         this._texture = assetLoader.loadTexture(path);
-
-        // Default start frame is facing down stand
-        this._direction = "down";
-        this._currentFrame = 1;
-
-        // Keep track of active animation properties
-        this._animation = null;
-        this._looping = false;
-        this._animationElapsed = 0;
-
-        // Walk animation properties
-        this._targetPosition = null;
-
-        // Slide animation properties
-        this._slideTarget = null;
-        this._slideSpeed = 1;
-
-        // Shake animation properties
-        this._shakeMagnitude = null;
-        this._shakeDirection = "right";
-        this._shakeOrigin = null;
-        this._shakeIncrements = 0;
-
-        // Morph number animation properties
-        this._morphNumberTarget = null;
-        this._morphNumberSpeed = 0;
-        this._morphPreviousSize = [0, 0];
-
-        // Blend number animation properties
-        this._blendNumberTarget = null;
-        this._blendNumberSpeeds = null;
-        this._blendNumberIncrementsRemaining = 0;
-
-        // Fade avatar animation properties
-        this._fadeTarget = null;
-        this._fadeSpeed = 0;
-
-        // Morph avatar animation properties
-        this._morphTarget = null;
-        this._morphSpeed = 0;
 
         let x = startRect.x;
         let y = startRect.y;
@@ -72,25 +98,25 @@ class UnitAvatar {
         this.height = startRect.height;
 
         this._frames = {
-            down: [
+            [Direction.Down]: [
                 new PIXI.Rectangle(x, y, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y, this.width, this.height),
                 new PIXI.Rectangle(x + this.width * 2, y, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y, this.width, this.height),
             ],
-            left: [
+            [Direction.Left]: [
                 new PIXI.Rectangle(x, y + this.height, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height, this.width, this.height),
                 new PIXI.Rectangle(x + this.width * 2, y + this.height, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height, this.width, this.height),
             ],
-            right: [
+            [Direction.Right]: [
                 new PIXI.Rectangle(x, y + this.height * 2, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height * 2, this.width, this.height),
                 new PIXI.Rectangle(x + this.width * 2, y + this.height * 2, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height * 2, this.width, this.height),
             ],
-            up: [
+            [Direction.Up]: [
                 new PIXI.Rectangle(x, y + this.height * 3, this.width, this.height),
                 new PIXI.Rectangle(x + this.width, y + this.height * 3, this.width, this.height),
                 new PIXI.Rectangle(x + this.width * 2, y + this.height * 3, this.width, this.height),
@@ -122,34 +148,33 @@ class UnitAvatar {
         this._stage.removeChild(this._counterLabel);
     }
 
-    setCounterVisibility(flag) {
+    setCounterVisibility(flag: boolean) {
         this._counterSprite.visible = flag;
         this._counterLabel.visible = flag;
     }
 
-    getCounter() {
+    getCounter(): number {
         return this._counter;
     }
 
-    setCounter(newAmount, skipAnimation = false) {
+    setCounter(newAmount: number) {
         this._counter = newAmount;
-        this._counterLabel.text = newAmount;
-        // Perhaps add animation logic in here for changing amount?
+        this._counterLabel.text = String(newAmount);
     }
 
-    slide(newPosition, speed) {
+    slide(newPosition: Point, speed: number) {
         this._slideTarget = newPosition;
         this._slideSpeed = speed;
     }
 
-    shake(magnitude) {
+    shake(magnitude: number) {
         this._shakeMagnitude = magnitude;
-        this._shakeDirection = "right";
+        this._shakeDirection = Direction.Right;
         this._shakeOrigin = this.getPosition();
         this._shakeIncrements = 0;
     }
 
-    morph(newScale, speed) {
+    morph(newScale: number, speed: number) {
         this._morphTarget = newScale;
         this._morphSpeed = speed;
     }
@@ -183,7 +208,7 @@ class UnitAvatar {
     }
 
     playWalkAnimation(loop = true) {
-        this._animation = "walk";
+        this._animation = Animation.Walk;
         this._looping = loop;
         this._animationElapsed = 0;
 
@@ -192,7 +217,7 @@ class UnitAvatar {
     }
 
     playAttackAnimation(loop = false) {
-        this._animation = "attack";
+        this._animation = Animation.Attack;
         this._looping = loop;
         this._animationElapsed = 0;
 
@@ -200,7 +225,7 @@ class UnitAvatar {
     }
 
     stopAnimation() {
-        this._animation = null;
+        this._animation = Animation.Stand;
         this._looping = false;
         this._currentFrame = 1;
     }
@@ -230,11 +255,11 @@ class UnitAvatar {
         this.facePoint(newPosition);
     }
 
-    getPosition() {
+    getPosition(): Point {
         return [...this._position];
     }
 
-    setPosition(position) {
+    setPosition(position: Point) {
         this._position = [...position];
 
         let unitX = position[0] - (this.width / 2) * SCALE;
@@ -264,7 +289,7 @@ class UnitAvatar {
         // If we are currently animating, check elapsed for frame increase
         if (this._animation) {
             this._animationElapsed += delta;
-            if (this._animation === "walk") {
+            if (this._animation === Animation.Walk) {
                 if (this._animationElapsed >= WALK_ANIM_INTERVAL) {
                     this._animationElapsed = 0;
                     this._currentFrame++;
@@ -276,7 +301,7 @@ class UnitAvatar {
                         }
                     }
                 }
-            } else if (this._animation === "attack") {
+            } else if (this._animation === Animation.Attack) {
                 if (this._animationElapsed >= ATTACK_ANIM_INTERVAL) {
                     this._animationElapsed = 0;
                     this._currentFrame = this._currentFrame === 1 ? 0 : 1;
@@ -298,7 +323,7 @@ class UnitAvatar {
 
             if (distanceLeft < MIN_MOVE_DISTANCE) {
                 this.setPosition(this._targetPosition);
-                this._targetPosition = null;
+                this._targetPosition = undefined;
                 this.stopAnimation();
             } else {
                 let direction = V.normalize(difference);
@@ -315,7 +340,7 @@ class UnitAvatar {
 
             if (distanceLeft < this._slideSpeed) {
                 this.setPosition(this._slideTarget);
-                this._slideTarget = null;
+                this._slideTarget = undefined;
             } else {
                 let direction = V.normalize(difference);
                 let newPosition = V.add(this.getPosition(), V.multiply(direction, delta * this._slideSpeed));
@@ -326,8 +351,11 @@ class UnitAvatar {
 
     _updateShake(delta) {
         if (this._shakeMagnitude) {
-            let sign = this._shakeDirection === "right" ? 1 : -1;
-            let newPosition = [this.getPosition()[0] + sign * this._shakeMagnitude * delta, this.getPosition()[1]];
+            let sign = this._shakeDirection === Direction.Right ? 1 : -1;
+            let newPosition: Point = [
+                this.getPosition()[0] + sign * this._shakeMagnitude * delta,
+                this.getPosition()[1],
+            ];
 
             this.setPosition(newPosition);
 
@@ -335,8 +363,8 @@ class UnitAvatar {
 
             if (this._shakeIncrements === SHAKE_INCREMENT_MAX) {
                 this._shakeIncrements = -SHAKE_INCREMENT_MAX;
-                if (this._shakeDirection === "right") this._shakeDirection = "left";
-                else if (this._shakeDirection === "left") this._shakeDirection = "right";
+                if (this._shakeDirection === Direction.Right) this._shakeDirection = Direction.Left;
+                else if (this._shakeDirection === Direction.Left) this._shakeDirection = Direction.Right;
                 this._shakeMagnitude -= 0.5;
             }
         }
@@ -350,7 +378,7 @@ class UnitAvatar {
 
             if (Math.abs(this._counterLabel.scale.x - this._morphNumberTarget) < this._morphNumberSpeed) {
                 this._counterLabel.scale.set(this._morphNumberTarget, this._morphNumberTarget);
-                this._morphNumberTarget = null;
+                this._morphNumberTarget = undefined;
             }
 
             // Center
@@ -378,7 +406,7 @@ class UnitAvatar {
             this._counterLabel.style = style;
 
             if (this._blendNumberIncrementsRemaining === 0) {
-                this._blendNumberTarget = null;
+                this._blendNumberTarget = undefined;
             }
         }
     }
@@ -387,7 +415,7 @@ class UnitAvatar {
         if (this._fadeTarget) {
             if (Math.abs(this.sprite.alpha - this._fadeTarget) < this._fadeSpeed) {
                 this.sprite.alpha = this._fadeTarget;
-                this._fadeTarget = null;
+                this._fadeTarget = undefined;
             } else {
                 let sign = this._fadeTarget > this.sprite.alpha ? 1 : -1;
                 this.sprite.alpha += sign * this._fadeSpeed;
@@ -403,12 +431,12 @@ class UnitAvatar {
 
             if (Math.abs(this.sprite.scale.x - this._morphTarget) < this._morphSpeed) {
                 this.sprite.scale.set(this._morphTarget, this._morphTarget);
-                this._morphTarget = null;
+                this._morphTarget = undefined;
             }
         }
     }
 
-    update(delta) {
+    update(delta: number) {
         this._updateAnimation(delta);
         this._updateWalking(delta);
         this._updateSlide(delta);

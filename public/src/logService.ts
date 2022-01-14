@@ -9,11 +9,13 @@ export enum LogLevel {
 export function logService(level: LogLevel, message, source = "APP", production = false) {
     // Use synthetic Error object to retrieve stacktrace data
     let stack = new Error().stack;
-    let fileTokens = stack.split("\n")[2].split("\\");
+    let fileTokens = stack?.split("\n")[2].split("\\");
     let trace = "unknown";
-    try {
-        trace = fileTokens[fileTokens.length - 1].substring(0, fileTokens[fileTokens.length - 1].length - 2);
-    } catch (err) {}
+    if (fileTokens) {
+        try {
+            trace = fileTokens[fileTokens.length - 1].substring(0, fileTokens[fileTokens.length - 1].length - 2);
+        } catch (err) {}
+    }
 
     let log = `${new Date().toLocaleTimeString()} (${level}) - ${source}: ${message}`;
 

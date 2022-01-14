@@ -3,26 +3,28 @@ import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import TextButton from "../components/textButton.jsx";
 import apiService from "../apiService";
-import IconButton, { BUTTON_TYPES } from "../components/iconButton.jsx";
+import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
 import LabelValue from "../components/labelValue.jsx";
 import LobbyFatButton from "../components/lobbyFatButton.jsx";
 import TextInput from "../components/textInput.jsx";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
+import { Lobby, Player } from "../../../../model/lobby.js";
+import { NationColor, PlayerStatus } from "../../../../model/enums.js";
 
-const GameJoinPage = (props) => {
-    let [selectedLobby, setSelectedLobby] = useState(null);
-    let [searchText, setSearchText] = useState("");
-    let [lobbies, setLobbies] = useState([]);
-    let [allLobbies, setAllLobbies] = useState([]);
+const GameJoinPage: React.FC = () => {
+    let [selectedLobby, setSelectedLobby] = useState<Lobby>();
+    let [lobbies, setLobbies] = useState<Lobby[]>([]);
+    let [allLobbies, setAllLobbies] = useState<Lobby[]>([]);
+    let [searchText, setSearchText] = useState<string>("");
     let history = useHistory();
 
     let activeAccount = useContext(AccountContext);
 
     useEffect(() => {
-        apiService.getLobbyData(true, null).then((data) => {
+        apiService.getAllLobbyData().then((data) => {
             // Filter out lobbies that we are already members of
-            data = data.filter((item) => !item.players.find((p) => p.id === activeAccount._id));
+            data = data.filter((item) => !item.players.find((p) => p.accountId === activeAccount._id));
 
             setLobbies(data);
             setAllLobbies(data);
@@ -38,10 +40,21 @@ const GameJoinPage = (props) => {
     };
 
     const _handleJoin = () => {
+        if (!selectedLobby) return;
+
+        const newPlayer: Player = {
+            username: activeAccount.username,
+            alive: true,
+            accountId: activeAccount._id,
+            status: PlayerStatus.Waiting,
+            color: NationColor.BLUE,
+            avatar: "knight",
+        };
+
         apiService
-            .updateLobby(selectedLobby._id, activeAccount._id, "WAITING")
+            .updateLobby(selectedLobby._id, newPlayer)
             .then((rsp) => {
-                history.push(`/lobby/${selectedLobby._id}`);
+                history.push(`/lobby/${selectedLobby?._id}`);
             })
             .catch((err) => console.log("failed adding account to lobby", err));
     };
@@ -50,8 +63,8 @@ const GameJoinPage = (props) => {
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton type={BUTTON_TYPES.arrowLeft} onClick={() => history.push("/home")} />
-                    <IconButton type={BUTTON_TYPES.reset} onClick={() => console.log("refresh connected lobbies?")} />
+                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/home")} />
+                    <IconButton type={ButtonTypes.reset} onClick={() => console.log("refresh connected lobbies?")} />
                 </div>
                 <PTitle>{`JOIN A NEW GAME`}</PTitle>
             </DivTitlebar>
@@ -59,7 +72,7 @@ const GameJoinPage = (props) => {
                 {selectedLobby && (
                     <div style={{ margin: "0.25em" }}>
                         <PTitle>{`Game ${selectedLobby.tag}`}</PTitle>
-                        <hr width="80%" />
+                        <hr />
                         <LabelValue
                             label="CREATED"
                             value={new Date(selectedLobby.dateCreated).toDateString().substr(3)}
@@ -106,11 +119,11 @@ const GameJoinPage = (props) => {
                 <div style={{ display: "flex" }}>
                     <TextInput
                         value={searchText}
-                        handleChange={(e) => setSearchText(e.target.value)}
+                        handleChange={setSearchText}
                         width="300px"
                         handleEnter={_applySearch}
                     />
-                    <IconButton type={BUTTON_TYPES.arrowRight} onClick={_applySearch} />
+                    <IconButton type={ButtonTypes.arrowRight} onClick={_applySearch} />
                 </div>
                 <PTitle>AVAILABLE GAMES</PTitle>
                 <DivButton>

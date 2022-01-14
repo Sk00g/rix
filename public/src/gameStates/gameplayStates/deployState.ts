@@ -1,33 +1,38 @@
+import { RegionVisual } from './../../regionLayer';
 import * as PIXI from "pixi.js";
 import SUIE from "../../sengine/suie/suie.js";
-import StateManagerBase from "../stateManagerBase";
 import AppContext from "../../appContext.js";
 import UnitAvatar from "../../sengine/unitAvatar";
 import graphics from "../../game_data/graphics";
 import Keyboard from "pixi.js-keyboard";
+import GameStateManager from "../gameStateManager.js";
+import GameHandler from "../../game_data/gameHandler.js";
 
-export const DeployStateType = Object.freeze({
-    REGION_SELECT: "REGION_SELECT",
-    EDIT_AMOUNT: "EDIT_AMOUNT",
-    CONFIRM: "CONFIRM",
-});
+export enum DeployStateType {
+    RegionSelect,
+    EditAmount,
+    Confirm
+}
 
 const HOVER_FILL = 0x3030f0;
 
 // Will remove these from this file if they get too big
 class RegionSelectState {
-    constructor(parentState, gameData) {
+    parentState: DeployState;
+    game: GameHandler;
+    
+    constructor(parentState: DeployState, gameHandler: GameHandler) {
         this.parentState = parentState;
-        this.game = gameData;
+        this.game = gameHandler;
     }
 
     activate() {
         this.game.regionVisualLayer.on(
             "mouseEnter",
-            (regionVisual) => {
+            (regionVisual: RegionVisual) => {
                 this.game.regionVisualLayer.clearAllStyles();
                 let region = this.game.getRegion(regionVisual.name);
-                if (region.owner.name === AppContext.playerName) {
+                if (region?.owner.username === AppContext.playerName) {
                     region.avatar.playWalkAnimation();
                     regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
                 }
@@ -37,20 +42,20 @@ class RegionSelectState {
 
         this.game.regionVisualLayer.on(
             "mouseExit",
-            (regionVisual) => {
+            (regionVisual: RegionVisual) => {
                 this.game.regionVisualLayer.clearAllStyles();
                 let region = this.game.getRegion(regionVisual.name);
-                if (region.owner.name === AppContext.playerName) region.avatar.stopAnimation();
+                if (region?.owner.username === AppContext.playerName) region.avatar.stopAnimation();
             },
             this
         );
 
         this.game.regionVisualLayer.on(
             "leftClick",
-            (regionVisual) => {
+            (regionVisual: RegionVisual) => {
                 let region = this.game.getRegion(regionVisual.name);
-                if (region.owner.name === AppContext.playerName)
-                    this.parentState.pushState(DeployStateType.EDIT_AMOUNT, {
+                if (region?.owner.username === AppContext.playerName)
+                    this.parentState.pushState(DeployStateType.EditAmount, {
                         selectedRegion: region,
                     });
             },
@@ -236,7 +241,7 @@ class ConfirmState {
     }
 }
 
-export default class DeployState extends StateManagerBase {
+export default class DeployState extends GameplayState, StateManagerBase {
     constructor(manager, gameData, initData = null) {
         super();
 
