@@ -1,5 +1,7 @@
+import { RegionVisual } from "./../../regionLayer";
+import { IGameState } from "./../stateManagerBase";
 import * as PIXI from "pixi.js";
-import * as V from "../../vector.js";
+import * as V from "../../vector";
 import Mouse from "pixi.js-mouse";
 import Keyboard from "pixi.js-keyboard";
 import AppContext from "../../appContext";
@@ -7,69 +9,83 @@ import RegionPathMarker from "../../sengine/regionPathMarker";
 import SUIE from "../../sengine/suie/suie";
 import StateManagerBase from "../stateManagerBase";
 import UnitAvatar from "../../sengine/unitAvatar";
-import graphics from "../../game_data/graphics";
+import graphics from "../../gameData/graphics";
+import { GameplayStateType, IOrder } from "../model";
+import GameHandler from "../../gameData/gameHandler";
+import Region from "../../gameData/region";
+import Panel from "../../sengine/suie/panel";
+import GameStateManager from "../gameStateManager";
+import theme from "../../lobby/theme";
 
 const HOVER_FILL = 0x3030f0;
 const OUTLINE_COLOR = 0xa0c0ff;
 const ATTACK_ARROW_COLOR = 0xff6060;
 const MOVE_ARROW_COLOR = 0x60ff60;
 
-class OrderEdit {
-    constructor(parentState, gameData, initData) {
-        this.parentState = parentState;
-        this.game = gameData;
-        this.origin = initData.origin;
-        this.target = initData.target;
-        this.orderCount = initData.count || this.origin.avatar.getCounter() - 1;
+// Shared state among internal states
+let _origin: Region;
+let _target: Region;
+let _orderCount: number;
+let _selectedRegion: Region;
 
-        this._orderAvatar = null;
-        this._orderMarker = null;
-        this._editPanel = null;
+class OrderEdit implements IGameState {
+    _parent: OrderState;
+    _handler: GameHandler;
+    _orderAvatar: UnitAvatar;
+    _orderMarker: RegionPathMarker;
+    _editPanel: any;
 
-        // This is set to true when we pass the graphics to the parent state to keep displaying
-        // This is just a convenience thing to avoid re-creating the avatar and path in parent state
-        // when the order is placed, it prevents the this.dispose() method from killing them
-        this._preserveGraphics = false;
+    // This is set to true when we pass the graphics to the parent state to keep displaying
+    // This is just a convenience thing to avoid re-creating the avatar and path in parent state
+    // when the order is placed, it prevents the this.dispose() method from killing them
+    _preserveGraphics = false;
+
+    stateType = GameplayStateType.OrderEdit;
+
+    constructor(parentState: OrderState, handler: GameHandler) {
+        this._parent = parentState;
+        this._handler = handler;
+
+        _orderCount = _orderCount || _origin.avatar.getCounter() - 1;
     }
 
-    _handleButton(type) {
+    dispose: () => void;
+
+    _handleButton(type: string) {
         switch (type) {
             case "delete":
-                this.parentState.popState();
+                this._parent.popState();
                 return;
             case "minus":
-                this.orderCount = Math.max(1, this.orderCount - 1);
+                _orderCount = Math.max(1, _orderCount - 1);
                 break;
             case "plus":
-                this.orderCount = Math.min(
-                    this.parentState.getRegionDisplayCounter(this.origin) - 1,
-                    this.orderCount + 1
-                );
+                _orderCount = Math.min(this._parent.getRegionDisplayCounter(_origin) - 1, _orderCount + 1);
                 break;
             case "max":
-                this.orderCount = this.parentState.getRegionDisplayCounter(this.origin) - 1;
+                _orderCount = this._parent.getRegionDisplayCounter(_origin) - 1;
                 break;
             case "check":
                 this._preserveGraphics = true;
-                this.parentState.registerOrder(
-                    this.origin,
-                    this.target,
+                this._parent.registerOrder(
+                    _origin,
+                    _target,
                     this._orderAvatar.getCounter(),
                     this._orderAvatar,
                     this._orderMarker
                 );
-                this.parentState.resetState("PRE_SELECT");
+                this._parent.resetState(GameplayStateType.PreSelect);
                 return;
         }
-        this._orderAvatar.setCounter(this.orderCount);
-        this.origin.avatar.setCounter(this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount);
+        this._orderAvatar.setCounter(_orderCount);
+        _origin.avatar.setCounter(this._parent.getRegionDisplayCounter(_origin) - _orderCount);
     }
 
     _createEditPanel() {
         // HUD position is dependent on direction of movement
         let hudPos = this._orderAvatar.getPosition();
-        let originCenter = this.origin.visual.getUnitCenter();
-        let targetCenter = this.target.visual.getUnitCenter();
+        let originCenter = _origin.visual.getUnitCenter();
+        let targetCenter = _target.visual.getUnitCenter();
         let diff = V.subtract(originCenter, targetCenter);
         if (Math.abs(diff[0]) > Math.abs(diff[1])) {
             hudPos[0] -= 60;
@@ -89,7 +105,7 @@ class OrderEdit {
                 SUIE.IconType.DELETE,
                 [0, 0],
                 () => this._handleButton("delete"),
-                SUIE.PanelColor.ORANGE,
+                SUIE.PanelColor.Orange,
                 2.0
             )
         );
@@ -98,7 +114,7 @@ class OrderEdit {
                 SUIE.IconType.MINUS,
                 [32, 0],
                 () => this._handleButton("minus"),
-                SUIE.PanelColor.ORANGE,
+                SUIE.PanelColor.Orange,
                 2.0
             )
         );
@@ -107,7 +123,7 @@ class OrderEdit {
                 SUIE.IconType.PLUS,
                 [this._editPanel.getChildAt(0).width * 2, 0],
                 () => this._handleButton("plus"),
-                SUIE.PanelColor.ORANGE,
+                SUIE.PanelColor.Orange,
                 2.0
             )
         );
@@ -116,7 +132,7 @@ class OrderEdit {
                 SUIE.IconType.MAX,
                 [this._editPanel.getChildAt(0).width * 3, 0],
                 () => this._handleButton("max"),
-                SUIE.PanelColor.ORANGE,
+                SUIE.PanelColor.Orange,
                 2.0
             )
         );
@@ -125,45 +141,45 @@ class OrderEdit {
                 SUIE.IconType.CHECK,
                 [this._editPanel.getChildAt(0).width * 4, 0],
                 () => this._handleButton("check"),
-                SUIE.PanelColor.ORANGE,
+                SUIE.PanelColor.Orange,
                 2.0
             )
         );
     }
 
     activate() {
-        this.game.regionVisualLayer.clearAllStyles();
-        this.origin.avatar.setCounter(this.parentState.getRegionDisplayCounter(this.origin) - this.orderCount);
-        this.origin.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
-        this.target.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
+        this._handler.regionVisualLayer.clearAllStyles();
+        _origin.avatar.setCounter(this._parent.getRegionDisplayCounter(_origin) - _orderCount);
+        _origin.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
+        _target.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
 
         // Create marker path between regions
-        let pathColor = this.origin.owner === this.target.owner ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
-        this._orderMarker = new RegionPathMarker(AppContext.stage, this.origin.visual, this.target.visual, pathColor);
+        let pathColor = _origin.owner === _target.owner ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
+        this._orderMarker = new RegionPathMarker(AppContext.stage, _origin.visual, _target.visual, pathColor);
         this._orderMarker.setAlpha(0.75);
 
         // Create avatar to represent 'moving troops'
-        this._orderAvatar = new UnitAvatar(AppContext.stage, graphics.avatar[this.origin.owner.avatarType], 0x99999c);
+        this._orderAvatar = new UnitAvatar(AppContext.stage, graphics.avatar[_origin.owner.avatar], 0x99999c);
         this._orderAvatar.sprite.alpha = 0.75;
         this._orderAvatar.sprite.scale.set(1.2, 1.2);
-        this._orderAvatar.setCounter(this.orderCount);
+        this._orderAvatar.setCounter(_orderCount);
         this._orderAvatar.playWalkAnimation(true);
 
         // Place avatar at halfway point between two regions
-        let originCenter = this.origin.visual.getUnitCenter();
-        let targetCenter = this.target.visual.getUnitCenter();
+        let originCenter = _origin.visual.getUnitCenter();
+        let targetCenter = _target.visual.getUnitCenter();
         let difference = V.subtract(targetCenter, originCenter);
         let direction = V.normalize(difference);
         let newPos = V.add(originCenter, V.multiply(direction, V.norm(difference) / 2));
         this._orderAvatar.setPosition([newPos[0], newPos[1]]);
-        this._orderAvatar.facePoint(this.target.visual.getUnitCenter());
+        this._orderAvatar.facePoint(_target.visual.getUnitCenter());
 
         // Create panel to edit amount of troops moved
         this._createEditPanel();
     }
 
     deactivate() {
-        this.game.regionVisualLayer.clearAllStyles();
+        this._handler.regionVisualLayer.clearAllStyles();
         if (!this._preserveGraphics) {
             if (this._orderAvatar) this._orderAvatar.destroy();
             if (this._orderMarker) this._orderMarker.destroy();
@@ -179,104 +195,110 @@ class OrderEdit {
     }
 }
 
-class TargetSelect {
-    constructor(parentState, gameData, initData) {
-        this.parentState = parentState;
-        this.game = gameData;
-        this.selectedRegion = initData.selectedRegion;
+class TargetSelect implements IGameState {
+    _parent: OrderState;
+    _handler: GameHandler;
+    _pathMarker: RegionPathMarker;
+    _hoveredRegion?: Region;
 
-        this._pathMarker = null;
-        this._hoveredRegion = null;
+    stateType = GameplayStateType.TargetSelect;
 
-        // Constants unique to this state
-        this.FILL_ALPHA = 0.4;
-        this.OUTLINE_ALPHA = 0;
+    readonly FILL_ALPHA = 0.4;
+    readonly OUTLINE_ALPHA = 0;
+
+    constructor(parentState: OrderState, handler: GameHandler) {
+        this._parent = parentState;
+        this._handler = handler;
     }
 
-    _handleRegionClick(regionVisual) {
-        let region = this.game.getRegion(regionVisual.name);
+    dispose: () => void;
 
-        if (region === this.selectedRegion) this.parentState.popState();
-        else if (region.owner === this.selectedRegion.owner) {
-            this.parentState.pushState("ORDER_EDIT", {
-                origin: this.selectedRegion,
-                target: region,
-            });
-        } else if (region.owner !== this.selectedRegion.owner) {
-            this.parentState.pushState("ORDER_EDIT", {
-                origin: this.selectedRegion,
-                target: region,
-            });
+    _handleRegionClick(regionVisual: RegionVisual) {
+        let region = this._handler.getRegion(regionVisual.name);
+
+        if (region === _selectedRegion) this._parent.popState();
+        else {
+            _origin = _selectedRegion;
+            if (region) _target = region;
+            this._parent.pushState(GameplayStateType.OrderEdit);
         }
     }
 
-    _handleRegionEnter(regionVisual) {
-        let region = this.game.getRegion(regionVisual.name);
+    _handleRegionEnter(regionVisual: RegionVisual) {
+        let region = this._handler.getRegion(regionVisual.name);
+        if (!region) throw new Error("Regions are screwed somehow");
 
-        if (!this.game.isRegionBorder(this.selectedRegion, region)) return;
+        if (!this._handler.isRegionBorder(_selectedRegion, region)) return;
 
         this._hoveredRegion = region;
 
         if (this._pathMarker) this._pathMarker.destroy();
 
-        let pathColor = region.owner.name === AppContext.playerName ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
-        this._pathMarker = new RegionPathMarker(AppContext.stage, this.selectedRegion.visual, regionVisual, pathColor);
+        let pathColor = region.owner.username === AppContext.player.username ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
+        this._pathMarker = new RegionPathMarker(AppContext.stage, _selectedRegion.visual, regionVisual, pathColor);
         region.avatar.playWalkAnimation();
         regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
     }
 
-    _handleRegionExit(regionVisual) {
-        this._hoveredRegion = null;
+    _handleRegionExit(regionVisual: RegionVisual) {
+        this._hoveredRegion = undefined;
         if (this._pathMarker) this._pathMarker.destroy();
-        let region = this.game.getRegion(regionVisual.name);
-        if (region !== this.selectedRegion) {
-            region.avatar.stopAnimation();
+        let region = this._handler.getRegion(regionVisual.name);
+        if (region !== _selectedRegion) {
+            region?.avatar.stopAnimation();
             regionVisual.resetStyle();
         }
     }
 
     activate() {
-        this.selectedRegion.visual.setStyle({
+        _selectedRegion.visual.setStyle({
             outlineAlpha: this.OUTLINE_ALPHA,
             fillAlpha: this.FILL_ALPHA,
         });
-        this.selectedRegion.avatar.morph(1.6, 0.04);
-        this.selectedRegion.avatar.playWalkAnimation(true);
+        _selectedRegion.avatar.morph(1.6, 0.04);
+        _selectedRegion.avatar.playWalkAnimation(true);
 
-        this.game.regionVisualLayer.on("mouseEnter", (r) => this._handleRegionEnter(r), this);
-        this.game.regionVisualLayer.on("mouseExit", (r) => this._handleRegionExit(r), this);
-        this.game.regionVisualLayer.on("leftClick", (r) => this._handleRegionClick(r), this);
+        this._handler.regionVisualLayer.on("mouseEnter", (r) => this._handleRegionEnter(r), this);
+        this._handler.regionVisualLayer.on("mouseExit", (r) => this._handleRegionExit(r), this);
+        this._handler.regionVisualLayer.on("leftClick", (r) => this._handleRegionClick(r), this);
     }
 
     deactivate() {
         if (this._pathMarker) this._pathMarker.destroy();
         if (this._hoveredRegion) this._hoveredRegion.avatar.stopAnimation();
-        this.selectedRegion.visual.resetStyle();
-        this.selectedRegion.avatar.stopAnimation();
-        this.selectedRegion.avatar.morph(1.5, 0.04);
-        this.game.regionVisualLayer.unsubscribeAll(this);
+        _selectedRegion.visual.resetStyle();
+        _selectedRegion.avatar.stopAnimation();
+        _selectedRegion.avatar.morph(1.5, 0.04);
+        this._handler.regionVisualLayer.unsubscribeAll(this);
     }
 
     update() {}
 }
 
-class PreSelectState {
-    constructor(parentState, gameData, initData) {
-        this.parentState = parentState;
-        this.game = gameData;
+class PreSelectState implements IGameState {
+    _parent: OrderState;
+    _handler: GameHandler;
+
+    stateType = GameplayStateType.PreSelect;
+
+    constructor(parent: OrderState, handler: GameHandler) {
+        this._parent = parent;
+        this._handler = handler;
     }
 
-    _isRegionValid(region) {
-        return region.owner.name === AppContext.playerName && region.avatar.getCounter() > 1;
+    dispose: () => void;
+
+    _isRegionValid(region: Region) {
+        return region.owner.username === AppContext.player.username && region.avatar.getCounter() > 1;
     }
 
     activate() {
-        this.game.regionVisualLayer.on(
+        this._handler.regionVisualLayer.on(
             "mouseEnter",
             (regionVisual) => {
-                this.game.regionVisualLayer.clearAllStyles();
-                let region = this.game.getRegion(regionVisual.name);
-                if (this._isRegionValid(region)) {
+                this._handler.regionVisualLayer.clearAllStyles();
+                let region = this._handler.getRegion(regionVisual.name);
+                if (region && this._isRegionValid(region)) {
                     region.avatar.playWalkAnimation();
                     regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
                 }
@@ -284,57 +306,64 @@ class PreSelectState {
             this
         );
 
-        this.game.regionVisualLayer.on(
+        this._handler.regionVisualLayer.on(
             "mouseExit",
-            (regionVisual) => {
-                this.game.regionVisualLayer.clearAllStyles();
-                let region = this.game.getRegion(regionVisual.name);
-                if (this._isRegionValid(region)) region.avatar.stopAnimation();
+            (regionVisual: RegionVisual) => {
+                this._handler.regionVisualLayer.clearAllStyles();
+                let region = this._handler.getRegion(regionVisual.name);
+                if (region && this._isRegionValid(region)) region.avatar.stopAnimation();
             },
             this
         );
 
-        this.game.regionVisualLayer.on(
+        this._handler.regionVisualLayer.on(
             "leftClick",
-            (regionVisual) => {
-                let region = this.game.getRegion(regionVisual.name);
-                if (this._isRegionValid(region)) {
+            (regionVisual: RegionVisual) => {
+                let region = this._handler.getRegion(regionVisual.name);
+                if (region && this._isRegionValid(region)) {
                     regionVisual.resetStyle();
-                    this.parentState.pushState("TARGET_SELECT", {
-                        selectedRegion: region,
-                    });
+                    _selectedRegion = region;
+                    this._parent.pushState(GameplayStateType.TargetSelect);
                 }
             },
             this
         );
 
         Keyboard.events.on("released", "orderPreSelectState", (keyCode) => {
-            if (keyCode === "Enter") this.parentState.pushState("CONFIRM");
+            if (keyCode === "Enter") this._parent.pushState(GameplayStateType.OrderConfirm);
         });
     }
 
     deactivate() {
-        this.game.regionVisualLayer.unsubscribeAll(this);
+        this._handler.regionVisualLayer.unsubscribeAll(this);
         Keyboard.events.remove("released", "orderPreSelectState");
     }
 
     update() {}
 }
 
-class ConfirmState {
-    constructor(parentState, gameData) {
-        this.parentState = parentState;
+class ConfirmState implements IGameState {
+    _parent: OrderState;
+    _confirmPanel: Panel;
+
+    stateType = GameplayStateType.OrderConfirm;
+
+    constructor(parentState: OrderState, handler: GameHandler) {
+        this._parent = parentState;
 
         this._confirmPanel = new SUIE.Panel(new PIXI.Rectangle(500, 350, 200, 100));
         this._confirmPanel.addChild(new SUIE.Label("Submit orders?", [10, 30], 10));
         this._confirmPanel.addChild(new SUIE.TextButton("YES", [60, 60], () => this._confirmAction()));
-        this._confirmPanel.addChild(new SUIE.TextButton("NO", [100, 60], () => this.parentState.popState()));
+        this._confirmPanel.addChild(new SUIE.TextButton("NO", [100, 60], () => this._parent.popState()));
 
         AppContext.stage.addChild(this._confirmPanel);
     }
 
+    update: (delta: number) => void;
+    dispose: () => void;
+
     _confirmAction() {
-        this.parentState.finalize();
+        this._parent.finalize();
     }
 
     activate() {
@@ -349,49 +378,50 @@ class ConfirmState {
     }
 }
 
-export default class OrderState extends StateManagerBase {
-    constructor(manager, gameData, initData = null) {
+export default class OrderState extends StateManagerBase implements IGameState {
+    _parent: GameStateManager;
+    _handler: GameHandler;
+    _registeredOrders: { [regionName: string]: IOrder[] };
+    _hud = new PIXI.Container();
+    _regionText: any;
+
+    // Graphical flag to avoid twitching numbers during finalize
+    _finalReset = false;
+
+    stateType = GameplayStateType.ORDER;
+
+    readonly DEFAULT_AVATAR_ALPHA = 0.75;
+    readonly DEFAULT_MARKER_ALPHA = 0.75;
+    readonly HOVER_AVATAR_ALPHA = 1.0;
+    readonly HOVER_MARKER_ALPHA = 1.0;
+
+    constructor(manager: GameStateManager, handler: GameHandler) {
         super();
 
-        // CONSTANTS
-        this.DEFAULT_AVATAR_ALPHA = 0.75;
-        this.DEFAULT_MARKER_ALPHA = 0.75;
-        this.HOVER_AVATAR_ALPHA = 1.0;
-        this.HOVER_MARKER_ALPHA = 1.0;
-
-        this.parentState = manager;
-        this._gameData = gameData;
-        this._initData = initData;
+        this._parent = manager;
+        this._handler = handler;
         this._registeredOrders = {};
 
-        // Graphical flag to avoid twitching numbers during finalize
-        this._finalReset = false;
+        this.resetState(GameplayStateType.PreSelect);
 
-        this.resetState("PRE_SELECT");
-
-        this._hud = new PIXI.Container();
-        this._hud.position.set(1000, 20);
-        this._regionText = new SUIE.Label("placeholder", [0, 0], 10);
+        this._hud.position.set(10, 170);
+        this._regionText = new SUIE.Label("----", [0, 0], 10);
         this._hud.addChild(this._regionText);
-        AppContext.stage.addChild(this._hud);
+
+        manager.hud.addMember(this._hud);
 
         // Subscribe to hover events for HUD update
-        gameData.regionVisualLayer.on(
+        handler.regionVisualLayer.on(
             "mouseEnter",
-            (region) => {
+            (region: Region) => {
                 this._regionText.text = region.name;
             },
             this
         );
     }
 
-    // Sends order and deploy information to server for processing
-    transmitTurn() {
-        // websocket info
-    }
-
     // Calculate the correct display counter for a region, based on army size and registered orders
-    getRegionDisplayCounter(region) {
+    getRegionDisplayCounter(region: Region): number {
         let count = region.size;
         if (region.name in this._registeredOrders) {
             for (let order of this._registeredOrders[region.name]) count -= order.amount;
@@ -444,12 +474,12 @@ export default class OrderState extends StateManagerBase {
         setTimeout(() => {
             for (let key in this._registeredOrders) {
                 for (let order of this._registeredOrders[key])
-                    this._gameData.registerOrder(order.origin, order.target, order.amount);
+                    this._handler.registerCommand(order.origin, order.target, order.amount);
             }
             // This will actually send the data to the server
-            this._gameData.finishTurn();
+            this._handler.finishTurn();
             this._finalReset = true;
-            this.parentState.resetState("DEPLOY");
+            this._parent.resetState(GameplayStateType.VIEW_ONLY);
         }, 500);
     }
 
@@ -458,21 +488,22 @@ export default class OrderState extends StateManagerBase {
 
         // On every state switch, ensure all avatar counters are displaying correctly
         if (!this._finalReset) {
-            for (let region of this._gameData.allRegions)
-                region.avatar.setCounter(this.getRegionDisplayCounter(region));
+            for (let region of this._handler.allRegions) region.avatar.setCounter(this.getRegionDisplayCounter(region));
         }
     }
 
-    _generateState(type, initData = null) {
+    _generateState(type: GameplayStateType): IGameState {
         switch (type) {
-            case "PRE_SELECT":
-                return new PreSelectState(this, this._gameData, initData);
-            case "TARGET_SELECT":
-                return new TargetSelect(this, this._gameData, initData);
-            case "ORDER_EDIT":
-                return new OrderEdit(this, this._gameData, initData);
-            case "CONFIRM":
-                return new ConfirmState(this, this._gameData, initData);
+            case GameplayStateType.PreSelect:
+                return new PreSelectState(this, this._handler);
+            case GameplayStateType.TargetSelect:
+                return new TargetSelect(this, this._handler);
+            case GameplayStateType.OrderEdit:
+                return new OrderEdit(this, this._handler);
+            case GameplayStateType.OrderConfirm:
+                return new ConfirmState(this, this._handler);
+            default:
+                throw new Error("invalid state");
         }
     }
 
@@ -484,11 +515,10 @@ export default class OrderState extends StateManagerBase {
                 for (let order of this._registeredOrders[key]) {
                     if (V.isPointWithinPolygon([Mouse.posLocalX, Mouse.posLocalY], order.hitbox)) {
                         this.unregisterOrder(key, order);
-                        this.pushState("ORDER_EDIT", {
-                            origin: order.origin,
-                            target: order.target,
-                            count: order.avatar.getCounter(),
-                        });
+                        _orderCount = order.avatar.getCounter();
+                        _origin = order.origin;
+                        _target = order.target;
+                        this.pushState(GameplayStateType.OrderEdit);
                     }
                 }
             }
@@ -512,11 +542,11 @@ export default class OrderState extends StateManagerBase {
     }
 
     dispose() {
-        this._gameData.regionVisualLayer.unsubscribeAll(this);
+        this._handler.regionVisualLayer.unsubscribeAll(this);
         this._hud.destroy();
     }
 
-    update(delta) {
+    update(delta: number) {
         for (let key in this._registeredOrders) {
             for (let order of this._registeredOrders[key]) {
                 if (V.isPointWithinPolygon([Mouse.posLocalX, Mouse.posLocalY], order.hitbox)) {

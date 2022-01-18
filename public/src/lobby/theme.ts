@@ -10,5 +10,6 @@ export default {
         dark1: "#444444dd",
         dark2: "#222222dd",
         dark3: "#000000dd",
+        green: "#11ff22",
     },
 };

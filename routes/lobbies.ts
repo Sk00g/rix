@@ -1,4 +1,4 @@
-import { Lobby, LobbyValidator, Player, PlayerValidator } from "./../model/lobby";
+import { Account, Lobby, LobbyValidator, Player, PlayerValidator } from "./../model/lobby";
 import express from "express";
 import { ObjectId } from "mongodb";
 import { PlayerStatus } from "../model/enums";
@@ -21,17 +21,19 @@ function _generateTag() {
 
 router.get("/", async (req, res) => {
     let db = req.app.get("db");
-    let lobbies = await db.collection("lobbies").find().toArray();
+    let lobbies: Lobby[] = await db.collection("lobbies").find().toArray();
+    let accounts: Account[] = await db.collection("accounts").find().toArray();
+    for (let lobby of lobbies)
+        lobby.createdBy = accounts.find((acct) => String(acct._id) === String(lobby.createdById));
     res.json(lobbies);
 });
 
 router.get("/:id", async (req, res) => {
     let db = req.app.get("db");
-    let lobbies = await db
-        .collection("lobbies")
-        .find({ _id: ObjectId(req.params.id) })
-        .toArray();
-    res.json(lobbies[0] || []);
+    let lobby: Lobby = await db.collection("lobbies").findOne({ _id: ObjectId(req.params.id) });
+    let account: Account = await db.collection("accounts").findOne({ _id: ObjectId(lobby.createdById) });
+    lobby.createdBy = account;
+    res.json(lobby);
 });
 
 // Create a new game lobby

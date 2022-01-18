@@ -1,10 +1,10 @@
 import { Direction, Animation, Point } from "./model";
 import * as PIXI from "pixi.js";
-import * as V from "../vector.js";
+import * as V from "../vector";
 import * as utils from "./utils";
-import assetLoader from "../assetLoader.js";
-import Label from "./suie/label.js";
-import graphics from "../game_data/graphics.js";
+import assetLoader from "../assetLoader";
+import Label from "./suie/label";
+import graphics from "../gameData/graphics";
 import { NationColor } from "../../../model/enums";
 
 const WALK_ANIM_INTERVAL = 11.5;
@@ -135,7 +135,7 @@ class UnitAvatar {
         this._counterSprite = new PIXI.Sprite(counterTexture);
         this._counterSprite.tint = nationColor;
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
-        this._counterLabel = new Label(1, [0, 0], 12, "#ffffff");
+        this._counterLabel = new Label("1", [0, 0], 12, "#ffffff");
 
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
@@ -236,15 +236,15 @@ class UnitAvatar {
 
         if (Math.abs(diffX) > Math.abs(diffY)) {
             if (diffX < 0) {
-                this.setDirection("left");
+                this.setDirection(Direction.Left);
             } else if (diffX > 0) {
-                this.setDirection("right");
+                this.setDirection(Direction.Right);
             }
         } else {
             if (diffY < 0) {
-                this.setDirection("up");
+                this.setDirection(Direction.Up);
             } else if (diffY > 0) {
-                this.setDirection("down");
+                this.setDirection(Direction.Down);
             }
         }
     }
@@ -273,8 +273,8 @@ class UnitAvatar {
         }
     }
 
-    setDirection(direction) {
-        if (!["down", "right", "left", "up"].includes(direction)) {
+    setDirection(direction: Direction) {
+        if (![Direction.Down, Direction.Right, Direction.Left, Direction.Up].includes(direction)) {
             throw new Error(`Invalid direction '{direction}'`);
         }
 

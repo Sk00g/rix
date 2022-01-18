@@ -1,7 +1,7 @@
-import { RegionVisual } from "./../regionLayer";
-import * as utils from "../sengine/utils";
-import AppContext from "../appContext.js";
-import graphics from "./graphics.js";
+import { Direction } from "./../sengine/model";
+import { RegionVisual } from "../regionLayer";
+import AppContext from "../appContext";
+import graphics from "./graphics";
 import UnitAvatar from "../sengine/unitAvatar";
 import { Player } from "../../../model/lobby";
 
@@ -25,6 +25,6 @@ export default class Region {
         this.avatar = new UnitAvatar(AppContext.stage, graphics.avatar[this.owner.avatar], this.owner.color);
         this.avatar.setPosition(this.visual.getUnitCenter());
         this.avatar.setCounter(this.size);
-        this.avatar.setDirection("down");
+        this.avatar.setDirection(Direction.Down);
     }
 }

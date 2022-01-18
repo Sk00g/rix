@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import apiService from "../apiService";
-import FatButton from "../components/fatButton.jsx";
-import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
-import LabelSelect from "../components/labelSelect.jsx";
-import LabelNumberInput from "../components/labelNumberInput.jsx";
-import settings from "../../game_data/gameSettings";
+import apiService from "../../apiService";
+import FatButton from "../components/fatButton";
+import IconButton, { ButtonTypes } from "../components/iconButton";
+import LabelSelect from "../components/labelSelect";
+import LabelNumberInput from "../components/labelNumberInput";
+import settings from "../../gameData/gameSettings";
 import theme from "../theme";
 import AccountContext from "../contexts/accountContext";
 import { NationColor, PlayerStatus } from "../../../../model/enums";
 import { Lobby } from "../../../../model/lobby";
+import AppContext from "../../appContext";
 
 /*
 Work still needed for this section:
@@ -67,16 +68,15 @@ const CreatorPage: React.FC = () => {
                 {
                     accountId: activeAccount._id,
                     username: activeAccount.username,
-                    alive: true,
                     status: PlayerStatus.Waiting,
+                    color: NationColor.RED,
                     avatar: "knight",
-                    color: NationColor.BLUE,
+                    alive: true,
                 },
             ],
             gameSettings: settings,
             mapName: selectedMap,
         };
-
         apiService.createLobby(gameData);
 
         history.push("/home");
@@ -102,9 +102,7 @@ const CreatorPage: React.FC = () => {
                     <div style={{ margin: "1em", marginTop: "2.5em" }}>
                         <LabelSelect
                             label="Select Map"
-                            options={mapList.map((map) => {
-                                return { label: map, value: map };
-                            })}
+                            options={mapList}
                             value={selectedMap}
                             onChange={_handleMapSelect}
                         />

@@ -2,16 +2,16 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { Lobby } from "../../../../model/lobby";
-import apiService from "../apiService";
-import FatButton from "../components/fatButton.jsx";
-import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
+import apiService from "../../apiService";
+import FatButton from "../components/fatButton";
+import IconButton, { ButtonTypes } from "../components/iconButton";
 import LabelValue from "../components/labelValue";
-import LobbyFatButton from "../components/lobbyFatButton.jsx";
+import LobbyFatButton from "../components/lobbyFatButton";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
 
 interface HomePageProps {
-    startGame: () => void;
+    startGame: (gameId: string) => void;
 }
 
 const HomePage: React.FC<HomePageProps> = (props) => {
@@ -48,21 +48,41 @@ const HomePage: React.FC<HomePageProps> = (props) => {
                 <DivButton>
                     <FatButton title="Create New Game" onClick={() => history.push("/creator")} />
                     <FatButton title="Join Game" onClick={() => history.push("/gameJoin")} />
-                    <FatButton title="Play Game" onClick={() => props.startGame()} />
+                    <FatButton title="View Games" onClick={() => console.log("coming soon")} />
                 </DivButton>
                 <PTitle>Active Lobbies</PTitle>
                 <DivButton>
                     {activeLobbies.length > 0 &&
-                        activeLobbies.map((lobby) => (
-                            <LobbyFatButton
-                                key={lobby._id}
-                                lobby={lobby}
-                                onClick={() => history.push(`/lobby/${lobby._id}`)}
-                            />
-                        ))}
+                        activeLobbies
+                            .filter(
+                                (lob) => lob.players.filter((p) => p.status === "ACTIVE").length < lob.players.length
+                            )
+                            .map((lobby) => (
+                                <LobbyFatButton
+                                    key={lobby._id}
+                                    lobby={lobby}
+                                    onClick={() => history.push(`/lobby/${lobby._id}`)}
+                                />
+                            ))}
                 </DivButton>
                 <PTitle>Active Games</PTitle>
-                <DivButton></DivButton>
+                <DivButton>
+                    {activeLobbies.length > 0 &&
+                        activeLobbies
+                            .filter(
+                                (lob) => lob.players.filter((p) => p.status === "ACTIVE").length === lob.players.length
+                            )
+                            .map((lobby) => (
+                                <LobbyFatButton
+                                    key={lobby._id}
+                                    lobby={lobby}
+                                    onClick={async () => {
+                                        const gameState = await apiService.getGameStateByLobby(lobby._id);
+                                        props.startGame(gameState._id);
+                                    }}
+                                />
+                            ))}
+                </DivButton>
             </DivActions>
         </DivRoot>
     );

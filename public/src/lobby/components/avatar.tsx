@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import graphics from "../../game_data/graphics";
+import graphics from "../../gameData/graphics";
 import { randomInt } from "../../sengine/utils";
 
 interface AvatarProps {

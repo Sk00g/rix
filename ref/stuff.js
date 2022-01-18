@@ -30,7 +30,7 @@ loader.add(imagePaths).load(() => {
     enemy = new UnitAvatar("graphics/characters/knights_1x.png", new PIXI.Rectangle(156, 2, 26, 36));
     enemy.sprite.position.set(100, 200);
 
-    panel = new SUIE.Panel(new PIXI.Rectangle(500, 50, 100, 100), SUIE.PanelSize.LARGE, SUIE.PanelColor.ORANGE);
+    panel = new SUIE.Panel(new PIXI.Rectangle(500, 50, 100, 100), SUIE.PanelSize.LARGE, SUIE.PanelColor.Orange);
     panel.addMember(new SUIE.Label("Hello scott", [15, 10]));
     panel.addMember(new SUIE.TextButton("log", [20, 20], () => console.warn("booyah!")));
     panel.addMember(new SUIE.TextButton("logi", [20, 40]));

@@ -1,11 +1,11 @@
 import { RegionVisual } from "./../regionLayer";
+import * as PIXI from "pixi.js";
+import * as V from "../vector";
+import graphics from "../gameData/graphics";
+import assetLoader from "../assetLoader";
 /*
 Concerned only with the visual representation of a path between regions
 */
-import * as PIXI from "pixi.js";
-import * as V from "../vector.js";
-import graphics from "../game_data/graphics.js";
-import assetLoader from "../assetLoader.js";
 
 const ARROW_INCREMENT = 28;
 const ARROW_SCALE_X = 0.7;

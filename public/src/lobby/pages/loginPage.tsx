@@ -1,36 +1,35 @@
 import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
-import TextInput from "../components/textInput.jsx";
-import TextButton from "../components/textButton.jsx";
+import TextInput from "../components/textInput";
+import TextButton from "../components/textButton";
 import styled from "styled-components";
 import { toast } from "react-toastify";
 import theme from "../theme";
-import apiService from "../apiService";
-import { Account } from "../../../../model/lobby.js";
+import apiService from "../../apiService";
+import { Account } from "../../../../model/lobby";
 
 export interface LoginPageProps {
     updateAccount: (account: Account) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = (props) => {
-    let [username, setUsername] = useState<string>("");
+    let [username, setUsername] = useState<string>("Sk00g");
     let [redirect, setRedirect] = useState<boolean>(false);
 
-    const _handleClick = () => {
+    const _handleClick = async () => {
         if (!username || username.length < 3) {
             toast.warn("Username must be at least 3 characters long");
             return;
         }
 
-        apiService
-            .getAccountByUsername(username)
-            .then((user) => {
-                props.updateAccount(user);
-                setRedirect(true);
-            })
-            .catch((err) => {
-                console.log("login request failed", err);
-            });
+        const account = await apiService.getAccountByUsername(username);
+        if (!account) {
+            toast.warn("Username not found");
+            return;
+        }
+
+        props.updateAccount(account);
+        setRedirect(true);
     };
 
     return redirect ? (
@@ -39,7 +38,7 @@ const LoginPage: React.FC<LoginPageProps> = (props) => {
         <DivForm>
             <PTitle>WELCOME TO PERILOUS</PTitle>
             <P>USERNAME</P>
-            <TextInput value={username} handleChange={setUsername} handleEnter={_handleClick} />
+            <TextInput value={username} handleChange={(val) => setUsername(val)} handleEnter={_handleClick} />
             <div style={{ margin: "1em" }}></div>
             <TextButton handleClick={_handleClick} text="LOGIN" />
         </DivForm>

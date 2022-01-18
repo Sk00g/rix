@@ -4,14 +4,18 @@ import styled from "styled-components";
 import { Account, Player } from "../../../../model/lobby";
 import { PlayerStatus } from "../../../../model/enums";
 import { Lobby } from "../../../../model/lobby";
-import apiService from "../apiService";
-import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
+import apiService from "../../apiService";
+import IconButton, { ButtonTypes } from "../components/iconButton";
 import PlayerRow from "../components/playerRow";
 import TextButton from "../components/textButton";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
 
-const LobbyPage = () => {
+interface LobbyPageProps {
+    startGame: (gameId: string) => void;
+}
+
+const LobbyPage: React.FC<LobbyPageProps> = (props) => {
     const [lobby, setLobby] = useState<Lobby>();
 
     const account = useContext(AccountContext);
@@ -19,7 +23,20 @@ const LobbyPage = () => {
     const history = useHistory();
 
     useEffect(() => {
-        if (id) apiService.getLobbyData(id).then(setLobby);
+        if (id) {
+            apiService.getLobbyData(id).then(setLobby);
+        }
+
+        var timer = setInterval(async () => {
+            const updatedLobby = await apiService.getLobbyData(id);
+            const gameState = await apiService.getGameStateByLobby(updatedLobby._id);
+            if (!!gameState) {
+                props.startGame(gameState._id);
+                return;
+            }
+            if (updatedLobby) setLobby(() => updatedLobby);
+        }, 5000);
+        return () => clearInterval(timer);
     }, [id]);
 
     const _getThisPlayer = (): Player | undefined => {
@@ -47,13 +64,14 @@ const LobbyPage = () => {
                     <IconButton type={ButtonTypes.reset} onClick={() => console.log("refresh lobby games?")} />
                 </div>
                 {lobby && (
-                    <PTitle>{`[${lobby.players.length} PLAYERS] ${lobby.gameSettings.victoryCondition} on ${lobby.mapName}`}</PTitle>
+                    <PTitle>{`[${lobby.players.length} of ${lobby.gameSettings.maxPlayers} PLAYERS] ${lobby.gameSettings.victoryCondition} on ${lobby.mapName}`}</PTitle>
                 )}
             </DivTitlebar>
 
             <DivMain>
                 <div style={{ margin: "2em" }}>
                     <div>
+                        <PLabel>{lobby?.mapName}</PLabel>
                         {lobby && (
                             <img
                                 width="200px"
@@ -68,19 +86,31 @@ const LobbyPage = () => {
                     {/* Will put chat here in the future */}
                 </div>
 
-                <div style={{ margin: "2em" }}>
-                    {lobby?.players?.map((player) => (
-                        <PlayerRow key={player.accountId} player={player} />
+                <div style={{ margin: "1em", marginLeft: "0" }}>
+                    {[...Array(lobby?.gameSettings.maxPlayers)].map((_, num) => (
+                        <div key={num} style={{ display: "flex", alignItems: "center" }}>
+                            <PlayerRow index={num + 1} player={lobby?.players?.[num]} />
+                            {lobby?.players?.[num]?.accountId === account._id && (
+                                <TextButton
+                                    height="40px"
+                                    text={_getThisPlayer()?.status === PlayerStatus.Active ? "Not Ready" : "Ready"}
+                                    handleClick={_handleToggle}
+                                />
+                            )}
+                        </div>
                     ))}
                 </div>
             </DivMain>
 
             <DivInfo>
-                Info area
-                <TextButton
-                    text={_getThisPlayer()?.status === PlayerStatus.Active ? "Not Ready" : "Ready"}
-                    handleClick={_handleToggle}
-                />
+                <PLabel>Info area</PLabel>
+                {lobby && (
+                    <DivInfoContent>
+                        {Object.keys(lobby.gameSettings).map((key) => (
+                            <PInfo key={key}>{`${key} - ${lobby.gameSettings[key]}`}</PInfo>
+                        ))}
+                    </DivInfoContent>
+                )}
             </DivInfo>
         </DivRoot>
     );
@@ -92,13 +122,32 @@ const DivMain = styled.div`
     grid-column: 1 / 2;
 `;
 
+const PInfo = styled.p`
+    color: ${theme.colors.fontWhite};
+    font-size: ${theme.fontSizeTiny};
+    user-select: none;
+    margin: 1em 0.3em;
+`;
+
+const PLabel = styled.p`
+    color: ${theme.colors.fontWhite};
+    font-size: ${theme.fontSizeLarge};
+    user-select: none;
+    margin: 0.3em 0;
+`;
+
 const DivInfo = styled.div`
     display: flex;
     flex-direction: column;
     grid-row: 1 / 3;
     grid-column: 2 / 3;
     background: ${theme.colors.dark2};
-    width: 200px;
+    width: 340px;
+    padding: 0.5em 0.25em;
+`;
+
+const DivInfoContent = styled.div`
+    margin: 1em 0.25em;
 `;
 
 const DivTitlebar = styled.div`

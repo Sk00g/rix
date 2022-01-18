@@ -12,8 +12,7 @@ const settings = [
         options: "0-100",
         default: "0",
         units: "%",
-        description:
-            "How many regions of the initial deployment will be given to neutral instead of a player",
+        description: "How many regions of the initial deployment will be given to neutral instead of a player",
     },
     {
         key: "initialRegionAmount",
@@ -28,8 +27,8 @@ const settings = [
         default: 20,
         description: "How many armies are given to deploy on the first round",
     },
-    { key: "publicChatEnabled", options: ['true'], default: 'true' },
-    { key: "privateChatEnabled", options: ['false'], default: 'false' },
+    { key: "publicChatEnabled", options: ["true"], default: "true" },
+    { key: "privateChatEnabled", options: ["false"], default: "false" },
     {
         key: "roundLimit",
         options: "0-999",
@@ -48,8 +47,7 @@ const settings = [
         key: "kickedPlayerResolution",
         options: ["neutral1", "neutralStay"],
         default: "neutral1",
-        description:
-            "Controls what happens to a player's armies and region when they are kicked from the game",
+        description: "Controls what happens to a player's armies and region when they are kicked from the game",
     },
     {
         key: "baseReinforcements",
@@ -67,8 +65,7 @@ const settings = [
         key: "connectedRegionReinforceFactor",
         options: "1-99",
         default: "map",
-        description:
-            "One reinforcement is given to players for their connected regions divided by this factor",
+        description: "One reinforcement is given to players for their connected regions divided by this factor",
     },
     {
         key: "connectedRegionReinforceThreshold",
@@ -90,20 +87,18 @@ const settings = [
         description:
             "Controls the reward given for eliminating another player (other than the obvious fame and glory...)",
     },
-    { key: "firstRoundAttackEnabled", options: ['true', 'false'], default: 'false' },
+    { key: "firstRoundAttackEnabled", options: ["true", "false"], default: "false" },
     {
         key: "preventMismatchKills",
-        options: ['true', 'false'],
-        default: 'true',
-        description:
-            "When enabled, prevents an army from killing more than its amount duration multi-invasions",
+        options: ["true", "false"],
+        default: "true",
+        description: "When enabled, prevents an army from killing more than its amount duration multi-invasions",
     },
     {
         key: "deployLimitation",
         options: ["connected2", "none"],
         default: "connected2",
-        description:
-            "Controls what, if any, limitations are placed on deployment amounts per region",
+        description: "Controls what, if any, limitations are placed on deployment amounts per region",
     },
 ];
 

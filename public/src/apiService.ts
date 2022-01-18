@@ -1,14 +1,18 @@
+import { CommandSet } from "./../../model/gameplay";
 import axios from "axios";
-import { GameState, GameStatePing } from "../../../model/gameplay";
-import { Account, Lobby, Player } from "../../../model/lobby";
-import { MapData } from "../../../model/mapData";
+import { GameState, GameStatePing, PlayerDeployment } from "../../model/gameplay";
+import { Account, Lobby, Player } from "../../model/lobby";
 
 type InsertResponse = { insertedId: string };
 type UpdateResponse = { updatedId: string };
 
 export default {
     createLobby: async (data: Lobby): Promise<InsertResponse> => {
-        let response = await axios.post("/api/lobbies", data);
+        let clean: any = { ...data };
+        delete clean._id;
+        delete clean.dateCreated;
+        delete clean.tag;
+        let response = await axios.post("/api/lobbies", clean);
         return response.data;
     },
     getAllLobbyData: async (): Promise<Lobby[]> => (await axios.get("/api/lobbies")).data,
@@ -24,4 +28,8 @@ export default {
     getGameState: async (id: string): Promise<GameState> => (await axios.get(`/api/gameStates/${id}`)).data,
     getGameStatePing: async (id: string): Promise<GameStatePing> =>
         (await axios.get(`/api/gameStates/${id}/ping`)).data,
+    getGameStateByLobby: async (lobbyId: string): Promise<GameStatePing> =>
+        (await axios.get(`/api/gameStates/byLobby/${lobbyId}`)).data,
+    sendCommandSet: async (gameId: string, commands: CommandSet) =>
+        (await axios.put(`/api/gameStates/${gameId}/commands`, commands)).data,
 };

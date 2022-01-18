@@ -12,7 +12,7 @@ const TextInput: React.FC<TextInputProps> = (props) => {
     return (
         <InputStyle
             type={"text"}
-            readOnly={!!props.handleChange}
+            readOnly={!props.handleChange}
             onChange={(e) => props.handleChange(e.target.value)}
             value={props.value ?? ""}
             width={props.width ?? "160px"}

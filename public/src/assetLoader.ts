@@ -1,33 +1,35 @@
 import * as PIXI from "pixi.js";
-import { logService, LogLevel } from "./logService.js";
-import graphics from "./game_data/graphics.js";
+import { logService, LogLevel } from "./logService";
+import graphics from "./gameData/graphics";
 
-function initialize(loader: PIXI.Loader, callback: any): void {
-    let loadCount = 0;
-    let totalAssets = 0;
-    let imagePaths: any[] = [];
+function initialize(loader: PIXI.Loader): Promise<void> {
+    return new Promise((resolve, reject) => {
+        let loadCount = 0;
+        let totalAssets = 0;
+        let imagePaths: any[] = [];
 
-    loader.onProgress.add((loader, resource) => {
-        loadCount++;
-        if (resource.error) {
-            logService(LogLevel.ERROR, `asset loading error: ${resource.error}`, "ASSET");
-        } else {
-            logService(
-                LogLevel.DEBUG,
-                `[${loadCount} of ${totalAssets} (${Math.round(loader.progress)}%)] - LOADED ${resource.url}`,
-                "ASSET"
-            );
+        loader.onProgress.add((loader, resource) => {
+            loadCount++;
+            if (resource.error) {
+                logService(LogLevel.ERROR, `asset loading error: ${resource.error}`, "ASSET");
+            } else {
+                logService(
+                    LogLevel.DEBUG,
+                    `[${loadCount} of ${totalAssets} (${Math.round(loader.progress)}%)] - LOADED ${resource.url}`,
+                    "ASSET"
+                );
+            }
+
+            if (loadCount === totalAssets) logService(LogLevel.INFO, "asset loading complete", "ASSET");
+        });
+
+        for (let category of graphics.categories) {
+            totalAssets += Object.keys(graphics[category]).length;
+            imagePaths.push(...Object.keys(graphics[category]).map((key) => graphics[category][key]));
         }
 
-        if (loadCount === totalAssets) logService(LogLevel.INFO, "asset loading complete", "ASSET");
+        loader.add(imagePaths).load(() => resolve());
     });
-
-    for (let category of graphics.categories) {
-        totalAssets += Object.keys(graphics[category]).length;
-        imagePaths.push(...Object.keys(graphics[category]).map((key) => graphics[category][key]));
-    }
-
-    loader.add(imagePaths).load(callback);
 }
 
 function loadTexture(path: string): PIXI.Texture {

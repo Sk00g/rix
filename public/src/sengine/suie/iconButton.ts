@@ -1,24 +1,29 @@
+import { Point } from "./../model";
 import * as PIXI from "pixi.js";
 import * as core from "./core";
 import Mouse from "pixi.js-mouse";
 
-class IconButton extends PIXI.Container {
-    constructor(iconType, position, action, color = core.PanelColor.BLUE, scale = 1.75) {
+class IconButton extends core.SUIEBase {
+    _isPressed = false;
+    _action: () => void;
+    _icon: PIXI.Sprite;
+    _highlight: PIXI.Graphics;
+
+    constructor(
+        iconType: core.IconType,
+        position: Point,
+        action: () => void,
+        color = core.PanelColor.Blue,
+        scale = 1.75
+    ) {
         super();
 
-        this._uid = core.generateUID();
-        this._iconType = iconType;
-        this._scale = scale;
-        this._color = color;
-        this._isPressed = false;
         this._action = action;
         this.position.set(...position);
 
         this._icon = new PIXI.Sprite(
             new PIXI.Texture(
-                PIXI.BaseTexture.from(
-                    color === core.PanelColor.BLUE ? core.ICON_PATH_BLUE : core.ICON_PATH_BROWN
-                ),
+                PIXI.BaseTexture.from(color === core.PanelColor.Blue ? core.ICON_PATH_BLUE : core.ICON_PATH_BROWN),
                 new PIXI.Rectangle(iconType * 16, 0, 16, 16)
             )
         );
@@ -36,7 +41,7 @@ class IconButton extends PIXI.Container {
         Mouse.events.on("released", this._uid, (code, event) => this._mouseUp(code, event));
     }
 
-    _isPointWithin(x, y) {
+    _isPointWithin(x: number, y: number) {
         let thisX = this.getGlobalPosition().x;
         let thisY = this.getGlobalPosition().y;
         return x < thisX + this.width && x > thisX && y > thisY && y < thisY + this.height;

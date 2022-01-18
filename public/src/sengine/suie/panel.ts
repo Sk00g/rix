@@ -2,8 +2,8 @@ import * as PIXI from "pixi.js";
 import * as core from "./core";
 
 const BORDER_FRAMES = {
-    [core.PanelSize.LARGE]: {
-        [core.PanelColor.BLUE]: {
+    [core.PanelSize.Large]: {
+        [core.PanelColor.Blue]: {
             tl: [384, 96, 16, 16],
             t: [407, 96, 16, 16],
             tr: [432, 96, 16, 16],
@@ -13,7 +13,7 @@ const BORDER_FRAMES = {
             bl: [384, 160, 16, 16],
             l: [384, 121, 16, 16],
         },
-        [core.PanelColor.ORANGE]: {
+        [core.PanelColor.Orange]: {
             tl: [320, 96, 16, 16],
             t: [339, 96, 16, 16],
             tr: [368, 96, 16, 16],
@@ -24,13 +24,13 @@ const BORDER_FRAMES = {
             l: [320, 127, 16, 16],
         },
     },
-    [core.PanelSize.SMALL]: {
-        [core.PanelColor.BLUE]: {
+    [core.PanelSize.Small]: {
+        [core.PanelColor.Blue]: {
             l: [368, 32, 8, 16],
             m: [381, 32, 8, 16],
             r: [392, 32, 8, 16],
         },
-        [core.PanelColor.ORANGE]: {
+        [core.PanelColor.Orange]: {
             l: [240, 32, 8, 16],
             m: [252, 32, 8, 16],
             r: [264, 32, 8, 16],
@@ -38,20 +38,26 @@ const BORDER_FRAMES = {
     },
 };
 const BACKGROUND_COLOR = {
-    [core.PanelColor.BLUE]: 0x417291,
-    [core.PanelColor.ORANGE]: 0xd36b41,
+    [core.PanelColor.Blue]: 0x417291,
+    [core.PanelColor.Orange]: 0xd36b41,
 };
 const RAW_BORDER_WIDTH = {
-    [core.PanelSize.LARGE]: 16,
-    [core.PanelSize.SMALL]: 8,
+    [core.PanelSize.Large]: 16,
+    [core.PanelSize.Small]: 8,
 };
 const RAW_BORDER_HEIGHT = {
-    [core.PanelSize.LARGE]: 16,
-    [core.PanelSize.SMALL]: 8,
+    [core.PanelSize.Large]: 16,
+    [core.PanelSize.Small]: 8,
 };
 
-class Panel extends PIXI.Container {
-    constructor(rect, panelSize = core.PanelSize.LARGE, panelColor = core.PanelColor.BLUE) {
+class Panel extends core.SUIEBase {
+    _size: [number, number];
+    _borderScale = 1.0;
+    _color: core.PanelColor;
+    _panelSize: core.PanelSize;
+    _panelChildren: PIXI.DisplayObject[] = [];
+
+    constructor(rect: PIXI.Rectangle, panelSize = core.PanelSize.Large, panelColor = core.PanelColor.Blue) {
         super();
 
         this.position.set(rect.x, rect.y);
@@ -59,17 +65,21 @@ class Panel extends PIXI.Container {
         this._borderScale = 1.0;
         this._color = panelColor;
         this._panelSize = panelSize;
-        this._panelChildren = [];
 
         this._assemble();
     }
 
-    addMember(child) {
+    addMember(child: PIXI.DisplayObject) {
         this._panelChildren.push(child);
         this._assemble();
     }
 
-    _getBorderSprite(border) {
+    removeMember(child: PIXI.DisplayObject) {
+        this._panelChildren.splice(this._panelChildren.indexOf(child), 1);
+        this._assemble();
+    }
+
+    _getBorderSprite(border: core.Border) {
         let texture = new PIXI.Texture(
             PIXI.BaseTexture.from(core.SOURCE_PATH),
             new PIXI.Rectangle(...BORDER_FRAMES[this._panelSize][this._color][border])
@@ -94,8 +104,8 @@ class Panel extends PIXI.Container {
         this.addChild(bckgr);
 
         // Corner borders
-        let borders = {};
-        for (let border of ["tl", "tr", "br", "bl"]) {
+        let borders: any = {};
+        for (let border of [core.Border.tl, core.Border.tr, core.Border.br, core.Border.bl]) {
             borders[border] = this._getBorderSprite(border);
         }
         borders.tr.x = w - bw;
@@ -106,34 +116,34 @@ class Panel extends PIXI.Container {
         // Horizontal edges
         let curx = bw;
         while (curx < w - bw * 2) {
-            let top = this._getBorderSprite("t");
-            let bot = this._getBorderSprite("b");
+            let top = this._getBorderSprite(core.Border.t);
+            let bot = this._getBorderSprite(core.Border.b);
             top.x = curx;
             bot.position.set(curx, h - bh);
 
             this.addChild(top, bot);
             curx += bw;
         }
-        let topFill = this._getBorderSprite("t");
+        let topFill = this._getBorderSprite(core.Border.t);
         topFill.x = w - bw * 2;
-        let botFill = this._getBorderSprite("b");
+        let botFill = this._getBorderSprite(core.Border.b);
         botFill.position.set(w - bw * 2, h - bh);
         this.addChild(topFill, botFill);
 
         // Vertical edges
         let cury = bh;
         while (cury < h - bh * 2) {
-            let left = this._getBorderSprite("l");
-            let right = this._getBorderSprite("r");
+            let left = this._getBorderSprite(core.Border.l);
+            let right = this._getBorderSprite(core.Border.r);
             left.y = cury;
             right.position.set(w - bw, cury);
 
             this.addChild(left, right);
             cury += bh;
         }
-        let leftFill = this._getBorderSprite("l");
+        let leftFill = this._getBorderSprite(core.Border.l);
         leftFill.y = h - bh * 2;
-        let rightFill = this._getBorderSprite("r");
+        let rightFill = this._getBorderSprite(core.Border.r);
         rightFill.position.set(w - bw, h - bh * 2);
         this.addChild(leftFill, rightFill);
 

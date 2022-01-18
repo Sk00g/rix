@@ -1,28 +1,38 @@
-import { logService, LogLevel } from "../logService.js";
-import { GameplayState, GameplayStateType } from "./gameplayState";
+import { GameState } from "../../../model/gameplay";
+import GameHandler from "../gameData/gameHandler";
+import { logService, LogLevel } from "../logService";
+import { GameplayStateType } from "./model";
+
+export interface IGameState {
+    update: (delta: number) => void;
+    deactivate: () => void;
+    activate: () => void;
+    dispose: () => void;
+    stateType: GameplayStateType;
+}
 
 export default class StateManagerBase {
-    _stateStack: GameplayState[];
+    _stateStack: IGameState[];
 
     constructor() {
         this._stateStack = [];
     }
 
     // Must override as this base class is unaware of specific states
-    _generateState(type: string, initData: any = null): GameplayState {
+    _generateState(type: GameplayStateType): IGameState {
         throw new Error("Must override this function in the child class!");
     }
 
     // Gets the currently activate state (on top of stack)
-    getActiveState(): GameplayState {
+    getActiveState(): IGameState {
         return this._stateStack[this._stateStack.length - 1];
     }
 
     // Remove all states from the stack and reset to only the given state
-    resetState(stateType: GameplayStateType, initData: any = null) {
+    resetState(stateType: GameplayStateType) {
         while (this.getActiveState()) this.popState();
 
-        this.pushState(stateType, initData);
+        this.pushState(stateType);
     }
 
     // Pop off the top state from current stack
@@ -40,11 +50,11 @@ export default class StateManagerBase {
     }
 
     // Push a new state on top of the current stack
-    pushState(stateType, initData: any = null) {
+    pushState(stateType: GameplayStateType) {
         let currentState = this.getActiveState();
         if (currentState && currentState.deactivate) currentState.deactivate();
 
-        let newState = this._generateState(stateType, initData);
+        let newState = this._generateState(stateType);
         newState.stateType = stateType;
         if (newState.activate) newState.activate();
         logService(LogLevel.DEBUG, `adding new state ${stateType} to stack`, "STATE");

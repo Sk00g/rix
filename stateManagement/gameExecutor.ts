@@ -52,9 +52,9 @@ export async function executeNextTurn(db: any, game: GameState) {
     game.turnHistory.push(newRound);
 
     // Clear all pendingCommandSets and write to db
-    // await db
-    //     .collection("gameStates")
-    //     .updateOne({ _id: game._id }, { $set: { pendingCommandSets: {}, turnHistory: game.turnHistory } });
+    await db
+        .collection("gameStates")
+        .updateOne({ _id: game._id }, { $set: { pendingCommandSets: {}, turnHistory: game.turnHistory } });
 }
 
 function _rollToResolve(

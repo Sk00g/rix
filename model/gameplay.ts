@@ -39,6 +39,7 @@ export const GenerateCommandSetValidator = (game: GameState) =>
     });
 
 export interface GameStatePing {
+    _id: string;
     currentRound: number;
     submissions: [{ [player: string]: string }];
 }

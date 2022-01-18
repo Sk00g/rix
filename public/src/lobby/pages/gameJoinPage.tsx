@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import TextButton from "../components/textButton.jsx";
-import apiService from "../apiService";
-import IconButton, { ButtonTypes } from "../components/iconButton.jsx";
-import LabelValue from "../components/labelValue.jsx";
-import LobbyFatButton from "../components/lobbyFatButton.jsx";
-import TextInput from "../components/textInput.jsx";
+import TextButton from "../components/textButton";
+import apiService from "../../apiService";
+import IconButton, { ButtonTypes } from "../components/iconButton";
+import LabelValue from "../components/labelValue";
+import LobbyFatButton from "../components/lobbyFatButton";
+import TextInput from "../components/textInput";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
-import { Lobby, Player } from "../../../../model/lobby.js";
-import { NationColor, PlayerStatus } from "../../../../model/enums.js";
+import { Lobby, Player } from "../../../../model/lobby";
+import { NationColor, PlayerStatus } from "../../../../model/enums";
 
 const GameJoinPage: React.FC = () => {
     let [selectedLobby, setSelectedLobby] = useState<Lobby>();

@@ -4,7 +4,7 @@ import theme from "../theme";
 
 interface LabelSelectProps {
     label: string;
-    options: Array<{ value: string; label: string }>;
+    options: string[];
     onChange: (newValue: string) => void;
     value: string;
 }
@@ -14,11 +14,11 @@ const LabelSelect: React.FC<LabelSelectProps> = (props) => {
         <DivParent>
             <P>{props.label}</P>
             <Select
-                value={props.value || ""}
+                value={props.value ?? ""}
                 disabled={!props.onChange}
                 onChange={(e) => props.onChange(e.target.value)}
             >
-                {props.options && props.options.map((option) => <option key={option.value}>{option.label}</option>)}
+                {props.options && props.options.map((option, index) => <option key={index}>{option}</option>)}
             </Select>
         </DivParent>
     );

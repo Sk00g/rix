@@ -13,7 +13,7 @@ export default async function initializeGame(db: any, lobby: Lobby): Promise<str
 
     // Determine from game settings initial deployment size and players
     var initialRegions = {};
-    if (settings.initialDeploymentType === "RANDOM") {
+    if (settings.initialDeploymentType === "Random") {
         // Create pool of ownerships evenly distributed across players
         let count = 0;
         let ownerships: string[] = [];

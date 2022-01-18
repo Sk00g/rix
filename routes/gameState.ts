@@ -30,6 +30,28 @@ router.get("/:id/ping", async (req, res) => {
     res.json(values);
 });
 
+// Get simple game state by lobby id to see when the game has started
+router.get("/byLobby/:lobbyId", async (req, res) => {
+    let db = req.app.get("db");
+    let gameState: GameState = await db.collection("gameStates").findOne({ lobbyId: ObjectId(req.params.lobbyId) });
+
+    if (!gameState) {
+        res.json(null);
+        return;
+    }
+
+    let values = {
+        _id: gameState._id,
+        currentRound: gameState.turnHistory.length + 1,
+        submissions: gameState.players.map((player) => {
+            const sentTime = gameState.pendingCommandSets?.[player.username]?.submittedAt;
+            return { [player.username]: sentTime ?? null };
+        }),
+    };
+
+    res.json(values);
+});
+
 // PUT turn deployments and commands
 router.put("/:id/commands", async (req, res) => {
     let db = req.app.get("db");

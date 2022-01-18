@@ -1,7 +1,8 @@
-import Region from "./../public/src/game_data/region";
+import Region from "../public/src/gameData/region";
 import { ObjectId } from "mongodb";
 import { PlayerStatus, NationColor } from "./enums";
 import joi from "joi";
+import { GameState } from "./gameplay";
 
 export interface Player {
     accountId: ObjectId;
@@ -45,6 +46,7 @@ export interface Account {
     username: string;
     gameHistory: GameOutcome[];
     lobbies: Lobby[];
+    games: GameState[];
     elo: number;
     lastLogin: Date;
 }

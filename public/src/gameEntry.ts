@@ -1,3 +1,4 @@
+import { Account } from "./../../model/lobby";
 import * as PIXI from "pixi.js";
 import assetLoader from "./assetLoader";
 import Keyboard from "pixi.js-keyboard";
@@ -5,13 +6,9 @@ import Mouse from "pixi.js-mouse";
 import GameStateManager from "./gameStates/gameStateManager";
 import { logService, LogLevel } from "./logService";
 import AppContext from "./appContext";
+import apiService from "./apiService";
 
-// In the future, map data and game state data should be pulled from the server, for testing
-// we will use hard-coded JSON test data instead
-import protomap from "../dist/maps/Protomap/Protomap.json";
-import apiService from "./lobby/apiService";
-
-export default async function enterGame() {
+export default async function enterGame(gameStateId: string, account: Account) {
     // Universally get rid of default right-click behaviour
     document.addEventListener("contextmenu", (event) => event.preventDefault());
 
@@ -25,31 +22,31 @@ export default async function enterGame() {
     document.getElementById("main")?.appendChild(app.view);
 
     // Load all assets from game_data/* files
-    assetLoader.initialize(loader, main);
+    await assetLoader.initialize(loader);
 
     // Download current game state from server
-    const testGameState = await apiService.getGameState("61de5286e8dc75644013466f");
+    const testGameState = await apiService.getGameState(gameStateId);
+    const lobby = await apiService.getLobbyData(testGameState.lobbyId);
+    const mapData = await import(`../dist/maps/${testGameState.mapName}/${testGameState.mapName}.json`);
 
     // Provide app-wide context accessible from anywhere else, be careful...
-    AppContext.playerName = "JKase";
     AppContext.stage = app.stage;
+    const player = lobby.players.find((p) => p.accountId === account._id);
+    if (!player) throw new Error("Authentication issue...");
+    AppContext.player = player;
 
-    function main() {
-        logService(LogLevel.INFO, "initializing application");
+    logService(LogLevel.INFO, "initializing application");
 
-        // For production, this will be another level above for managing overall game state
-        // For testing we will jump straight into gameplay with fake data imported above
-        logService(LogLevel.WARNING, "running in DEV mode");
-        let stateMaster = new GameStateManager(protomap, testGameState);
+    logService(LogLevel.WARNING, "running in DEV mode");
+    let stateMaster = new GameStateManager(mapData, testGameState, lobby);
 
-        // ----- DEBUG CODE -----
-        // ----------------------
+    // ----- DEBUG CODE -----
+    // ----------------------
 
-        app.ticker.add((delta) => {
-            Keyboard.update();
-            Mouse.update();
+    app.ticker.add((delta) => {
+        Keyboard.update();
+        Mouse.update();
 
-            stateMaster.update(delta);
-        });
-    }
+        stateMaster.update(delta);
+    });
 }

@@ -3,7 +3,7 @@ import * as V from "./vector";
 import { MapData } from "./../../model/mapData";
 import { Point } from "./sengine/model";
 import Mouse from "pixi.js-mouse";
-import graphics from "./game_data/graphics";
+import graphics from "./gameData/graphics";
 import assetLoader from "./assetLoader";
 
 const DEFAULT_REGION_COLOR = 0xffffff;

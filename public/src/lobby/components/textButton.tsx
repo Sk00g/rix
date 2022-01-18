@@ -6,12 +6,18 @@ interface TextButtonProps {
     text: string;
     disabled?: boolean;
     width?: string;
+    height?: string;
 }
 
-const TextButton: React.FC<TextButtonProps> = ({ text, disabled, handleClick, width }) => {
+const TextButton: React.FC<TextButtonProps> = (props) => {
     return (
-        <Button disabled={disabled} onClick={handleClick} width={width ?? "120px"}>
-            {text}
+        <Button
+            disabled={props.disabled}
+            onClick={props.handleClick}
+            width={props.width ?? "120px"}
+            height={props.height}
+        >
+            {props.text}
         </Button>
     );
 };
@@ -22,7 +28,8 @@ const Button = styled.button<any>`
     font-size: 10px;
     font-family: "emulogic";
     color: #ffe4c0;
-    width: ${(props) => props.width || "130px"};
+    height: ${(props) => props.height ?? ""};
+    width: ${(props) => props.width ?? "130px"};
     padding: 1em;
     background: #333;
     border: 1px solid #00000000;
