@@ -11,9 +11,7 @@ import TextButton from "../components/textButton";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
 
-interface LobbyPageProps {
-    startGame: (gameId: string) => void;
-}
+interface LobbyPageProps {}
 
 const LobbyPage: React.FC<LobbyPageProps> = (props) => {
     const [lobby, setLobby] = useState<Lobby>();
@@ -31,7 +29,7 @@ const LobbyPage: React.FC<LobbyPageProps> = (props) => {
             const updatedLobby = await apiService.getLobbyData(id);
             const gameState = await apiService.getGameStateByLobby(updatedLobby._id);
             if (!!gameState) {
-                props.startGame(gameState._id);
+                history.push(`/game/${gameState._id}`);
                 return;
             }
             if (updatedLobby) setLobby(() => updatedLobby);
@@ -60,7 +58,7 @@ const LobbyPage: React.FC<LobbyPageProps> = (props) => {
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/home")} />
+                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/manage/home")} />
                     <IconButton type={ButtonTypes.reset} onClick={() => console.log("refresh lobby games?")} />
                 </div>
                 {lobby && (

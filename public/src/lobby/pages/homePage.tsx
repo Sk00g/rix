@@ -10,9 +10,7 @@ import LobbyFatButton from "../components/lobbyFatButton";
 import AccountContext from "../contexts/accountContext";
 import theme from "../theme";
 
-interface HomePageProps {
-    startGame: (gameId: string) => void;
-}
+interface HomePageProps {}
 
 const HomePage: React.FC<HomePageProps> = (props) => {
     let [activeLobbies, setActiveLobbies] = useState<Lobby[]>([]);
@@ -46,8 +44,8 @@ const HomePage: React.FC<HomePageProps> = (props) => {
             </DivPlayerStats>
             <DivActions>
                 <DivButton>
-                    <FatButton title="Create New Game" onClick={() => history.push("/creator")} />
-                    <FatButton title="Join Game" onClick={() => history.push("/gameJoin")} />
+                    <FatButton title="Create New Game" onClick={() => history.push("/manage/creator")} />
+                    <FatButton title="Join Game" onClick={() => history.push("/manage/gameJoin")} />
                     <FatButton title="View Games" onClick={() => console.log("coming soon")} />
                 </DivButton>
                 <PTitle>Active Lobbies</PTitle>
@@ -61,7 +59,7 @@ const HomePage: React.FC<HomePageProps> = (props) => {
                                 <LobbyFatButton
                                     key={lobby._id}
                                     lobby={lobby}
-                                    onClick={() => history.push(`/lobby/${lobby._id}`)}
+                                    onClick={() => history.push(`/manage/lobby/${lobby._id}`)}
                                 />
                             ))}
                 </DivButton>
@@ -78,7 +76,7 @@ const HomePage: React.FC<HomePageProps> = (props) => {
                                     lobby={lobby}
                                     onClick={async () => {
                                         const gameState = await apiService.getGameStateByLobby(lobby._id);
-                                        props.startGame(gameState._id);
+                                        history.push(`/game/${gameState._id}`);
                                     }}
                                 />
                             ))}

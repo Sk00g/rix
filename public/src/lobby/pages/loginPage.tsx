@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Redirect } from "react-router-dom";
+import { useHistory } from "react-router";
 import TextInput from "../components/textInput";
 import TextButton from "../components/textButton";
 import styled from "styled-components";
@@ -13,8 +13,9 @@ export interface LoginPageProps {
 }
 
 const LoginPage: React.FC<LoginPageProps> = (props) => {
-    let [username, setUsername] = useState<string>("Sk00g");
-    let [redirect, setRedirect] = useState<boolean>(false);
+    let [username, setUsername] = useState<string>("");
+
+    const history = useHistory();
 
     const _handleClick = async () => {
         if (!username || username.length < 3) {
@@ -29,19 +30,19 @@ const LoginPage: React.FC<LoginPageProps> = (props) => {
         }
 
         props.updateAccount(account);
-        setRedirect(true);
+        history.push(`/manage/home`);
     };
 
-    return redirect ? (
-        <Redirect to="/home" />
-    ) : (
-        <DivForm>
-            <PTitle>WELCOME TO PERILOUS</PTitle>
-            <P>USERNAME</P>
-            <TextInput value={username} handleChange={(val) => setUsername(val)} handleEnter={_handleClick} />
-            <div style={{ margin: "1em" }}></div>
-            <TextButton handleClick={_handleClick} text="LOGIN" />
-        </DivForm>
+    return (
+        <DivRoot>
+            <DivForm>
+                <PTitle>WELCOME TO PERILOUS</PTitle>
+                <P>USERNAME</P>
+                <TextInput value={username} handleChange={(val) => setUsername(val)} handleEnter={_handleClick} />
+                <div style={{ margin: "1em" }}></div>
+                <TextButton handleClick={_handleClick} text="LOGIN" />
+            </DivForm>
+        </DivRoot>
     );
 };
 
@@ -70,6 +71,16 @@ const DivForm = styled.div`
     box-shadow: 0px 0px 10px #00000044;
     height: 320px;
     padding-bottom: 6em;
+`;
+
+const DivRoot = styled.div`
+    height: 100%;
+    background-image: url("./graphics/ui/lobby-background1.jpg");
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 `;
 
 export default LoginPage;

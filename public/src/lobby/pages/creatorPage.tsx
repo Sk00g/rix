@@ -79,7 +79,7 @@ const CreatorPage: React.FC = () => {
         };
         apiService.createLobby(gameData);
 
-        history.push("/home");
+        history.push("/manage/home");
     };
 
     const _updateSettingValue = (key, value) => {
@@ -92,7 +92,7 @@ const CreatorPage: React.FC = () => {
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/home")} />
+                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/manage/home")} />
                     <IconButton type={ButtonTypes.reset} onClick={() => _resetSettings(mapList[0])} />
                 </div>
                 <PTitle>{`Create New Game`}</PTitle>

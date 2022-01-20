@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import TextButton from "../components/textButton";
 import apiService from "../../apiService";
@@ -17,8 +17,8 @@ const GameJoinPage: React.FC = () => {
     let [lobbies, setLobbies] = useState<Lobby[]>([]);
     let [allLobbies, setAllLobbies] = useState<Lobby[]>([]);
     let [searchText, setSearchText] = useState<string>("");
-    let history = useHistory();
 
+    let history = useHistory();
     let activeAccount = useContext(AccountContext);
 
     useEffect(() => {
@@ -54,7 +54,7 @@ const GameJoinPage: React.FC = () => {
         apiService
             .updateLobby(selectedLobby._id, newPlayer)
             .then((rsp) => {
-                history.push(`/lobby/${selectedLobby?._id}`);
+                history.push(`/manage/lobby/${selectedLobby?._id}`);
             })
             .catch((err) => console.log("failed adding account to lobby", err));
     };
@@ -63,7 +63,7 @@ const GameJoinPage: React.FC = () => {
         <DivRoot>
             <DivTitlebar>
                 <div style={{ position: "absolute", left: 0, top: 0, display: "flex" }}>
-                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/home")} />
+                    <IconButton type={ButtonTypes.arrowLeft} onClick={() => history.push("/manage/home")} />
                     <IconButton type={ButtonTypes.reset} onClick={() => console.log("refresh connected lobbies?")} />
                 </div>
                 <PTitle>{`JOIN A NEW GAME`}</PTitle>

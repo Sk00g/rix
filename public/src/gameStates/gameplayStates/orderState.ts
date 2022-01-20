@@ -37,7 +37,7 @@ class OrderEdit implements IGameState {
 
     // This is set to true when we pass the graphics to the parent state to keep displaying
     // This is just a convenience thing to avoid re-creating the avatar and path in parent state
-    // when the order is placed, it prevents the this.dispose() method from killing them
+    // when the order is placed, it prevents the this.deactivate() method from killing them
     _preserveGraphics = false;
 
     stateType = GameplayStateType.OrderEdit;
@@ -46,7 +46,7 @@ class OrderEdit implements IGameState {
         this._parent = parentState;
         this._handler = handler;
 
-        _orderCount = _orderCount || _origin.avatar.getCounter() - 1;
+        _orderCount = _origin.avatar.getCounter() - 1;
     }
 
     dispose: () => void;
@@ -190,7 +190,7 @@ class OrderEdit implements IGameState {
         this._editPanel.destroy();
     }
 
-    update(delta) {
+    update(delta: number) {
         if (this._orderAvatar) this._orderAvatar.update(delta);
     }
 }

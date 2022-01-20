@@ -40,9 +40,6 @@ export default async function enterGame(gameStateId: string, account: Account) {
     logService(LogLevel.WARNING, "running in DEV mode");
     let stateMaster = new GameStateManager(mapData, testGameState, lobby);
 
-    // ----- DEBUG CODE -----
-    // ----------------------
-
     app.ticker.add((delta) => {
         Keyboard.update();
         Mouse.update();

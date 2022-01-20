@@ -38,7 +38,6 @@ export default class GameHandler {
 
     constructor(mapData: MapData, gameState: GameState, regionVisuals: RegionLayer) {
         this._originalState = { ...gameState };
-        console.log(gameState);
         this.currentState = gameState;
         this.regionVisualLayer = regionVisuals;
         this.mapData = mapData;
@@ -187,6 +186,14 @@ export default class GameHandler {
     getPlayerDensity(player: Player): number {
         const regions = this.allRegions.filter((reg) => reg.owner.accountId === player.accountId);
         return this.getPlayerArmySize(player) / regions.length;
+    }
+
+    getPlayerPendingCommands(player: Player): CommandSet {
+        return {
+            username: player.username,
+            commands: this.currentState.pendingCommandSets[player.username].commands,
+            deployments: this.currentState.pendingCommandSets[player.username].deployments,
+        };
     }
 
     getReinforcementCount(player: Player) {

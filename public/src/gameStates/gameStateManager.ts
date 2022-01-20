@@ -41,9 +41,7 @@ build the initial graphics and reactions upon entering a new state
 const LOG_TAG = "GAMEPLAY";
 
 /*
-- on initial game state load, go to deploy state if current user has not submitted, if we have, then go to view state
 - view state should show commands for that turn that are 'waiting'
-- make logins keep the original logger inererer
 - continent bonuses are not working
 
 while in view state, listen for event from handler that says that new round has been executed
@@ -80,16 +78,16 @@ export default class GameStateManager extends StateManagerBase {
         this._lobby = lobby;
         this._handler = new GameHandler(mapData, gameState, this._regionVisuals);
 
-        logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
-        // Initial state of GAMEPLAY will normally be view only
-        // this.resetState(GameplayStateType.VIEW_ONLY, this._handler);
-
         // Setup HUD that exists across all states
         this._setupHud();
 
-        // For testing will go straight to other phase
-        this.resetState(GameplayStateType.DEPLOY);
-        // this.resetState(GameplayStateType.ORDER, this._handler);
+        if (AppContext.player.username in gameState.pendingCommandSets) {
+            logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
+            this.resetState(GameplayStateType.VIEW_ONLY);
+        } else {
+            logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
+            this.resetState(GameplayStateType.DEPLOY);
+        }
 
         // Setup HUD to respond to events
         this._handler.on(GameStateEvent.PlayerCompletedTurn, (player: string) => {
