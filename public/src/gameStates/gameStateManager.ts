@@ -40,10 +40,11 @@ const LOG_TAG = "GAMEPLAY";
 /*
 - design basic conductor stuff
 - add min button or slider
+- bug where view state is not showing the correct values for command origin territories on load
+- bug still exists where if you take over a territory before it's command completes, it's command will think 
+        it's from the attacking player, instead of the actual original
 
 CLEANUP:
-- game state and regions and such from game handler should be private, state can only be accessed / mutated via
-public methods, not directly
 - event handlers for game handler should have the off method, will need unique key and such
 - game events are a bit sloppy... maybe it should just trigger whenever major areas of state change instead of trying
 to be specific, like react hooks for redux instead of typed events

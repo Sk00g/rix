@@ -232,7 +232,7 @@ function _applyCommands(
 
         // Store the rolls and apply the remainder to the map state
         if (!existingRolls) rolls.push(...newRolls);
-        mapState[region].owner = mapState[remainder.origin].owner;
+        mapState[region].owner = originalState[remainder.origin].owner;
         mapState[region].size = remainder.amount;
     }
 
