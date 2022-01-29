@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import gameEntry from "../gameEntry";
 import { HashRouter as Router, Switch, Route, Redirect, useLocation } from "react-router-dom";
 import LoginPage from "./pages/loginPage";
 import HomePage from "./pages/homePage";
@@ -13,12 +12,12 @@ import { Account } from "../../../model/lobby";
 import GamePage from "./gamePage";
 
 const App = () => {
-    const cachedAccount = localStorage.getItem("account");
+    const cachedAccount = sessionStorage.getItem("account");
     const [activeAccount, setActiveAccount] = useState<Account>(cachedAccount ? JSON.parse(cachedAccount) : undefined);
 
     const _updateAccount = (account: Account) => {
         setActiveAccount(account);
-        localStorage.setItem("account", JSON.stringify(account));
+        sessionStorage.setItem("account", JSON.stringify(account));
     };
 
     return (

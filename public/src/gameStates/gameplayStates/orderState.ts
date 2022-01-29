@@ -1,4 +1,4 @@
-import { RegionVisual } from "./../../regionLayer";
+import { RegionVisual, RegionVisualEvent } from "../../gameVisuals/regionLayer";
 import { IGameState } from "./../stateManagerBase";
 import * as PIXI from "pixi.js";
 import * as V from "../../vector";
@@ -11,7 +11,7 @@ import StateManagerBase from "../stateManagerBase";
 import UnitAvatar from "../../sengine/unitAvatar";
 import graphics from "../../gameData/graphics";
 import { GameplayStateType, IOrder } from "../model";
-import GameHandler from "../../gameData/gameHandler";
+import GameHandler from "../../gameData/gameDataHandler";
 import Region from "../../gameData/region";
 import Panel from "../../sengine/suie/panel";
 import GameStateManager from "../gameStateManager";
@@ -46,39 +46,35 @@ class OrderEdit implements IGameState {
         this._parent = parentState;
         this._handler = handler;
 
-        _orderCount = _origin.avatar.getCounter() - 1;
+        _orderCount = 1;
     }
 
     dispose: () => void;
 
     _handleButton(type: string) {
+        const originTempSize = this._parent.getRegionTempAmount(_origin);
         switch (type) {
             case "delete":
                 this._parent.popState();
+                _origin.avatar.setCounter(originTempSize);
                 return;
             case "minus":
                 _orderCount = Math.max(1, _orderCount - 1);
                 break;
             case "plus":
-                _orderCount = Math.min(this._parent.getRegionDisplayCounter(_origin) - 1, _orderCount + 1);
+                _orderCount = Math.min(originTempSize - 1, _orderCount + 1);
                 break;
             case "max":
-                _orderCount = this._parent.getRegionDisplayCounter(_origin) - 1;
+                _orderCount = originTempSize - 1;
                 break;
             case "check":
                 this._preserveGraphics = true;
-                this._parent.registerOrder(
-                    _origin,
-                    _target,
-                    this._orderAvatar.getCounter(),
-                    this._orderAvatar,
-                    this._orderMarker
-                );
+                this._parent.registerOrder(_origin, _target, _orderCount, this._orderAvatar, this._orderMarker);
                 this._parent.resetState(GameplayStateType.PreSelect);
                 return;
         }
         this._orderAvatar.setCounter(_orderCount);
-        _origin.avatar.setCounter(this._parent.getRegionDisplayCounter(_origin) - _orderCount);
+        _origin.avatar.setCounter(originTempSize - _orderCount);
     }
 
     _createEditPanel() {
@@ -148,8 +144,8 @@ class OrderEdit implements IGameState {
     }
 
     activate() {
-        this._handler.regionVisualLayer.clearAllStyles();
-        _origin.avatar.setCounter(this._parent.getRegionDisplayCounter(_origin) - _orderCount);
+        this._handler.clearVisualStyles();
+        _origin.avatar.setCounter(this._parent.getRegionTempAmount(_origin) - _orderCount);
         _origin.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
         _target.visual.setStyle({ fillColor: HOVER_FILL, fillAlpha: 0.2 });
 
@@ -179,7 +175,7 @@ class OrderEdit implements IGameState {
     }
 
     deactivate() {
-        this._handler.regionVisualLayer.clearAllStyles();
+        this._handler.clearVisualStyles();
         if (!this._preserveGraphics) {
             if (this._orderAvatar) this._orderAvatar.destroy();
             if (this._orderMarker) this._orderMarker.destroy();
@@ -258,9 +254,9 @@ class TargetSelect implements IGameState {
         _selectedRegion.avatar.morph(1.6, 0.04);
         _selectedRegion.avatar.playWalkAnimation(true);
 
-        this._handler.regionVisualLayer.on("mouseEnter", (r) => this._handleRegionEnter(r), this);
-        this._handler.regionVisualLayer.on("mouseExit", (r) => this._handleRegionExit(r), this);
-        this._handler.regionVisualLayer.on("leftClick", (r) => this._handleRegionClick(r), this);
+        this._handler.onVisual(RegionVisualEvent.MouseEnter, (r) => this._handleRegionEnter(r), this);
+        this._handler.onVisual(RegionVisualEvent.MouseExit, (r) => this._handleRegionExit(r), this);
+        this._handler.onVisual(RegionVisualEvent.LeftClick, (r) => this._handleRegionClick(r), this);
     }
 
     deactivate() {
@@ -269,7 +265,7 @@ class TargetSelect implements IGameState {
         _selectedRegion.visual.resetStyle();
         _selectedRegion.avatar.stopAnimation();
         _selectedRegion.avatar.morph(1.5, 0.04);
-        this._handler.regionVisualLayer.unsubscribeAll(this);
+        this._handler.unsubscribeAllVisual(this);
     }
 
     update() {}
@@ -289,14 +285,14 @@ class PreSelectState implements IGameState {
     dispose: () => void;
 
     _isRegionValid(region: Region) {
-        return region.owner.username === AppContext.player.username && region.avatar.getCounter() > 1;
+        return region.owner.username === AppContext.player.username && this._parent.getRegionTempAmount(region) > 1;
     }
 
     activate() {
-        this._handler.regionVisualLayer.on(
-            "mouseEnter",
+        this._handler.onVisual(
+            RegionVisualEvent.MouseEnter,
             (regionVisual) => {
-                this._handler.regionVisualLayer.clearAllStyles();
+                this._handler.clearVisualStyles();
                 let region = this._handler.getRegion(regionVisual.name);
                 if (region && this._isRegionValid(region)) {
                     region.avatar.playWalkAnimation();
@@ -306,18 +302,18 @@ class PreSelectState implements IGameState {
             this
         );
 
-        this._handler.regionVisualLayer.on(
-            "mouseExit",
+        this._handler.onVisual(
+            RegionVisualEvent.MouseExit,
             (regionVisual: RegionVisual) => {
-                this._handler.regionVisualLayer.clearAllStyles();
+                this._handler.clearVisualStyles();
                 let region = this._handler.getRegion(regionVisual.name);
                 if (region && this._isRegionValid(region)) region.avatar.stopAnimation();
             },
             this
         );
 
-        this._handler.regionVisualLayer.on(
-            "leftClick",
+        this._handler.onVisual(
+            RegionVisualEvent.LeftClick,
             (regionVisual: RegionVisual) => {
                 let region = this._handler.getRegion(regionVisual.name);
                 if (region && this._isRegionValid(region)) {
@@ -335,7 +331,7 @@ class PreSelectState implements IGameState {
     }
 
     deactivate() {
-        this._handler.regionVisualLayer.unsubscribeAll(this);
+        this._handler.unsubscribeAllVisual(this);
         Keyboard.events.remove("released", "orderPreSelectState");
     }
 
@@ -381,7 +377,7 @@ class ConfirmState implements IGameState {
 export default class OrderState extends StateManagerBase implements IGameState {
     _parent: GameStateManager;
     _handler: GameHandler;
-    _registeredOrders: { [regionName: string]: IOrder[] };
+    _pendingCommands: { [regionName: string]: IOrder[] };
     _hud = new PIXI.Container();
     _regionText: any;
 
@@ -400,7 +396,7 @@ export default class OrderState extends StateManagerBase implements IGameState {
 
         this._parent = manager;
         this._handler = handler;
-        this._registeredOrders = {};
+        this._pendingCommands = {};
 
         this.resetState(GameplayStateType.PreSelect);
 
@@ -411,32 +407,24 @@ export default class OrderState extends StateManagerBase implements IGameState {
         manager.hud.addMember(this._hud);
 
         // Subscribe to hover events for HUD update
-        handler.regionVisualLayer.on(
-            "mouseEnter",
-            (region: Region) => {
+        handler.onVisual(
+            RegionVisualEvent.MouseEnter,
+            (region: RegionVisual) => {
                 this._regionText.text = region.name;
             },
             this
         );
     }
 
-    // Calculate the correct display counter for a region, based on army size and registered orders
-    getRegionDisplayCounter(region: Region): number {
-        let count = region.size;
-        if (region.name in this._registeredOrders) {
-            for (let order of this._registeredOrders[region.name]) count -= order.amount;
-        }
-        return count;
-    }
-
-    unregisterOrder(key, order) {
-        order.origin.avatar.setCounter(this.getRegionDisplayCounter(order.origin));
+    unregisterOrder(regionName: string, order: IOrder) {
         order.avatar.destroy();
         order.marker.destroy();
-        this._registeredOrders[key].splice(this._registeredOrders[key].indexOf(order), 1);
+        this._pendingCommands[regionName].splice(this._pendingCommands[regionName].indexOf(order), 1);
+        const origin = this._handler.getRegion(regionName);
+        if (origin) this._updateRegionCounter(origin);
     }
 
-    registerOrder(origin, target, amount, avatar, marker) {
+    registerOrder(origin: Region, target: Region, amount: number, avatar: UnitAvatar, marker: RegionPathMarker) {
         // Hit box for selecting and edit / delete
         let center = avatar.getPosition();
         let hitbox = [
@@ -446,8 +434,8 @@ export default class OrderState extends StateManagerBase implements IGameState {
             V.add(center, [-20, 20]),
         ];
 
-        if (!(origin.name in this._registeredOrders)) this._registeredOrders[origin.name] = [];
-        this._registeredOrders[origin.name].push({
+        if (!(origin.name in this._pendingCommands)) this._pendingCommands[origin.name] = [];
+        this._pendingCommands[origin.name].push({
             hitbox: hitbox,
             origin: origin,
             target: target,
@@ -456,30 +444,45 @@ export default class OrderState extends StateManagerBase implements IGameState {
             marker: marker,
         });
 
-        origin.avatar.setCounter(this.getRegionDisplayCounter(origin));
+        this._updateRegionCounter(origin);
+    }
+
+    // Returns the region's size and adjusts for pending commands
+    getRegionTempAmount(region: Region): number {
+        let tempAmount = region.size;
+        const regionCommands = this._pendingCommands[region.name];
+        if (regionCommands) for (let cmd of regionCommands) tempAmount -= cmd.amount;
+        return tempAmount;
+    }
+
+    // This function updates command origin regions to show reduced counters based on the 'pending' orders that
+    // would (will) take away from each region
+    _updateRegionCounter(region: Region) {
+        region.avatar.setCounter(this.getRegionTempAmount(region));
     }
 
     finalize() {
-        for (let key in this._registeredOrders) {
-            for (let order of this._registeredOrders[key]) {
-                order.marker.destroy();
-                order.avatar.sprite.alpha = 1.0;
-                order.avatar.setCounterVisibility(false);
-                order.avatar.morph(1.5, 0.01);
-                order.avatar.fade(0, 0.01);
-                order.avatar.walk(order.target.visual.getUnitCenter());
-            }
-        }
+        // for (let key in this._pendingCommands) {
+        //     for (let order of this._pendingCommands[key]) {
+        //         order.marker.destroy();
+        //         order.avatar.sprite.alpha = 1.0;
+        //         order.avatar.setCounterVisibility(false);
+        //         order.avatar.morph(1.5, 0.01);
+        //         order.avatar.fade(0, 0.01);
+        //         order.avatar.walk(order.target.visual.getUnitCenter());
+        //     }
+        // }
 
         setTimeout(() => {
-            for (let key in this._registeredOrders) {
-                for (let order of this._registeredOrders[key])
+            for (let key in this._pendingCommands) {
+                for (let order of this._pendingCommands[key])
                     this._handler.registerCommand(order.origin, order.target, order.amount);
             }
-            // This will actually send the data to the server
-            this._handler.finishTurn();
             this._finalReset = true;
             this._parent.resetState(GameplayStateType.VIEW_ONLY);
+
+            // This will actually send the data to the server
+            this._handler.finishTurn();
         }, 500);
     }
 
@@ -487,9 +490,7 @@ export default class OrderState extends StateManagerBase implements IGameState {
         super.popState();
 
         // On every state switch, ensure all avatar counters are displaying correctly
-        if (!this._finalReset) {
-            for (let region of this._handler.allRegions) region.avatar.setCounter(this.getRegionDisplayCounter(region));
-        }
+        // if (!this._finalReset) this._updateRegionCounter();
     }
 
     _generateState(type: GameplayStateType): IGameState {
@@ -511,11 +512,13 @@ export default class OrderState extends StateManagerBase implements IGameState {
         Mouse.events.on("released", "orderState", (code) => {
             if (code === 2 && this._stateStack.length > 1) this.popState();
 
-            for (let key in this._registeredOrders) {
-                for (let order of this._registeredOrders[key]) {
+            if (this.getActiveState().stateType === GameplayStateType.OrderEdit) return;
+
+            for (let key in this._pendingCommands) {
+                for (let order of this._pendingCommands[key]) {
                     if (V.isPointWithinPolygon([Mouse.posLocalX, Mouse.posLocalY], order.hitbox)) {
                         this.unregisterOrder(key, order);
-                        _orderCount = order.avatar.getCounter();
+                        _orderCount = order.amount;
                         _origin = order.origin;
                         _target = order.target;
                         this.pushState(GameplayStateType.OrderEdit);
@@ -532,8 +535,8 @@ export default class OrderState extends StateManagerBase implements IGameState {
         Mouse.events.remove("released", "orderState");
         Keyboard.events.remove("released", "orderState");
 
-        for (let key in this._registeredOrders)
-            this._registeredOrders[key].forEach((order) => {
+        for (let key in this._pendingCommands)
+            this._pendingCommands[key].forEach((order) => {
                 order.avatar.destroy();
                 order.marker.destroy();
             });
@@ -542,13 +545,14 @@ export default class OrderState extends StateManagerBase implements IGameState {
     }
 
     dispose() {
-        this._handler.regionVisualLayer.unsubscribeAll(this);
+        this._handler.unsubscribeAllVisual(this);
+        this._parent.hud.removeMember(this._hud);
         this._hud.destroy();
     }
 
     update(delta: number) {
-        for (let key in this._registeredOrders) {
-            for (let order of this._registeredOrders[key]) {
+        for (let key in this._pendingCommands) {
+            for (let order of this._pendingCommands[key]) {
                 if (V.isPointWithinPolygon([Mouse.posLocalX, Mouse.posLocalY], order.hitbox)) {
                     order.avatar.sprite.alpha = this.HOVER_AVATAR_ALPHA;
                     order.marker.setAlpha(this.HOVER_MARKER_ALPHA);
@@ -561,8 +565,8 @@ export default class OrderState extends StateManagerBase implements IGameState {
 
         let currentState = this.getActiveState();
         if (currentState && currentState.update) currentState.update(delta);
-        for (let key in this._registeredOrders) {
-            for (let order of this._registeredOrders[key]) order.avatar.update(delta);
+        for (let key in this._pendingCommands) {
+            for (let order of this._pendingCommands[key]) order.avatar.update(delta);
         }
     }
 }

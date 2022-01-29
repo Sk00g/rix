@@ -135,7 +135,7 @@ class UnitAvatar {
         this._counterSprite = new PIXI.Sprite(counterTexture);
         this._counterSprite.tint = nationColor;
         this._counterSprite.scale.set(COUNTER_SCALE, COUNTER_SCALE);
-        this._counterLabel = new Label("1", [0, 0], 12, "#ffffff");
+        this._counterLabel = new Label("1", [0, 0], 10, "#ffffff");
 
         stage.addChild(this.sprite);
         stage.addChild(this._counterSprite);
@@ -160,6 +160,7 @@ class UnitAvatar {
     setCounter(newAmount: number) {
         this._counter = newAmount;
         this._counterLabel.text = String(newAmount);
+        this._resetCounterPosition();
     }
 
     slide(newPosition: Point, speed: number) {
@@ -267,9 +268,7 @@ class UnitAvatar {
         this.sprite.position.set(unitX, unitY);
 
         if (!this._shakeMagnitude) {
-            // TODO - Make these magical numbers based on this._counterLabel.width/height
-            this._counterSprite.position.set(unitX - 15, unitY - 15);
-            this._counterLabel.position.set(unitX - 7, unitY - 7);
+            this._resetCounterPosition();
         }
     }
 
@@ -283,6 +282,14 @@ class UnitAvatar {
 
     getDirection() {
         return this._direction;
+    }
+
+    _resetCounterPosition() {
+        let unitX = this._position[0] - (this.width / 2) * SCALE;
+        let unitY = this._position[1] - (this.height / 2) * SCALE;
+
+        this._counterSprite.position.set(unitX - 15, unitY - 15);
+        this._counterLabel.position.set(this._counter < 10 ? unitX - 6 : unitX - 12, unitY - 7);
     }
 
     _updateAnimation(delta) {
@@ -380,13 +387,6 @@ class UnitAvatar {
                 this._counterLabel.scale.set(this._morphNumberTarget, this._morphNumberTarget);
                 this._morphNumberTarget = undefined;
             }
-
-            // Center
-            let diffX = this._counterLabel.width - this._morphPreviousSize[0];
-            let diffY = this._counterLabel.height - this._morphPreviousSize[1];
-
-            this._counterLabel.position.x -= diffX / 2;
-            this._counterLabel.position.y -= diffY / 2;
 
             this._morphPreviousSize = [this._counterLabel.width, this._counterLabel.height];
         }

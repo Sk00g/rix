@@ -1,10 +1,10 @@
 import * as PIXI from "pixi.js";
-import * as V from "./vector";
-import { MapData } from "./../../model/mapData";
-import { Point } from "./sengine/model";
+import * as V from "../vector";
+import { MapData } from "../../../model/mapData";
+import { Point } from "../sengine/model";
 import Mouse from "pixi.js-mouse";
-import graphics from "./gameData/graphics";
-import assetLoader from "./assetLoader";
+import graphics from "../gameData/graphics";
+import assetLoader from "../assetLoader";
 
 const DEFAULT_REGION_COLOR = 0xffffff;
 const DEFAULT_REGION_ALPHA = 0.3;
@@ -26,6 +26,7 @@ export class RegionVisual {
     _outlineAlpha: any;
     _shape: any;
     _defaultStyle: any;
+    _isHovering = false;
 
     public name: string;
 
@@ -116,14 +117,21 @@ export class RegionVisual {
     }
 }
 
+export enum RegionVisualEvent {
+    MouseEnter = "MouseEnter",
+    MouseExit = "MouseExit",
+    LeftClick = "LeftClick",
+    RightClick = "RightClick",
+}
+
 export class RegionLayer {
     _staticData: any;
     _stage: any;
-    _regions: any;
-    _eventHandlerUID;
+    _regions: { [name: string]: RegionVisual };
+    _eventHandlerUID = 100;
     _handlerRegistry;
     _objectKeyRegistry;
-    _eventHandlers;
+    _eventHandlers: { [event: string]: Array<(regionVisual: RegionVisual) => void> };
 
     constructor(stage: PIXI.Container, mapData: MapData, tileScale: number = 1.0) {
         this._staticData = { ...mapData };
@@ -148,15 +156,14 @@ export class RegionLayer {
 
         this.clearAllStyles();
 
-        this._eventHandlerUID = 100;
         this._handlerRegistry = {};
         this._objectKeyRegistry = {};
         // All handlers are passed the region that fired the event
         this._eventHandlers = {
-            mouseEnter: [],
-            mouseExit: [],
-            leftClick: [],
-            rightClick: [],
+            [RegionVisualEvent.MouseEnter]: [],
+            [RegionVisualEvent.MouseExit]: [],
+            [RegionVisualEvent.LeftClick]: [],
+            [RegionVisualEvent.RightClick]: [],
         };
 
         // Setup click handler
@@ -168,14 +175,14 @@ export class RegionLayer {
             for (let key in this._regions) {
                 let region = this._regions[key];
                 if (V.isPointWithinPolygon([x, y], region.getHitPath())) {
-                    let eventType = code === 0 ? "leftClick" : "rightClick";
+                    let eventType = code === 0 ? RegionVisualEvent.LeftClick : RegionVisualEvent.RightClick;
                     for (let handler of this._eventHandlers[eventType]) handler(region);
                 }
             }
         });
     }
 
-    on(eventType, func, objectKey: any = null) {
+    on(eventType: RegionVisualEvent, func: (visual: RegionVisual) => void, objectKey: any = null) {
         this._eventHandlers[eventType].push(func);
 
         // Use simple UID registry for optional unsubscribing
@@ -191,14 +198,14 @@ export class RegionLayer {
         return this._eventHandlerUID;
     }
 
-    removeHandler(eventType, uid) {
+    removeHandler(eventType: RegionVisualEvent, uid: number) {
         if (!(eventType in this._eventHandlers) || !(uid in this._handlerRegistry))
             throw new Error(`Specified handler ${eventType} (${uid}) doesn't exist`);
 
         this._eventHandlers[eventType].splice(this._eventHandlers[eventType].indexOf(this._handlerRegistry[uid]), 1);
     }
 
-    unsubscribeAll(objectKey) {
+    unsubscribeAll(objectKey: any) {
         if (!(objectKey in this._objectKeyRegistry)) {
             // throw new Error(`objectKey ${objectKey} not in event registry`);
             console.warn(`objectKey ${objectKey} is not in registry`);
@@ -225,11 +232,13 @@ export class RegionLayer {
         for (let key in this._regions) {
             let region = this._regions[key];
             if (V.isPointWithinPolygon(mousePos, region.getHitPath())) {
-                if (!region.isHovering) for (let handler of this._eventHandlers.mouseEnter) handler(region);
-                region.isHovering = true;
+                if (!region._isHovering)
+                    for (let handler of this._eventHandlers[RegionVisualEvent.MouseEnter]) handler(region);
+                region._isHovering = true;
             } else {
-                if (region.isHovering) for (let handler of this._eventHandlers.mouseExit) handler(region);
-                region.isHovering = false;
+                if (region._isHovering)
+                    for (let handler of this._eventHandlers[RegionVisualEvent.MouseExit]) handler(region);
+                region._isHovering = false;
             }
         }
     }

@@ -28,7 +28,12 @@ function initialize(loader: PIXI.Loader): Promise<void> {
             imagePaths.push(...Object.keys(graphics[category]).map((key) => graphics[category][key]));
         }
 
-        loader.add(imagePaths).load(() => resolve());
+        try {
+            loader.add(imagePaths).load(() => resolve());
+        } catch (err) {
+            logService(LogLevel.INFO, `Resources already loaded...`);
+            resolve();
+        }
     });
 }
 

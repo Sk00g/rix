@@ -1,5 +1,5 @@
 import { GameState } from "../../../model/gameplay";
-import GameHandler from "../gameData/gameHandler";
+import GameHandler from "../gameData/gameDataHandler";
 import { logService, LogLevel } from "../logService";
 import { GameplayStateType } from "./model";
 

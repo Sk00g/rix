@@ -1,12 +1,25 @@
-import GameHandler from "../../gameData/gameHandler";
+import { GameStateEvent } from "../../gameData/gameDataHandler";
+import * as V from "../../vector";
+import GameHandler from "../../gameData/gameDataHandler";
 import AppContext from "../../appContext";
 import GameStateManager from "../gameStateManager";
 import { GameplayStateType } from "../model";
 import { IGameState } from "../stateManagerBase";
+import RegionPathMarker from "../../sengine/regionPathMarker";
+import UnitAvatar from "../../sengine/unitAvatar";
+import graphics from "../../gameData/graphics";
+import { CommandSet } from "../../../../model/gameplay";
+
+const HOVER_FILL = 0x3030f0;
+const OUTLINE_COLOR = 0xa0c0ff;
+const ATTACK_ARROW_COLOR = 0xff6060;
+const MOVE_ARROW_COLOR = 0x60ff60;
 
 export default class ViewState implements IGameState {
     _parent: GameStateManager;
     _handler: GameHandler;
+    _orderMarkers: RegionPathMarker[] = [];
+    _orderAvatars: UnitAvatar[] = [];
 
     stateType = GameplayStateType.VIEW_ONLY;
 
@@ -15,45 +28,72 @@ export default class ViewState implements IGameState {
         this._handler = handler;
     }
 
-    activate() {
-        this._handler.regionVisualLayer.clearAllStyles();
-
-        const { commands, deployments } = this._handler.getPlayerPendingCommands(AppContext.player);
-        
-        // Reset all region counters
-        for (let region of this._handler.allRegions) {
-            const deployAmount = deployments.find(dep => dep.target === region.name)?.amount ?? 0;
-            region.avatar.setCounter(region.size + deployAmount);
-        }
+    _displayPendingCommands(set: CommandSet) {
+        const { deployments, commands } = set;
 
         for (let command of commands) {
-        // // Create marker path between regions
-        // let pathColor = _origin.owner === _target.owner ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
-        // this._orderMarker = new RegionPathMarker(AppContext.stage, _origin.visual, _target.visual, pathColor);
-        // this._orderMarker.setAlpha(0.75);
+            const origin = this._handler.getRegion(command.origin);
+            const target = this._handler.getRegion(command.target);
 
-        // // Create avatar to represent 'moving troops'
-        // this._orderAvatar = new UnitAvatar(AppContext.stage, graphics.avatar[_origin.owner.avatar], 0x99999c);
-        // this._orderAvatar.sprite.alpha = 0.75;
-        // this._orderAvatar.sprite.scale.set(1.2, 1.2);
-        // this._orderAvatar.setCounter(_orderCount);
-        // this._orderAvatar.playWalkAnimation(true);
+            if (!origin || !target) continue;
 
-        // // Place avatar at halfway point between two regions
-        // let originCenter = _origin.visual.getUnitCenter();
-        // let targetCenter = _target.visual.getUnitCenter();
-        // let difference = V.subtract(targetCenter, originCenter);
-        // let direction = V.normalize(difference);
-        // let newPos = V.add(originCenter, V.multiply(direction, V.norm(difference) / 2));
-        // this._orderAvatar.setPosition([newPos[0], newPos[1]]);
-        // this._orderAvatar.facePoint(_target.visual.getUnitCenter());
+            // Create marker path between regions
+            let pathColor = origin.owner === target.owner ? MOVE_ARROW_COLOR : ATTACK_ARROW_COLOR;
+            const marker = new RegionPathMarker(AppContext.stage, origin.visual, target.visual, pathColor);
+            marker.setAlpha(0.75);
+
+            // Create avatar to represent 'moving troops'
+            const avatar = new UnitAvatar(AppContext.stage, graphics.avatar[origin.owner.avatar], 0x99999c);
+            avatar.sprite.alpha = 0.75;
+            avatar.sprite.scale.set(1.2, 1.2);
+            avatar.setCounter(command.amount);
+            avatar.playWalkAnimation(true);
+
+            // Place avatar at halfway point between two regions
+            let originCenter = origin.visual.getUnitCenter();
+            let targetCenter = target.visual.getUnitCenter();
+            let difference = V.subtract(targetCenter, originCenter);
+            let direction = V.normalize(difference);
+            let newPos = V.add(originCenter, V.multiply(direction, V.norm(difference) / 2));
+            avatar.setPosition([newPos[0], newPos[1]]);
+            avatar.facePoint(target.visual.getUnitCenter());
+
+            this._orderMarkers.push(marker);
+            this._orderAvatars.push(avatar);
         }
     }
 
-    deactivate() {}
+    _initializeDisplay() {
+        this._parent.clearVisualStyles();
+
+        // Show pending command movement and deployments
+        const set = this._handler.getPlayerCommandSets(AppContext.player);
+        if (set) this._displayPendingCommands(set);
+    }
+
+    _handleNewRound() {
+        for (let marker of this._orderMarkers) marker.destroy();
+        for (let avatar of this._orderAvatars) avatar.destroy();
+
+        this._initializeDisplay();
+        this._parent.resetState(GameplayStateType.DEPLOY);
+    }
+
+    activate() {
+        this._initializeDisplay();
+
+        // Subscribe to a new round
+        this._handler.on(GameStateEvent.NewRoundProcessed, () => this._handleNewRound());
+    }
+
+    deactivate() {
+        for (let marker of this._orderMarkers) marker.destroy();
+        for (let avatar of this._orderAvatars) avatar.destroy();
+    }
 
     dispose() {}
 
-    update(delta: number) {}
+    update(delta: number) {
+        for (let avatar of this._orderAvatars) avatar.update(delta);
+    }
 }
-

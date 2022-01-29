@@ -8,7 +8,16 @@ import { logService, LogLevel } from "./logService";
 import AppContext from "./appContext";
 import apiService from "./apiService";
 
-export default async function enterGame(gameStateId: string, account: Account) {
+let _app: PIXI.Application;
+
+export async function exitGame() {
+    _app.destroy(true);
+
+    window.location.href = "/#/manage/home";
+    window.location.reload();
+}
+
+export async function enterGame(gameStateId: string, account: Account) {
     // Universally get rid of default right-click behaviour
     document.addEventListener("contextmenu", (event) => event.preventDefault());
 
@@ -18,8 +27,8 @@ export default async function enterGame(gameStateId: string, account: Account) {
     PIXI.settings.RESOLUTION = 1.0;
 
     // Initialization
-    let app = new PIXI.Application({ width: 1400, height: 900, backgroundColor: 0x000000 });
-    document.getElementById("main")?.appendChild(app.view);
+    _app = new PIXI.Application({ width: 1400, height: 900, backgroundColor: 0x000000 });
+    document.getElementById("main")?.appendChild(_app.view);
 
     // Load all assets from game_data/* files
     await assetLoader.initialize(loader);
@@ -30,7 +39,7 @@ export default async function enterGame(gameStateId: string, account: Account) {
     const mapData = await import(`../dist/maps/${testGameState.mapName}/${testGameState.mapName}.json`);
 
     // Provide app-wide context accessible from anywhere else, be careful...
-    AppContext.stage = app.stage;
+    AppContext.stage = _app.stage;
     const player = lobby.players.find((p) => p.accountId === account._id);
     if (!player) throw new Error("Authentication issue...");
     AppContext.player = player;
@@ -40,7 +49,7 @@ export default async function enterGame(gameStateId: string, account: Account) {
     logService(LogLevel.WARNING, "running in DEV mode");
     let stateMaster = new GameStateManager(mapData, testGameState, lobby);
 
-    app.ticker.add((delta) => {
+    _app.ticker.add((delta) => {
         Keyboard.update();
         Mouse.update();
 

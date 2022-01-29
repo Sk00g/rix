@@ -1,4 +1,4 @@
-import { RegionVisual } from "./../regionLayer";
+import { RegionVisual } from "../gameVisuals/regionLayer";
 import * as PIXI from "pixi.js";
 import * as V from "../vector";
 import graphics from "../gameData/graphics";

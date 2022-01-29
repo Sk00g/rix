@@ -1,5 +1,5 @@
 import { Direction } from "./../sengine/model";
-import { RegionVisual } from "../regionLayer";
+import { RegionVisual } from "../gameVisuals/regionLayer";
 import AppContext from "../appContext";
 import graphics from "./graphics";
 import UnitAvatar from "../sengine/unitAvatar";
@@ -26,5 +26,9 @@ export default class Region {
         this.avatar.setPosition(this.visual.getUnitCenter());
         this.avatar.setCounter(this.size);
         this.avatar.setDirection(Direction.Down);
+    }
+
+    destroy() {
+        this.avatar.destroy();
     }
 }

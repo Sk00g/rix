@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import styled from "styled-components";
 import apiService from "../apiService";
-import gameEntry from "../gameEntry";
+import { enterGame } from "../gameEntry";
 import AccountContext from "./contexts/accountContext";
 import theme from "./theme";
 
@@ -13,7 +13,7 @@ const GamePage: React.FC<GamePageProps> = (props) => {
     let activeAccount = useContext(AccountContext);
 
     useEffect(() => {
-        if (id) gameEntry(id, activeAccount);
+        if (id) enterGame(id, activeAccount);
     }, [id]);
 
     return <div></div>;

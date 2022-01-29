@@ -1,29 +1,26 @@
-import { PanelColor, PanelSize } from "./../sengine/suie/core";
+import { IconType, PanelColor } from "./../sengine/suie/core";
 import { Lobby } from "./../../../model/lobby";
 import { GameState } from "./../../../model/gameplay";
 import { MapData } from "./../../../model/mapData";
 import { logService, LogLevel } from "../logService";
 import SUIE from "../sengine/suie/suie";
 import * as PIXI from "pixi.js";
-import { RegionLayer } from "../regionLayer";
-import TileMap from "../tilemap";
-import Keyboard from "pixi.js-keyboard";
+import { RegionLayer } from "../gameVisuals/regionLayer";
+import TileMap from "../gameVisuals/tilemap";
 import Mouse from "pixi.js-mouse";
 import graphics from "../gameData/graphics";
 import DeployState from "./gameplayStates/deployState";
 import OrderState from "./gameplayStates/orderState";
-import GameHandler, { GameStateEvent } from "../gameData/gameHandler";
+import GameHandler, { GameStateEvent } from "../gameData/gameDataHandler";
 import AppContext from "../appContext";
 import StateManagerBase, { IGameState } from "./stateManagerBase";
 import { GameplayStateType } from "./model";
 import theme from "../lobby/theme";
-import App from "../lobby/app";
 import Panel from "../sengine/suie/panel";
-import { StringFromRGB } from "../sengine/utils";
 import UnitAvatar from "../sengine/unitAvatar";
 import Label from "../sengine/suie/label";
 import ViewState from "./gameplayStates/viewState";
-import { PlayerStatus } from "../../../model/enums";
+import { exitGame } from "../gameEntry";
 
 /* This class is the state manager for various GamePlayState classes
 
@@ -41,18 +38,21 @@ build the initial graphics and reactions upon entering a new state
 const LOG_TAG = "GAMEPLAY";
 
 /*
-- view state should show commands for that turn that are 'waiting'
-- continent bonuses are not working
+- design basic conductor stuff
+- add min button or slider
 
-while in view state, listen for event from handler that says that new round has been executed
--> on this event, update visuals to new game state (should actually switch to conductor state)
--> switch to deploy phase again
+CLEANUP:
+- game state and regions and such from game handler should be private, state can only be accessed / mutated via
+public methods, not directly
+- event handlers for game handler should have the off method, will need unique key and such
+- game events are a bit sloppy... maybe it should just trigger whenever major areas of state change instead of trying
+to be specific, like react hooks for redux instead of typed events
 */
 
 export default class GameStateManager extends StateManagerBase {
     _stateStack: IGameState[];
     _tileMap: TileMap;
-    _regionVisuals: RegionLayer;
+    private _regionVisuals: RegionLayer;
     _handler: GameHandler;
     _lobby: Lobby;
     _items: { [key: string]: PIXI.DisplayObject } = {};
@@ -95,6 +95,16 @@ export default class GameStateManager extends StateManagerBase {
             (this._items[`${player}Status`] as PIXI.Text).style.fill = theme.colors.green;
         });
         this._handler.on(GameStateEvent.ArmySizeChanged, (region: string) => this._updateHudStats());
+        this._handler.on(GameStateEvent.NewRoundProcessed, () => {
+            for (let player of this._handler.getAllPlayers()) {
+                (this._items[`${player.username}Status`] as Label).text = "WAITING";
+                (this._items[`${player.username}Status`] as PIXI.Text).style.fill = theme.colors.fontGray;
+            }
+        });
+    }
+
+    public clearVisualStyles() {
+        this._regionVisuals.clearAllStyles();
     }
 
     _updateHudStats() {
@@ -104,15 +114,21 @@ export default class GameStateManager extends StateManagerBase {
             .toFixed(2)}`;
     }
 
-    _setupHud() {
-        const state = this._handler.currentState;
-        const regions = this._handler.allRegions;
+    _setupActionBar() {
+        const container = new PIXI.Container();
+        container.position.set(10, 860);
 
+        container.addChild(new SUIE.IconButton(IconType.HOME, [270, 0], () => exitGame(), PanelColor.Orange, 2));
+
+        this.hud.addMember(container);
+    }
+
+    _setupHud() {
         this.hud.addMember(new SUIE.Label(this._lobby.tag, [250, 10], 10, theme.colors.fontWhite));
-        this.hud.addMember(new SUIE.Label(this._handler.mapData.name, [10, 10], 10, theme.colors.fontMain));
+        this.hud.addMember(new SUIE.Label(this._handler.getMapName(), [10, 10], 10, theme.colors.fontMain));
 
         this._items.roundLabel = new SUIE.Label(
-            `Round ${this._handler.currentState.turnHistory.length + 1}`,
+            `Round ${this._handler.getCurrentRound()}`,
             [10, 30],
             10,
             theme.colors.fontMain
@@ -123,7 +139,7 @@ export default class GameStateManager extends StateManagerBase {
         this.hud.addMember(this._items.stateLabel);
 
         this._items.regionLabel = new SUIE.Label(
-            `My Regions:  ${regions.filter((reg) => reg.owner.username === AppContext.player.username).length}`,
+            `My Regions:  ${this._handler.getPlayerRegions(AppContext.player).length}`,
             [10, 70],
             10
         );
@@ -152,7 +168,7 @@ export default class GameStateManager extends StateManagerBase {
 
         // Setup player statuses
         let starty = 700;
-        for (let player of state.players) {
+        for (let player of this._handler.getAllPlayers()) {
             this._items[player.username] = new SUIE.Label(player.username, [10, starty], 12, theme.colors.fontWhite);
             this.hud.addMember(this._items[player.username]);
             const avatar = new UnitAvatar(
@@ -171,15 +187,17 @@ export default class GameStateManager extends StateManagerBase {
                 );
             }
             this._items[`${player.username}Status`] = new SUIE.Label(
-                player.username in state.pendingCommandSets ? "READY" : "WAITING",
+                this._handler.hasPlayerSubmitted(player) ? "READY" : "WAITING",
                 [textWidth + 130, starty + 2],
                 10,
-                player.username in state.pendingCommandSets ? theme.colors.green : theme.colors.fontGray
+                this._handler.hasPlayerSubmitted(player) ? theme.colors.green : theme.colors.fontGray
             );
             this.hud.addMember(this._items[`${player.username}Status`]);
 
             starty += 40;
         }
+
+        this._setupActionBar();
 
         AppContext.stage.addChild(this.hud);
     }

@@ -48,7 +48,7 @@ mongo.MongoClient.connect(mongoURL, { useUnifiedTopology: true }, (err, client) 
 
 // make the server listen to requests
 app.listen(PORT, () => {
-    console.log(`Server running at: http://127.0.0.1:${PORT}/`);
+    console.log(`Server running at: http://192.168.1.75:${PORT}/`);
 });
 
 export default db;

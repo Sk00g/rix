@@ -30,7 +30,8 @@ export async function executeNextTurn(db: any, game: GameState) {
 
     // Build the current map state from turn history and current round
     const nextRound = game.turnHistory.length;
-    let mapState = buildMapState(game, nextRound);
+    // let mapState = buildMapState(game, nextRound);
+    let mapState = game.turnHistory[nextRound - 1]?.endingMapState ?? game.initialRegionState;
 
     // Apply the deployments to the map state
     mapState = _applyDeployments(mapState, deployments);

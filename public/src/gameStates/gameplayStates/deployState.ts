@@ -1,13 +1,13 @@
 import { GameplayStateType } from "./../model";
 import { IGameState } from "./../stateManagerBase";
-import { RegionVisual } from "./../../regionLayer";
+import { RegionVisual, RegionVisualEvent } from "../../gameVisuals/regionLayer";
 import * as PIXI from "pixi.js";
 import SUIE from "../../sengine/suie/suie";
 import AppContext from "../../appContext";
 import UnitAvatar from "../../sengine/unitAvatar";
 import graphics from "../../gameData/graphics";
 import Keyboard from "pixi.js-keyboard";
-import GameHandler from "../../gameData/gameHandler";
+import GameHandler from "../../gameData/gameDataHandler";
 import StateManagerBase from "../stateManagerBase";
 import Region from "../../gameData/region";
 import theme from "../../lobby/theme";
@@ -34,31 +34,31 @@ class RegionSelectState implements IGameState {
     dispose: () => void;
 
     activate() {
-        this._handler.regionVisualLayer.on(
-            "mouseEnter",
+        this._handler.onVisual(
+            RegionVisualEvent.MouseEnter,
             (regionVisual: RegionVisual) => {
-                this._handler.regionVisualLayer.clearAllStyles();
+                this._handler.clearVisualStyles();
                 let region = this._handler.getRegion(regionVisual.name);
                 if (region?.owner.username === AppContext.player.username) {
                     region.avatar.playWalkAnimation();
                     regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
                 }
             },
-            this
+            "RegionSelectState"
         );
 
-        this._handler.regionVisualLayer.on(
-            "mouseExit",
+        this._handler.onVisual(
+            RegionVisualEvent.MouseExit,
             (regionVisual: RegionVisual) => {
-                this._handler.regionVisualLayer.clearAllStyles();
+                this._handler.clearVisualStyles();
                 let region = this._handler.getRegion(regionVisual.name);
                 if (region?.owner.username === AppContext.player.username) region.avatar.stopAnimation();
             },
-            this
+            "RegionSelectState"
         );
 
-        this._handler.regionVisualLayer.on(
-            "leftClick",
+        this._handler.onVisual(
+            RegionVisualEvent.LeftClick,
             (regionVisual: RegionVisual) => {
                 let region = this._handler.getRegion(regionVisual.name);
                 if (region?.owner.username === AppContext.player.username) {
@@ -66,17 +66,17 @@ class RegionSelectState implements IGameState {
                     this._parent.pushState(GameplayStateType.EditAmount);
                 }
             },
-            this
+            "RegionSelectState"
         );
 
-        Keyboard.events.on("released", "deployState", (keyCode) => {
+        Keyboard.events.on("released", "RegionSelectState", (keyCode) => {
             if (keyCode === "Enter") this._parent.pushState(GameplayStateType.Confirm);
         });
     }
 
     deactivate() {
-        this._handler.regionVisualLayer.unsubscribeAll(this);
-        Keyboard.events.remove("released", "deployState");
+        this._handler.unsubscribeAllVisual("RegionSelectState");
+        Keyboard.events.remove("released", "RegionSelectState");
     }
 }
 
@@ -132,7 +132,7 @@ class EditAmountState implements IGameState {
     }
 
     activate() {
-        this._handler.regionVisualLayer.clearAllStyles();
+        this._handler.clearVisualStyles();
         _selectedRegion.visual.setStyle({ fillColor: 0xffffff, fillAlpha: 0.2 });
 
         let currentAmount = this._parent.getDeployment(_selectedRegion);
@@ -198,7 +198,7 @@ class EditAmountState implements IGameState {
 
     deactivate() {
         if (this._deployAvatar) this._deployAvatar.destroy();
-        this._handler.regionVisualLayer.clearAllStyles();
+        this._handler.clearVisualStyles();
 
         let kids = [...this._editPanel.children];
         for (let child of kids) child.destroy();
@@ -239,13 +239,13 @@ class ConfirmState implements IGameState {
     }
 
     activate() {
-        Keyboard.events.on("released", "deployState", (keyCode) => {
+        Keyboard.events.on("released", "ConfirmState", (keyCode) => {
             if (keyCode === "Enter") this._confirmAction();
         });
     }
 
     deactivate() {
-        Keyboard.events.remove("released", "deployState");
+        Keyboard.events.remove("released", "ConfirmState");
         this._confirmPanel.destroy();
     }
 }
@@ -254,7 +254,7 @@ export default class DeployState extends StateManagerBase implements IGameState 
     _manager: GameStateManager;
     _handler: GameHandler;
     _regionAvatars: { [region: string]: UnitAvatar };
-    _regionDeployments: { [region: number]: number };
+    _pendingDeployments: { [region: number]: number };
     _hudInfo = new PIXI.Container();
     _availableLabel: any;
     _spentLabel: any;
@@ -269,11 +269,12 @@ export default class DeployState extends StateManagerBase implements IGameState 
         this._manager = manager;
         this._handler = handler;
         this._regionAvatars = {};
-        this._regionDeployments = {};
+        this._pendingDeployments = {};
 
         this.availableArmies = handler.getReinforcementCount(AppContext.player);
 
         // Setup HUD according to current game state
+        this._hudInfo = new PIXI.Container();
         this._hudInfo.position.set(10, 170);
         this._availableLabel = new SUIE.Label(
             `Available Army: ${String(this.availableArmies)}`,
@@ -317,20 +318,22 @@ export default class DeployState extends StateManagerBase implements IGameState 
     }
 
     unregisterDeployment(region: Region) {
-        if (region.name in this._regionDeployments) {
-            this.availableArmies += this._regionDeployments[region.name];
+        if (region.name in this._pendingDeployments) {
+            this.availableArmies += this._pendingDeployments[region.name];
             this._updateHUD();
-            delete this._regionDeployments[region.name];
+            delete this._pendingDeployments[region.name];
             this._regionAvatars[region.name].destroy();
             delete this._regionAvatars[region.name];
         }
+        console.log(this._pendingDeployments);
     }
 
-    getDeployment = (region: Region): number => this._regionDeployments[region.name];
+    getDeployment = (region: Region): number => this._pendingDeployments[region.name];
 
     registerDeployment(region: Region, amount: number) {
         this.availableArmies -= amount;
-        this._regionDeployments[region.name] = amount;
+        this._pendingDeployments[region.name] = amount;
+        console.log(this._pendingDeployments);
         this._updateHUD();
 
         let unitCenter = region.visual.getUnitCenter();
@@ -355,10 +358,10 @@ export default class DeployState extends StateManagerBase implements IGameState 
         }
 
         setTimeout(() => {
-            for (let name in this._regionDeployments) {
+            for (let name in this._pendingDeployments) {
                 const region = this._handler.getRegion(name);
                 if (!region) throw new Error("Invalid region deployment");
-                this._handler.registerDeployment(region, this._regionDeployments[name]);
+                this._handler.registerDeployment(region, this._pendingDeployments[name]);
             }
             this._manager.resetState(GameplayStateType.ORDER);
         }, 400);
