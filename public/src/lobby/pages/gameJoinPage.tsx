@@ -48,7 +48,7 @@ const GameJoinPage: React.FC = () => {
             accountId: activeAccount._id,
             status: PlayerStatus.Waiting,
             color: NationColor.BLUE,
-            avatar: "knight",
+            avatar: "bard",
         };
 
         apiService

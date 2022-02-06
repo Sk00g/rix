@@ -105,7 +105,8 @@ function _rollToResolve(
         let damagedPlayer = lowestPlayers[0];
 
         // lowest rolling player loses unit from random command
-        let reducedCommand = armies[damagedPlayer][Math.floor(Math.random() * armies[damagedPlayer].length)];
+        const remainingArmies = armies[damagedPlayer].filter((army) => army.amount);
+        let reducedCommand = remainingArmies[Math.floor(Math.random() * remainingArmies.length)];
         reducedCommand.amount--;
         if (reducedCommand.amount < 0) throw new Error("broke something");
         console.log("reduced army size from command", reducedCommand);

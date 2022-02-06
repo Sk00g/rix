@@ -24,7 +24,9 @@ export default async function initializeGame(db: any, lobby: Lobby): Promise<str
         }
 
         for (let region of mapData.regions) {
-            let owner = ownerships[Math.floor(Math.random() * ownerships.length)];
+            const index = Math.floor(Math.random() * ownerships.length);
+            let owner = ownerships[index];
+            ownerships.splice(index, 1);
             initialRegions[region.name] = { owner, size: settings.initialRegionAmount };
         }
     } else {
