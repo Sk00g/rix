@@ -42,6 +42,7 @@ class UnitAvatar {
     _animation: Animation = Animation.Stand;
     _animating = false;
     _looping = false;
+    _forceLoop = false;
     _animationElapsed = 0;
 
     // Walk animation properties
@@ -198,7 +199,7 @@ class UnitAvatar {
             this._blendNumberSpeeds[key] = Math.round((targetColors[key] - currentColors[key]) / increments);
     }
 
-    fade(newAlpha, speed) {
+    fade(newAlpha: number, speed: number) {
         this._fadeTarget = newAlpha;
         this._fadeSpeed = speed;
     }
@@ -208,9 +209,21 @@ class UnitAvatar {
         setTimeout(() => this.fade(0.01, 0.01), 500);
     }
 
-    playWalkAnimation(loop = true) {
+    // Called externally for permanent walking
+    playWalkAnimation(permanent = false) {
         this._animation = Animation.Walk;
-        this._looping = loop;
+        if (permanent) this._forceLoop = true;
+        else this._looping = true;
+        this._animationElapsed = 0;
+
+        // First frame of walk animation is always 0
+        this._currentFrame = 0;
+    }
+
+    // Private method for walk animation caused by walk command
+    _innerWalkAnimation() {
+        this._animation = Animation.Walk;
+        this._looping = true;
         this._animationElapsed = 0;
 
         // First frame of walk animation is always 0
@@ -226,6 +239,7 @@ class UnitAvatar {
     }
 
     stopAnimation() {
+        if (this._forceLoop) return;
         this._animation = Animation.Stand;
         this._looping = false;
         this._currentFrame = 1;
@@ -250,7 +264,13 @@ class UnitAvatar {
         }
     }
 
-    walk(newPosition) {
+    // Returns milliseconds
+    calculateWalkDuration(newPosition: Point): number {
+        const dist = V.distanceBetween(this.getPosition(), newPosition);
+        return Math.floor(dist * 9);
+    }
+
+    walk(newPosition: Point) {
         this._targetPosition = newPosition;
         this.playWalkAnimation();
         this.facePoint(newPosition);
@@ -301,11 +321,7 @@ class UnitAvatar {
                     this._animationElapsed = 0;
                     this._currentFrame++;
                     if (this._currentFrame > 3) {
-                        if (this._looping) this._currentFrame = 0;
-                        else {
-                            this._currentFrame = 1;
-                            this._animating = false;
-                        }
+                        this._currentFrame = 0;
                     }
                 }
             } else if (this._animation === Animation.Attack) {

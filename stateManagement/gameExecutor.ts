@@ -50,12 +50,11 @@ export async function executeNextTurn(db: any, game: GameState) {
         rolls,
         endingMapState: newState,
     };
-    game.turnHistory.push(newRound);
 
     // Clear all pendingCommandSets and write to db
     await db
         .collection("gameStates")
-        .updateOne({ _id: game._id }, { $set: { pendingCommandSets: {}, turnHistory: game.turnHistory } });
+        .updateOne({ _id: game._id }, { $set: { pendingCommandSets: {} }, $push: { turnHistory: newRound } });
 }
 
 function _rollToResolve(

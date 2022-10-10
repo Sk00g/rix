@@ -50,6 +50,7 @@ export enum IconType {
     PAUSE = 8,
     RESET = 9,
     REFRESH = 10,
+    MENU = 11,
     MAX = 12,
     HOME = 15,
     PLUS = 23,

@@ -21,6 +21,8 @@ import UnitAvatar from "../sengine/unitAvatar";
 import Label from "../sengine/suie/label";
 import ViewState from "./gameplayStates/viewState";
 import { exitGame } from "../gameEntry";
+import ReplayTurnState from "./gameplayStates/replayTurnState";
+import Conductor from "../gameVisuals/conductor";
 
 /* This class is the state manager for various GamePlayState classes
 
@@ -55,6 +57,7 @@ export default class GameStateManager extends StateManagerBase {
     _tileMap: TileMap;
     private _regionVisuals: RegionLayer;
     _handler: GameHandler;
+    _conductor: Conductor;
     _lobby: Lobby;
     _items: { [key: string]: PIXI.DisplayObject } = {};
 
@@ -79,16 +82,15 @@ export default class GameStateManager extends StateManagerBase {
         this._lobby = lobby;
         this._handler = new GameHandler(mapData, gameState, this._regionVisuals);
 
+        // Conductor is used primarily by playback state, but operates separate from the actual GameHandler, as
+        // it affects the map graphically, but does not update any actual game state or data outside itself
+        this._conductor = new Conductor(this._handler, gameState, this._regionVisuals);
+
         // Setup HUD that exists across all states
         this._setupHud();
 
-        if (AppContext.player.username in gameState.pendingCommandSets) {
-            logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
-            this.resetState(GameplayStateType.VIEW_ONLY);
-        } else {
-            logService(LogLevel.DEBUG, "settings initial state to DEPLOY", LOG_TAG);
-            this.resetState(GameplayStateType.DEPLOY);
-        }
+        // this.resetToHomeState();
+        this.resetState(GameplayStateType.REPLAY_TURN);
 
         // Setup HUD to respond to events
         this._handler.on(GameStateEvent.PlayerCompletedTurn, (player: string) => {
@@ -102,6 +104,18 @@ export default class GameStateManager extends StateManagerBase {
                 (this._items[`${player.username}Status`] as PIXI.Text).style.fill = theme.colors.fontGray;
             }
         });
+    }
+
+    /** Return to either VIEW or DEPLOY state, depending on if current user's commands have been submitted */
+    public resetToHomeState() {
+        const set = this._handler.getPlayerCommandSets(AppContext.player);
+        if (set?.commands.length || set?.deployments.length) {
+            logService(LogLevel.DEBUG, "resetting state to VIEW", LOG_TAG);
+            this.resetState(GameplayStateType.VIEW_ONLY);
+        } else {
+            logService(LogLevel.DEBUG, "resetting state to DEPLOY", LOG_TAG);
+            this.resetState(GameplayStateType.DEPLOY);
+        }
     }
 
     public clearVisualStyles() {
@@ -120,6 +134,15 @@ export default class GameStateManager extends StateManagerBase {
         container.position.set(10, 860);
 
         container.addChild(new SUIE.IconButton(IconType.HOME, [270, 0], () => exitGame(), PanelColor.Orange, 2));
+        container.addChild(
+            new SUIE.IconButton(
+                IconType.REFRESH,
+                [235, 0],
+                () => this.resetState(GameplayStateType.REPLAY_TURN),
+                PanelColor.Orange,
+                2
+            )
+        );
 
         this.hud.addMember(container);
     }
@@ -168,7 +191,7 @@ export default class GameStateManager extends StateManagerBase {
         this.hud.addMember(this._items.reinforcementLabel);
 
         // Setup player statuses
-        let starty = 700;
+        let starty = 600;
         for (let player of this._handler.getAllPlayers()) {
             this._items[player.username] = new SUIE.Label(player.username, [10, starty], 12, theme.colors.fontWhite);
             this.hud.addMember(this._items[player.username]);
@@ -206,6 +229,9 @@ export default class GameStateManager extends StateManagerBase {
     // Factory pattern for generating new gameplay state objects
     _generateState(type: GameplayStateType): IGameState {
         switch (type) {
+            case GameplayStateType.REPLAY_TURN:
+                (this._items.stateLabel as Label).text = "Turn Playback";
+                return new ReplayTurnState(this, this._handler, this._conductor);
             case GameplayStateType.DEPLOY:
                 (this._items.stateLabel as Label).text = "Deploy Phase";
                 return new DeployState(this, this._handler);

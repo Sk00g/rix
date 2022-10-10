@@ -41,7 +41,8 @@ class RegionSelectState implements IGameState {
                 let region = this._handler.getRegion(regionVisual.name);
                 if (region?.owner.username === AppContext.player.username) {
                     region.avatar.playWalkAnimation();
-                    regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
+                    // regionVisual.setStyle({ fillAlpha: 0.2, fillColor: HOVER_FILL });
+                    regionVisual.setStyle({ fillAlpha: 0.5, outlineAlpha: 1.0 });
                 }
             },
             "RegionSelectState"
@@ -347,7 +348,9 @@ export default class DeployState extends StateManagerBase implements IGameState 
         this._regionAvatars[region.name] = avatar;
     }
 
-    activate() {}
+    activate() {
+        this._handler.setupRegions();
+    }
 
     finalize() {
         for (let key in this._regionAvatars) {

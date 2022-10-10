@@ -81,6 +81,7 @@ export default class ViewState implements IGameState {
 
     activate() {
         this._initializeDisplay();
+        this._handler.setupRegions();
 
         // Subscribe to a new round
         this._handler.on(GameStateEvent.NewRoundProcessed, () => this._handleNewRound());

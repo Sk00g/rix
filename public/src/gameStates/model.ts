@@ -7,6 +7,7 @@ export enum GameplayStateType {
     REPLAY_TURN = "REPLAY_TURN",
     DEPLOY = "DEPLOY",
     ORDER = "ORDER",
+
     RegionSelect = "REGION_SELECT",
     EditAmount = "EDIT_AMOUNT",
     Confirm = "CONFIRM",

@@ -44,7 +44,7 @@ export default class GameDataHandler {
         this._mapData = mapData;
 
         // Shaping the state data into updateable and easily accessible objects
-        this._setupRegions();
+        this.setupRegions();
 
         // Start polling for game state updates
         this._interval = setInterval(() => this._pollGameState(), 5000);
@@ -129,7 +129,7 @@ export default class GameDataHandler {
                 break;
             case GameStateEvent.NewRoundProcessed:
                 // Re-render all unit avatars with the new state (don't really want to do this here? Cause conductor?)
-                this._setupRegions();
+                this.setupRegions();
                 break;
             default:
                 throw new Error("Unsupported event type" + type);
@@ -185,15 +185,17 @@ export default class GameDataHandler {
         return regionData?.borderRegionNames.includes(target.name) ?? false;
     }
 
-    getRegion(name: string): Region | undefined {
-        return this._regions.find((reg) => reg.name === name);
+    getRegion(name: string): Region {
+        const region = this._regions.find((reg) => reg.name === name);
+        if (!region) throw new Error(`Impossible state detected, region doesn't exist ${name}`);
+        return region;
     }
 
     getPlayerRegions(player: Player): Region[] {
         return this._regions.filter((reg) => reg.owner.accountId === player.accountId);
     }
 
-    _setupRegions() {
+    setupRegions() {
         for (let region of this._regions) region.destroy();
 
         const currentMapState =
@@ -281,6 +283,10 @@ export default class GameDataHandler {
     }
 
     /* Map / Round Methods */
+
+    getRegions(): Region[] {
+        return this._regions;
+    }
 
     getMapName(): string {
         return this._currentState.mapName;

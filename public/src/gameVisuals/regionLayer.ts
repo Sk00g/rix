@@ -7,8 +7,8 @@ import graphics from "../gameData/graphics";
 import assetLoader from "../assetLoader";
 
 const DEFAULT_REGION_COLOR = 0xffffff;
-const DEFAULT_REGION_ALPHA = 0.3;
-const DEFAULT_OUTLINE_ALPHA = 1.0;
+const DEFAULT_REGION_ALPHA = 0.2;
+const DEFAULT_OUTLINE_ALPHA = 0.5;
 const DEFAULT_OUTLINE_WIDTH = 2;
 const BLIP_SCALE = 1.25;
 
@@ -87,6 +87,8 @@ export class RegionVisual {
             this._outlineColor = style.fillColor;
         }
         if ("fillAlpha" in style) this._fillAlpha = style.fillAlpha;
+
+        if ("outlineAlpha" in style) this._outlineAlpha = style.outlineAlpha;
 
         // All blips are the same, so only compare to the first
         if ("outlineAlpha" in style && this._blipSprites[0].alpha !== style.outlineAlpha)
