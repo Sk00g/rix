@@ -149,8 +149,8 @@ export default class GameDataHandler {
         };
     }
 
-    registerCommand(origin: Region, target: Region, amount: number) {
-        this._commands.push({ origin: origin.name, target: target.name, amount });
+    registerCommand(player: string, origin: Region, target: Region, amount: number) {
+        this._commands.push({ origin: origin.name, target: target.name, amount, player });
     }
 
     registerDeployment(region: Region, amount: number, skipAnimation = false) {

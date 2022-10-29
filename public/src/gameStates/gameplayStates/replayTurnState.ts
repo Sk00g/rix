@@ -41,8 +41,9 @@ export default class ReplayTurnState implements IGameState {
         this._conductor.loadTurn(this._currentTurn);
     }
 
-    _play() {
-        this._conductor.next();
+    async _play() {
+        const finished = await this._conductor.next();
+        if (finished) this._parent.resetToHomeState();
     }
 
     _pause() {}

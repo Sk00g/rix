@@ -12,6 +12,13 @@ const DEFAULT_OUTLINE_ALPHA = 0.5;
 const DEFAULT_OUTLINE_WIDTH = 2;
 const BLIP_SCALE = 1.25;
 
+export interface IRegionStyle {
+    fillColor?: number;
+    fillAlpha?: number;
+    outlineColor?: number;
+    outlineAlpha?: number;
+}
+
 export class RegionVisual {
     _stage: any;
     _tileScale: any;
@@ -19,13 +26,13 @@ export class RegionVisual {
     _static: any;
     _blipSprites: any;
     _shadePath: any;
-    _fillColor: any;
-    _fillAlpha: any;
-    _outlineWidth: any;
-    _outlineColor: any;
-    _outlineAlpha: any;
+    _fillColor: number;
+    _fillAlpha: number;
+    _outlineWidth: number;
+    _outlineColor: number;
+    _outlineAlpha: number;
     _shape: any;
-    _defaultStyle: any;
+    _defaultStyle: IRegionStyle;
     _isHovering = false;
 
     public name: string;
@@ -81,14 +88,11 @@ export class RegionVisual {
         this.setStyle(this._defaultStyle);
     }
 
-    setStyle(style) {
-        if ("fillColor" in style) {
-            this._fillColor = style.fillColor;
-            this._outlineColor = style.fillColor;
-        }
-        if ("fillAlpha" in style) this._fillAlpha = style.fillAlpha;
-
-        if ("outlineAlpha" in style) this._outlineAlpha = style.outlineAlpha;
+    setStyle(style: IRegionStyle) {
+        this._fillColor = style.fillColor ?? this._fillColor;
+        this._outlineColor = style.fillColor ?? this._outlineColor;
+        this._fillAlpha = style.fillAlpha ?? this._fillAlpha;
+        this._outlineAlpha = style.outlineAlpha ?? this._outlineAlpha;
 
         // All blips are the same, so only compare to the first
         if ("outlineAlpha" in style && this._blipSprites[0].alpha !== style.outlineAlpha)

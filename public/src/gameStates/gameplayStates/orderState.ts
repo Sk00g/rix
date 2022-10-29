@@ -476,7 +476,7 @@ export default class OrderState extends StateManagerBase implements IGameState {
         setTimeout(() => {
             for (let key in this._pendingCommands) {
                 for (let order of this._pendingCommands[key])
-                    this._handler.registerCommand(order.origin, order.target, order.amount);
+                    this._handler.registerCommand(AppContext.player.username, order.origin, order.target, order.amount);
             }
             this._finalReset = true;
             this._parent.resetState(GameplayStateType.VIEW_ONLY);

@@ -1,5 +1,6 @@
 import { CombatRoll, GameRound, GameState, MapState, PlayerCommand, PlayerDeployment } from "./../model/gameplay";
 import { formatDatetime } from "../public/src/sengine/utils";
+import { compareByKey, compareByNumber } from "../utils";
 
 const BASE_DICE_MIN = 1;
 const BASE_DICE_MAX = 10;
@@ -23,6 +24,10 @@ export async function executeNextTurn(db: any, game: GameState) {
         (prev: PlayerCommand[], cur: string) => [...prev, ...game.pendingCommandSets[cur].commands],
         []
     );
+    // Take copy of the original commands to store to db, as this list is mutated during the execution
+    const originalCommands: PlayerCommand[] = [];
+    for (let cmd of commands) originalCommands.push({ ...cmd });
+
     const deployments = Object.keys(game.pendingCommandSets).reduce(
         (prev: PlayerDeployment[], cur: string) => [...prev, ...game.pendingCommandSets[cur].deployments],
         []
@@ -30,7 +35,6 @@ export async function executeNextTurn(db: any, game: GameState) {
 
     // Build the current map state from turn history and current round
     const nextRound = game.turnHistory.length;
-    // let mapState = buildMapState(game, nextRound);
     let mapState = game.turnHistory[nextRound - 1]?.endingMapState ?? game.initialRegionState;
 
     // Apply the deployments to the map state
@@ -46,7 +50,7 @@ export async function executeNextTurn(db: any, game: GameState) {
         executedAt: formatDatetime(new Date()),
         roundNumber: nextRound,
         deployments,
-        commands,
+        commands: originalCommands,
         rolls,
         endingMapState: newState,
     };
@@ -103,9 +107,9 @@ function _rollToResolve(
         }
         let damagedPlayer = lowestPlayers[0];
 
-        // lowest rolling player loses unit from random command
-        const remainingArmies = armies[damagedPlayer].filter((army) => army.amount);
-        let reducedCommand = remainingArmies[Math.floor(Math.random() * remainingArmies.length)];
+        // lowest rolling player loses unit from largest army
+        const remainingArmies = armies[damagedPlayer].filter((army) => army.amount).sort(compareByNumber("amount"));
+        let reducedCommand = remainingArmies[remainingArmies.length - 1];
         reducedCommand.amount--;
         if (reducedCommand.amount < 0) throw new Error("broke something");
         console.log("reduced army size from command", reducedCommand);
@@ -119,10 +123,14 @@ function _rollToResolve(
         );
         console.log("active players", activePlayers);
         if (activePlayers.length === 1) {
-            const lastCommand = armies[activePlayers[0]].find((cmd) => cmd.amount > 0);
-            console.log("only", activePlayers[0], "remains, they win with", lastCommand);
-            if (!lastCommand) throw new Error("This can also never happen");
-            remainder = { ...lastCommand };
+            const finalAmount = armies[activePlayers[0]].reduce((prev, cur) => prev + cur.amount, 0);
+            console.log("only", activePlayers[0], "remains, they win with", finalAmount);
+            remainder = {
+                player: activePlayers[0],
+                origin: armies[activePlayers[0]][0].origin,
+                target: armies[activePlayers[0]][0].target,
+                amount: finalAmount,
+            };
             break;
         }
     }
@@ -216,7 +224,7 @@ function _applyCommands(
 
         // Resolve this regions conflicting commands, including the existing army as a new command
         let armies: { [player: string]: PlayerCommand[] } = {
-            [currentOwner]: [{ origin: region, target: region, amount: mapState[region].size }],
+            [currentOwner]: [{ origin: region, target: region, amount: mapState[region].size, player: currentOwner }],
         };
         for (let command of incoming) {
             let player = mapState[command.origin].owner;
@@ -232,7 +240,7 @@ function _applyCommands(
 
         // Store the rolls and apply the remainder to the map state
         if (!existingRolls) rolls.push(...newRolls);
-        mapState[region].owner = originalState[remainder.origin].owner;
+        mapState[region].owner = remainder.player;
         mapState[region].size = remainder.amount;
     }
 

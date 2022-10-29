@@ -88,7 +88,6 @@ class UnitAvatar {
         startRect = new PIXI.Rectangle(0, 2, 26, 36)
     ) {
         this._stage = stage;
-
         // Copy texture so we can change frame only for this unit
         this._texture = assetLoader.loadTexture(path);
 
@@ -144,9 +143,9 @@ class UnitAvatar {
     }
 
     destroy() {
-        this._stage.removeChild(this.sprite);
-        this._stage.removeChild(this._counterSprite);
-        this._stage.removeChild(this._counterLabel);
+        this.sprite.destroy();
+        this._counterSprite.destroy();
+        this._counterLabel.destroy();
     }
 
     setCounterVisibility(flag: boolean) {
@@ -205,8 +204,7 @@ class UnitAvatar {
     }
 
     playDeathAnimation() {
-        this.shake(4);
-        setTimeout(() => this.fade(0.01, 0.01), 500);
+        this.fade(0.01, 0.01);
     }
 
     // Called externally for permanent walking
@@ -238,9 +236,10 @@ class UnitAvatar {
         this._currentFrame = 0;
     }
 
-    stopAnimation() {
-        if (this._forceLoop) return;
+    stopAnimation(force = false) {
+        if (this._forceLoop && !force) return;
         this._animation = Animation.Stand;
+        this._forceLoop = false;
         this._looping = false;
         this._currentFrame = 1;
     }

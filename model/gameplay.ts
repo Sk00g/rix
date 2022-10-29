@@ -1,4 +1,4 @@
-import joi from "joi";
+import joi, { string } from "joi";
 import { Player } from "./lobby";
 
 export type MapState = { [regionName: string]: { owner: string; size: number } };
@@ -9,6 +9,7 @@ export interface PlayerDeployment {
 }
 
 export interface PlayerCommand {
+    player: string;
     origin: string; // Region name
     target: string; // Region name
     amount: number;
@@ -33,6 +34,7 @@ export const GenerateCommandSetValidator = (game: GameState) =>
             joi.object({
                 origin: joi.allow(...Object.keys(game.initialRegionState)),
                 target: joi.allow(...Object.keys(game.initialRegionState)),
+                player: joi.string(),
                 amount: joi.number().min(1),
             })
         ),

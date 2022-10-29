@@ -89,8 +89,8 @@ export default class GameStateManager extends StateManagerBase {
         // Setup HUD that exists across all states
         this._setupHud();
 
-        // this.resetToHomeState();
-        this.resetState(GameplayStateType.REPLAY_TURN);
+        this.resetToHomeState();
+        // this.resetState(GameplayStateType.REPLAY_TURN);
 
         // Setup HUD to respond to events
         this._handler.on(GameStateEvent.PlayerCompletedTurn, (player: string) => {
